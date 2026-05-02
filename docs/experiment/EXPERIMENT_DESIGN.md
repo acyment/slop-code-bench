@@ -35,6 +35,7 @@ Checkpoint-level rows are still recorded for pass/fail matrices, regression coun
 ## Pilot Shape
 
 - Problems: 5-6 selected SCBench problems.
+- Selected first-pilot set: `code_search`, `file_backup`, `migrate_configs`, `log_query`, `file_merger`, and `textdrop`.
 - Conditions: C0, C1, C2.
 - Model/agent harness: one fixed model and agent harness.
 - Replicates: 3 per condition if budget allows.
@@ -46,7 +47,7 @@ Checkpoint-level rows are still recorded for pass/fail matrices, regression coun
 
 Use this cut before spending on the full pilot:
 
-- Problems: `xjq`, `code_search`.
+- Problems: `code_search`, `file_backup`.
 - Conditions: C0 and C2.
 - Model/agent: one fixed model and one fixed harness.
 - Replicates: 1.
@@ -71,7 +72,7 @@ MVP may skip:
 - enriched reporting dashboard,
 - LLM judge metrics,
 - C3-C5 prompt interventions,
-- broad problem inventory automation if the two MVP problems are manually pinned.
+- broad problem inventory reruns after the selected MVP problems are pinned.
 
 ## Comparability Rules
 
@@ -141,4 +142,3 @@ Suggested first statistical treatment after data exists:
 - Should C1 use only `.feature` files or also a generated markdown spec package with examples extracted from Gherkin?
 - Should locked `.feature` files be visible but read-only, or copied outside the implementation workspace and only rendered into prompt context?
 - Should hidden SCBench tests be evaluated after every checkpoint or only at trajectory end? Proposed: every checkpoint, matching SCBench.
-

@@ -84,7 +84,7 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 
 ## Proposed First Pilot
 
-- Problems: 5-6 SCBench problems, provisionally `xjq`, `code_search`, `file_backup`, `log_query`, `file_merger`, and `textdrop`.
+- Problems: `code_search`, `file_backup`, `migrate_configs`, `log_query`, `file_merger`, and `textdrop`.
 - Conditions: C0, C1, C2.
 - Model/agent: one fixed model and one fixed agent harness.
 - Replicates: 3 per condition if cost permits.
@@ -93,7 +93,7 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 
 ## Minimum Viable Pilot
 
-- Problems: `xjq` and `code_search`.
+- Problems: `code_search` and `file_backup`.
 - Conditions: C0 and C2 only.
 - Model/agent: one fixed model and one fixed agent harness.
 - Replicates: 1.

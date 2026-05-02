@@ -91,6 +91,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-020 - Build Problem Inventory Script
 
 - Phase: Problem selection
+- Status: completed in `experiment/scripts/select_problems.py`
 - Rationale: Selection should be auditable, not hand-picked after results.
 - Description: Implement `experiment/scripts/select_problems.py` to parse all problem configs and summarize category, tags, difficulty, checkpoints, dependencies, static assets, and prior-test behavior.
 - Dependencies: EXP-003
@@ -102,6 +103,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-021 - Measure Reference Test Runtime
 
 - Phase: Problem selection
+- Status: completed for selected candidates in `experiment/results/problem_inventory.jsonl`
 - Rationale: Avoid unexpectedly expensive first pilot problems.
 - Description: Run reference solution tests or available oracle checks for candidate problems and record runtime by checkpoint.
 - Dependencies: EXP-020
@@ -113,12 +115,13 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-022 - Finalize First 5-6 Problems
 
 - Phase: Problem selection
+- Status: completed in `docs/experiment/PROBLEM_SELECTION.md`
 - Rationale: The pilot needs a fixed problem set before prompt/harness work.
-- Description: Apply selection criteria and choose final problems. Provisional set is `xjq`, `code_search`, `file_backup`, `log_query`, `file_merger`, `textdrop`.
+- Description: Apply selection criteria and choose final problems. Final selected set is `code_search`, `file_backup`, `migrate_configs`, `log_query`, `file_merger`, `textdrop`.
 - Dependencies: EXP-020, EXP-021
 - Acceptance criteria: `PROBLEM_SELECTION.md` updated with final set, exclusions, and rationale.
 - Complexity: S
-- Implementation notes: Keep MVP as `xjq` and `code_search` unless runtime inspection changes it.
+- Implementation notes: Runtime inspection changed MVP to `code_search` and `file_backup`; keep `xjq` as an alternate pending reference mismatch triage.
 - Risks/unknowns: provisional set may shift after runtime and fixture inspection.
 
 ## Milestone 4 - Experiment Design Finalization
@@ -162,7 +165,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 
 - Phase: Gherkin conversion prototype
 - Rationale: MVP needs concrete feature files to validate the pipeline.
-- Description: Convert all checkpoints for `xjq` and `code_search` into `.feature` files.
+- Description: Convert all checkpoints for `code_search` and `file_backup` into `.feature` files.
 - Dependencies: EXP-040
 - Acceptance criteria: feature files exist, parse with selected Gherkin parser, and include conversion ledger entries.
 - Complexity: L
@@ -199,7 +202,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Rationale: MVP problems are CLI-oriented.
 - Description: Add helpers for command execution, stdin, stdout/stderr assertions, JSONL parsing, temp files, and exit-code checks.
 - Dependencies: EXP-050
-- Acceptance criteria: helpers can run `xjq` and `code_search` scenarios against reference solutions.
+- Acceptance criteria: helpers can run `code_search` and `file_backup` scenarios against reference solutions.
 - Complexity: M
 - Implementation notes: Keep helpers generic and locked in C2.
 - Risks/unknowns: entrypoint handling must match SCBench.

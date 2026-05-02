@@ -30,7 +30,7 @@ Deliverables:
 
 Scope:
 
-- `xjq`, `code_search`,
+- `code_search`, `file_backup`,
 - C0 vs C2,
 - one model/harness,
 - one replicate.
@@ -50,7 +50,7 @@ Deliverables:
 
 Scope:
 
-- 5-6 problems,
+- `code_search`, `file_backup`, `migrate_configs`, `log_query`, `file_merger`, and `textdrop`,
 - C0/C1/C2,
 - one model/harness,
 - 3 replicates if budget allows.
@@ -118,4 +118,3 @@ Deliverables:
 - expanded study design,
 - multi-model report,
 - limitations and external-validity analysis.
-

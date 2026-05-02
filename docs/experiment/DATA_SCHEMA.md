@@ -20,9 +20,9 @@ One row per full trajectory.
 ```json
 {
   "schema_version": 1,
-  "run_id": "20260502-c2-xjq-r01",
+  "run_id": "20260502-c2-code-search-r01",
   "condition_id": "C2",
-  "problem_id": "xjq",
+  "problem_id": "code_search",
   "replicate_id": 1,
   "model": "provider/model",
   "agent_harness": "codex|claude_code|other",
@@ -50,9 +50,9 @@ One row per trajectory checkpoint.
 ```json
 {
   "schema_version": 1,
-  "run_id": "20260502-c2-xjq-r01",
+  "run_id": "20260502-c2-code-search-r01",
   "condition_id": "C2",
-  "problem_id": "xjq",
+  "problem_id": "code_search",
   "checkpoint_id": "checkpoint_3",
   "checkpoint_index": 3,
   "replicate_id": 1,
@@ -107,13 +107,13 @@ One row per visible Gherkin scenario execution.
 ```json
 {
   "schema_version": 1,
-  "run_id": "20260502-c2-xjq-r01",
-  "problem_id": "xjq",
+  "run_id": "20260502-c2-code-search-r01",
+  "problem_id": "code_search",
   "checkpoint_id": "checkpoint_3",
-  "scenario_id": "xjq.cp003.css-selector-basic",
-  "feature_path": "experiment/features/xjq/checkpoint_003.feature",
-  "scenario_name": "Select elements with a CSS selector",
-  "tags": ["problem:xjq", "checkpoint:3", "core", "positive"],
+  "scenario_id": "code_search.cp003.literal-query-basic",
+  "feature_path": "experiment/features/code_search/checkpoint_003.feature",
+  "scenario_name": "Find matching code lines with a literal query",
+  "tags": ["problem:code_search", "checkpoint:3", "core", "positive"],
   "status": "passed|failed|error|skipped",
   "failure_type": "scenario_failure|step_error|product_error|harness_error|null",
   "duration_ms": 123.4,
@@ -129,8 +129,8 @@ One row per checkpoint, split out for easier analytics.
 ```json
 {
   "schema_version": 1,
-  "run_id": "20260502-c2-xjq-r01",
-  "problem_id": "xjq",
+  "run_id": "20260502-c2-code-search-r01",
+  "problem_id": "code_search",
   "checkpoint_id": "checkpoint_3",
   "condition_id": "C2",
   "replicate_id": 1,
@@ -169,4 +169,3 @@ Primary keys:
 - `checkpoints`: `(run_id, checkpoint_id)`
 - `scenarios`: `(run_id, checkpoint_id, scenario_id)`
 - `technical_metrics`: `(run_id, checkpoint_id)`
-
