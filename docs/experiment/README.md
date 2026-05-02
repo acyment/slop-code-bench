@@ -33,6 +33,15 @@ Primary sources inspected on 2026-05-02:
   - `src/slop_code/metrics/checkpoint/composites.py`
   - `src/slop_code/metrics/checkpoint/mass.py`
   - `src/slop_code/metrics/checkpoint/extractors.py`
+- Runner source files inspected locally for Milestone 2:
+  - `src/slop_code/agent_runner/runner.py`
+  - `src/slop_code/agent_runner/reporting.py`
+  - `src/slop_code/evaluation/config.py`
+  - `src/slop_code/evaluation/collection.py`
+  - `src/slop_code/evaluation/pytest_runner.py`
+  - `src/slop_code/metrics/quality_io.py`
+  - `src/slop_code/entrypoints/evaluation/metrics.py`
+  - `src/slop_code/entrypoints/commands/run_agent.py`
 - Problem repo files inspected:
   - top-level problem list
   - `config.yaml` for `xjq`, `code_search`, `file_backup`, `file_merger`, `file_query_tool`, `log_query`, `textdrop`, `execution_server`, `recli`, and `dynamic_config_service_api`
@@ -52,6 +61,7 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - Problems are directories containing `config.yaml`, `checkpoint_N.md` specs, static files, reference solutions, and pytest tests.
 - Checkpoints are represented in `config.yaml`; each checkpoint has version/order/state and may configure timeout and `include_prior_tests`.
 - Evaluation is pytest-based. Tests from prior checkpoints are automatically classified as regression when `include_prior_tests` is true.
+- Hidden pytest tests are staged only during evaluation by copying selected files into `.evaluation_tests` in an evaluation workspace.
 - The runner records structured evaluation output in `evaluation.json` and supports pass policies such as `core-cases` and `all-cases`.
 - Metrics already include static quality measures, cost/time/token/step fields, pass rates, and composite `verbosity` and `erosion` summaries.
 - SCBench computes verbosity from flagged verbose/slop lines or a fallback of clone ratio plus violation percentage. Erosion is the high-complexity mass share where function mass is `cyclomatic_complexity * sqrt(sloc)` and high complexity means CC greater than 10.
@@ -59,12 +69,15 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 ## Files
 
 - `BACKLOG.md`: task-level implementation backlog.
+- `BENCHMARK_ARCHITECTURE.md`: native runner/problem/evaluation/metrics data flow.
 - `EXPERIMENT_DESIGN.md`: pilot design, MVP cut, decision log.
+- `HIDDEN_TEST_SEPARATION.md`: file visibility model and C2 lock requirements.
 - `REPO_FORK_PLAN.md`: upstream/fork/branch and integration plan.
 - `PROBLEM_SELECTION.md`: selection criteria and provisional first problem set.
 - `CONDITIONS.md`: definitions for C0-C5.
 - `PROMPT_TEMPLATES.md`: templates for implementation-agent prompts.
 - `METRICS.md`: metric definitions and extraction plan.
+- `METRIC_FIELD_MAP.md`: native SCBench field-to-schema map.
 - `DATA_SCHEMA.md`: JSONL/SQLite-friendly data schema.
 - `RISK_REGISTER.md`: risks and mitigations.
 - `ROADMAP.md`: phased plan beyond the first pilot.
@@ -85,4 +98,3 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - Model/agent: one fixed model and one fixed agent harness.
 - Replicates: 1.
 - Purpose: validate repository setup, prompt generation, lock enforcement, acceptance execution, hidden scoring, metric extraction, and export end to end.
-

@@ -53,6 +53,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-010 - Document Native SCBench Data Flow
 
 - Phase: Benchmark architecture understanding
+- Status: completed in `docs/experiment/BENCHMARK_ARCHITECTURE.md`
 - Rationale: The experiment should wrap SCBench, not replace it.
 - Description: Trace `slop-code run`, `eval`, and `metrics static` outputs from docs/source into a short architecture note.
 - Dependencies: EXP-001
@@ -64,6 +65,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-011 - Verify Hidden-Test Separation Mechanism
 
 - Phase: Benchmark architecture understanding
+- Status: completed in `docs/experiment/HIDDEN_TEST_SEPARATION.md`
 - Rationale: Hidden tests must stay hidden from implementation agents.
 - Description: Inspect runner prompt construction and workspace staging to confirm tests are not copied into the agent-visible workspace during inference.
 - Dependencies: EXP-010
@@ -75,6 +77,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-012 - Map Native Metric Fields
 
 - Phase: Benchmark architecture understanding
+- Status: completed in `docs/experiment/METRIC_FIELD_MAP.md`
 - Rationale: Technical drift should reuse SCBench definitions first.
 - Description: Create a field map for native metrics: pass rates, cost, tokens, duration, steps, verbosity, erosion, complexity, clone metrics, and graph metrics.
 - Dependencies: EXP-010
@@ -412,4 +415,3 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Complexity: XL
 - Implementation notes: Requires separate harness-quality rubric.
 - Risks/unknowns: generated harness may encode wrong behavior.
-
