@@ -81,6 +81,8 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `DATA_SCHEMA.md`: JSONL/SQLite-friendly data schema.
 - `RISK_REGISTER.md`: risks and mitigations.
 - `ROADMAP.md`: phased plan beyond the first pilot.
+- `../../experiment/configs/*.yaml`: MVP and first-pilot run matrix configs.
+- `../../experiment/schemas/run_matrix.schema.json`: schema for run matrix configs.
 
 ## Proposed First Pilot
 
@@ -98,3 +100,19 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - Model/agent: one fixed model and one fixed agent harness.
 - Replicates: 1.
 - Purpose: validate repository setup, prompt generation, lock enforcement, acceptance execution, hidden scoring, metric extraction, and export end to end.
+
+## Run Matrix Configs
+
+Milestone 4 freezes five initial run matrices:
+
+- `experiment/configs/mvp_c0.yaml`
+- `experiment/configs/mvp_c2.yaml`
+- `experiment/configs/pilot_c0.yaml`
+- `experiment/configs/pilot_c1.yaml`
+- `experiment/configs/pilot_c2.yaml`
+
+Validate them with:
+
+```bash
+uv run python experiment/scripts/validate_run_matrix.py
+```

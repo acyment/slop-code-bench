@@ -1,5 +1,48 @@
 # Conditions
 
+Status: frozen for the first MVP and C0/C1/C2 pilot design. Any later change must update the run-matrix configs in `experiment/configs/` and rerun `experiment/scripts/validate_run_matrix.py`.
+
+## Common Rules For C0-C2
+
+- Hidden SCBench pytest tests are never visible to the implementation agent.
+- Native hidden SCBench evaluation remains the final correctness judge.
+- Visible Gherkin acceptance checks, when present, are intervention diagnostics and workflow feedback, not replacements for hidden scoring.
+- All conditions preserve native SCBench checkpoint ordering and prior-snapshot handoff behavior.
+- All conditions use the same selected problems, model, agent harness, upstream commits, environment config, pass policy, and replicate seeds within a comparison block.
+- Implementation agents must preserve prior behavior at every checkpoint.
+- Native evaluator stdout/stderr and hidden-test failure details are not fed back to the implementation agent during a trajectory unless a later condition explicitly pre-registers that feedback.
+
+## File Visibility Matrix
+
+| File or artifact | C0 | C1 | C2 |
+| --- | --- | --- | --- |
+| Native checkpoint prose | visible | converted into Gherkin context | converted into Gherkin context |
+| Gherkin `.feature` files | hidden/not used | visible as read-only spec context | visible and locked |
+| Gherkin step definitions | hidden/not used | hidden/not used | visible enough to run, locked against edits |
+| Visible acceptance command | hidden/not used | hidden/not used | visible/runnable |
+| Native SCBench pytest tests | hidden | hidden | hidden |
+| Experiment scripts/schemas/locks | hidden from prompt unless needed by command docs | locked where referenced | locked |
+| Native hidden evaluation result | external scorer only | external scorer only | external scorer only |
+
+## Lock And Invalid-Run Policy
+
+For C1 and C2, experiment-owned spec and harness files are protected by a before/after checkpoint manifest. For C2 this includes:
+
+- `experiment/features/**`
+- `experiment/steps/**`
+- `experiment/prompts/**`
+- `experiment/scripts/**`
+- `experiment/schemas/**`
+- `experiment/locks/**`
+
+If a locked file changes during an implementation run:
+
+- record `locked_file_violation: true`,
+- preserve the changed artifact for audit,
+- still run native hidden evaluation when feasible,
+- mark the trajectory as a protocol violation,
+- exclude the trajectory from the primary causal comparison unless a robustness analysis explicitly includes protocol violations.
+
 ## C0 - Baseline Prose
 
 The implementation agent receives the original SCBench checkpoint spec, as close as possible to the benchmark's intended baseline.
@@ -11,6 +54,7 @@ Rules:
 - Do not expose hidden pytest tests.
 - Do not expose acceptance harness files.
 - Preserve SCBench checkpoint order and prior solution handoff.
+- No experiment lock manifest is needed because no experiment spec/harness files are exposed.
 
 Primary purpose: baseline comparability.
 
@@ -25,6 +69,7 @@ Rules:
 - Do not provide runnable Gherkin commands.
 - Do not expose step definitions.
 - Do not expose hidden SCBench pytest tests.
+- Verify feature/prompt/context files before and after each checkpoint.
 
 Gherkin requirements:
 
@@ -50,6 +95,7 @@ Rules:
 - Agent may run acceptance commands.
 - Scorer independently reruns acceptance and hidden SCBench tests after each checkpoint.
 - Hidden SCBench pytest tests remain hidden from the implementation agent.
+- Feature, step, prompt, script, schema, and lock files are verified before and after each checkpoint.
 
 Primary purpose: isolate executable behavioral harness effect.
 
@@ -100,4 +146,3 @@ Rules:
 - compare to maintainer-authored locked steps from C2.
 
 Primary purpose: evaluate whether generated acceptance automation is reliable enough to be part of the workflow.
-

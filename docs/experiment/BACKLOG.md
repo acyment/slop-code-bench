@@ -129,6 +129,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-030 - Freeze Condition Definitions
 
 - Phase: Experiment design finalization
+- Status: completed in `docs/experiment/CONDITIONS.md`
 - Rationale: C0/C1/C2 must isolate different causal factors.
 - Description: Review and freeze condition rules, visible/hidden file exposure, lock behavior, and invalid-run policy.
 - Dependencies: EXP-011
@@ -140,6 +141,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-031 - Define Run Matrix
 
 - Phase: Experiment design finalization
+- Status: completed in `experiment/configs/*.yaml`
 - Rationale: Runs should be paired and reproducible.
 - Description: Generate MVP and full pilot config YAML files listing problems, conditions, replicates, model, agent harness, and seeds.
 - Dependencies: EXP-022, EXP-030

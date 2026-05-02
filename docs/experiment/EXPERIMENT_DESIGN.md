@@ -128,11 +128,13 @@ Suggested first statistical treatment after data exists:
 | --- | --- | --- | --- |
 | 2026-05-02 | Target current SCBench repos, not only the paper snapshot. | Proposed | Current site/repo have more problems/checkpoints; pin commits for reproducibility. |
 | 2026-05-02 | Keep hidden SCBench pytest evaluation as final correctness judge. | Proposed | Preserves comparability with SCBench. |
-| 2026-05-02 | Use C0/C1/C2 only in first pilot. | Proposed | Separates spec format effect from executable harness effect. |
+| 2026-05-02 | Use C0/C1/C2 only in first pilot. | Frozen for MVP/pilot configs | Separates spec format effect from executable harness effect. |
+| 2026-05-02 | Use `code_search` and `file_backup` for MVP. | Frozen for MVP configs | Small CLI/file-processing pair with viable runtime and full trajectories. |
+| 2026-05-02 | Use `code_search`, `file_backup`, `migrate_configs`, `log_query`, `file_merger`, and `textdrop` for first pilot. | Frozen for pilot configs | Covers CLI, file-processing, and small service/API-style observable behavior without UI automation. |
 | 2026-05-02 | Author C2 step definitions as experiment-maintainer code. | Proposed | Avoids confounding harness generation with implementation quality. |
 | 2026-05-02 | Use example-enriched Gherkin first, with an information-parity ablation later. | Proposed | Tests the intended workflow first while recording added information. |
 | 2026-05-02 | Expose prior checkpoint feature files to C1/C2 agents. | Proposed | Prior behavior preservation is part of the intended intervention. |
-| 2026-05-02 | Treat harness edits in C2+ as invalid run unless caused by benchmark tooling. | Proposed | Lock violation corrupts the condition. |
+| 2026-05-02 | Treat locked-file changes in C1/C2 as protocol violations excluded from the primary comparison. | Frozen for MVP/pilot configs | Lock violations corrupt the condition; artifacts are still retained for audit. |
 | 2026-05-02 | Start with one model/harness. | Proposed | Reduces cost and design confounds for pipeline validation. |
 
 ## Unresolved Questions

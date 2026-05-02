@@ -9,6 +9,7 @@ Current setup status:
 - `EXP-004`: reproducibility document is present.
 - `EXP-010`-`EXP-012`: native SCBench architecture, hidden-test staging, and metric fields are documented.
 - `EXP-020`-`EXP-022`: problem inventory, reference-runtime probes, and first pilot selection are present.
+- `EXP-030`-`EXP-031`: condition definitions are frozen and run-matrix configs validate.
 
 The experiment is designed to wrap SCBench rather than modify benchmark internals. Keep runner, problem, scoring, and hidden-test behavior pinned and documented.
 
@@ -29,4 +30,4 @@ experiment/
 
 ## Next Setup Step
 
-Continue with Milestone 4, starting at `EXP-030`.
+Continue with Milestone 5, starting at `EXP-040`.

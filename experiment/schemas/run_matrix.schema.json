@@ -1,0 +1,214 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://speccommons.local/scbench/run_matrix.schema.json",
+  "title": "SpecCommons SCBench Run Matrix",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "matrix_id",
+    "condition",
+    "problems",
+    "replicates",
+    "model",
+    "agent_harness",
+    "runner",
+    "outputs",
+    "lock_policy"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "matrix_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["design_locked", "ready_to_run", "paused"]
+    },
+    "condition": {
+      "type": "object",
+      "required": [
+        "id",
+        "spec_context",
+        "gherkin_context_visible",
+        "acceptance_harness_visible",
+        "acceptance_harness_runnable",
+        "hidden_tests_visible_to_agent",
+        "prompt_template"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "enum": ["C0", "C1", "C2"]
+        },
+        "spec_context": {
+          "type": "string",
+          "enum": ["native_prose", "gherkin_spec_package", "gherkin_executable_package"]
+        },
+        "gherkin_context_visible": {
+          "type": "boolean"
+        },
+        "acceptance_harness_visible": {
+          "type": "boolean"
+        },
+        "acceptance_harness_runnable": {
+          "type": "boolean"
+        },
+        "hidden_tests_visible_to_agent": {
+          "type": "boolean",
+          "const": false
+        },
+        "prompt_template": {
+          "type": "string"
+        },
+        "completion_policy": {
+          "type": "string"
+        }
+      }
+    },
+    "problems": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "pattern": "^[a-z0-9_]+$"
+      }
+    },
+    "replicates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["replicate_id", "seed"],
+        "additionalProperties": false,
+        "properties": {
+          "replicate_id": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "seed": {
+            "type": "integer",
+            "minimum": 1
+          }
+        }
+      }
+    },
+    "model": {
+      "type": "object",
+      "required": ["provider", "name"],
+      "additionalProperties": false,
+      "properties": {
+        "provider": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "temperature": {
+          "type": "number",
+          "minimum": 0
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "agent_harness": {
+      "type": "object",
+      "required": ["id", "version"],
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "runner": {
+      "type": "object",
+      "required": [
+        "benchmark_repo",
+        "benchmark_commit",
+        "problem_repo",
+        "problem_commit",
+        "native_environment",
+        "pass_policy"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "benchmark_repo": {
+          "type": "string"
+        },
+        "benchmark_commit": {
+          "type": "string"
+        },
+        "problem_repo": {
+          "type": "string"
+        },
+        "problem_commit": {
+          "type": "string"
+        },
+        "native_environment": {
+          "type": "string"
+        },
+        "pass_policy": {
+          "type": "string"
+        }
+      }
+    },
+    "outputs": {
+      "type": "object",
+      "required": ["run_root", "normalized_results_jsonl", "artifact_manifest"],
+      "additionalProperties": false,
+      "properties": {
+        "run_root": {
+          "type": "string"
+        },
+        "normalized_results_jsonl": {
+          "type": "string"
+        },
+        "artifact_manifest": {
+          "type": "string"
+        }
+      }
+    },
+    "lock_policy": {
+      "type": "object",
+      "required": ["mode", "locked_paths", "violation_policy"],
+      "additionalProperties": false,
+      "properties": {
+        "mode": {
+          "type": "string",
+          "enum": ["none", "manifest_before_after_checkpoint"]
+        },
+        "locked_paths": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "violation_policy": {
+          "type": "string",
+          "enum": [
+            "not_applicable",
+            "mark_protocol_violation_and_exclude_primary"
+          ]
+        }
+      }
+    }
+  }
+}
