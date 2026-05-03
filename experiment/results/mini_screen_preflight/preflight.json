@@ -1,0 +1,111 @@
+{
+  "checks": [
+    {
+      "details": {
+        "added_files": [],
+        "changed_files": [],
+        "checked_at": "2026-05-03T16:33:23.225993Z",
+        "file_count_after": 105,
+        "file_count_before": 105,
+        "freeze_hash": "e34b5e48381a82c8265e123a3e6c6127b1c2de92dd81ca696081d098c11d8a51",
+        "freeze_status": "pre_execution_artifact_freeze",
+        "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
+        "missing_patterns_after": [],
+        "missing_patterns_before": [],
+        "primary_run_gate": {
+          "reason": "The artifact package is frozen, but the full pilot should not run until locked C2 visible acceptance coverage exists for every selected C2 problem checkpoint.",
+          "status": "blocked"
+        },
+        "protocol_violation": false,
+        "removed_files": [],
+        "schema_version": 1,
+        "status": "unchanged"
+      },
+      "freeze_hash": "e34b5e48381a82c8265e123a3e6c6127b1c2de92dd81ca696081d098c11d8a51",
+      "id": "pilot_artifacts.freeze_manifest",
+      "message": "Freeze manifest matches current files.",
+      "status": "pass"
+    },
+    {
+      "id": "mini_screen_c0.model_agent_selected",
+      "matrix_id": "mini_screen_c0",
+      "message": "Model and agent are selected.",
+      "status": "pass"
+    },
+    {
+      "id": "mini_screen_c2.model_agent_selected",
+      "matrix_id": "mini_screen_c2",
+      "message": "Model and agent are selected.",
+      "status": "pass"
+    },
+    {
+      "id": "trajectory.execution_bridge",
+      "message": "run_trajectory.py appears to support a non-dry-run execution mode.",
+      "status": "pass"
+    },
+    {
+      "id": "c2.acceptance_snapshot_bridge",
+      "message": "C2 acceptance command points at a workspace-local standalone runner.",
+      "status": "pass"
+    },
+    {
+      "checked_checkpoint_slots": 6,
+      "id": "c2.acceptance_coverage",
+      "message": "C2 visible acceptance coverage exists for every selected checkpoint.",
+      "missing_checkpoint_slots": [],
+      "status": "pass"
+    },
+    {
+      "blockers": [],
+      "id": "reduced_drift.evidence_gate",
+      "message": "Configured run matrix is evidence-producing for a directional reduced-drift probe.",
+      "minimum_checkpoint_depth": 3,
+      "ready": true,
+      "required_conditions": [
+        "C0",
+        "C2"
+      ],
+      "status": "pass"
+    }
+  ],
+  "evidence_gate": {
+    "blockers": [],
+    "message": "Configured run matrix is evidence-producing for a directional reduced-drift probe.",
+    "ready": true
+  },
+  "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
+  "generated_at": "2026-05-03T16:33:23.235180Z",
+  "matrix_summary": {
+    "matrices": [
+      {
+        "checkpoint_counts": {
+          "code_search": 3,
+          "file_backup": 3
+        },
+        "checkpoint_executions": 6,
+        "condition_id": "C0",
+        "matrix_id": "mini_screen_c0",
+        "problem_count": 2,
+        "replicate_count": 1,
+        "trajectory_count": 2
+      },
+      {
+        "checkpoint_counts": {
+          "code_search": 3,
+          "file_backup": 3
+        },
+        "checkpoint_executions": 6,
+        "condition_id": "C2",
+        "matrix_id": "mini_screen_c2",
+        "problem_count": 2,
+        "replicate_count": 1,
+        "trajectory_count": 2
+      }
+    ],
+    "total_checkpoint_executions": 12,
+    "total_trajectories": 4
+  },
+  "profile": "mini_screen",
+  "schema_version": 1,
+  "status": "ready"
+}
