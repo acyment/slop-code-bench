@@ -8,6 +8,8 @@ For each trajectory, compute the largest checkpoint index `k` such that all chec
 
 Strict pass should use SCBench's full current-plus-prior hidden evaluation where available. If SCBench exports `strict_pass_rate`, require `strict_pass_rate == 1.0`.
 
+For C2 primary analysis, a checkpoint also must have `visible_acceptance_passed == true` and `c2_feedback_status == "observed"`. Otherwise the executable-spec intervention was not actually active for that checkpoint.
+
 ### Regression Rate
 
 For checkpoint `n`, count prior-checkpoint tests that previously passed but fail after checkpoint `n`.

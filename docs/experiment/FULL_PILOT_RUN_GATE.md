@@ -56,15 +56,15 @@ uv run python experiment/scripts/validate_full_pilot_preflight.py \
 The gate currently blocks primary execution for these reasons:
 
 1. Representative C2 visible acceptance coverage is incomplete for selected checkpoint slots.
-2. C2 visible acceptance is not yet audited or harness-enforced as implementation-time feedback before checkpoint completion.
+2. C2 visible acceptance coverage is incomplete for the full selected matrix; enforcement is now configured as harness-mediated for future C2 runs.
 3. Any freeze mismatch after protocol edits must be resolved before primary execution.
 
 ## Required Work Before EXP-101
 
 Before running the full pilot matrix:
 
-1. Implement EXP-100F so C2 requires executed visible acceptance feedback and records whether that feedback was observed by the implementation agent.
-2. Complete C2 visible acceptance coverage for selected checkpoints.
+1. Complete C2 visible acceptance coverage for selected checkpoints.
+2. Rerun the mini-screen with the harness-mediated C2 gate enabled before interpreting C2 effects.
 3. Preserve native hidden SCBench evaluation as the final judge.
 4. Re-run the freeze verifier and full-pilot preflight.
 

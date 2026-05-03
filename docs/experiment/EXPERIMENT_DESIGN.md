@@ -138,11 +138,11 @@ Suggested first statistical treatment after data exists:
 | 2026-05-02 | Treat locked-file changes in C1/C2 as protocol violations excluded from the primary comparison. | Frozen for MVP/pilot configs | Lock violations corrupt the condition; artifacts are still retained for audit. |
 | 2026-05-02 | Start with one model/harness. | Proposed | Reduces cost and design confounds for pipeline validation. |
 | 2026-05-03 | Require executed visible acceptance feedback for C2 primary evidence. | Frozen for C2 protocol | The thesis concerns an executable spec workflow that is actually executed; a runnable harness that is only scored after completion cannot prevent drift. |
+| 2026-05-03 | Use a harness-mediated C2 repair loop for the next run. | Frozen for next mini-screen | This proves visible acceptance was executed as implementation-time feedback even when agent transcripts are incomplete or inconsistent. |
 
 ## Unresolved Questions
 
 - Which exact fork owner should be used once GitHub credentials and authorization are available?
-- Should C2 enforcement use transcript-audited agent command execution first, or a harness-mediated repair loop that automatically feeds visible acceptance failures back to the agent before checkpoint closure?
 - Should C1 use only `.feature` files or also a generated markdown spec package with examples extracted from Gherkin?
 - Should locked `.feature` files be visible but read-only, or copied outside the implementation workspace and only rendered into prompt context?
 - Should hidden SCBench tests be evaluated after every checkpoint or only at trajectory end? Proposed: every checkpoint, matching SCBench.

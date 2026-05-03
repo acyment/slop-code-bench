@@ -4,10 +4,10 @@
       "details": {
         "added_files": [],
         "changed_files": [],
-        "checked_at": "2026-05-03T17:09:29.958277Z",
+        "checked_at": "2026-05-03T17:27:14.391531Z",
         "file_count_after": 105,
         "file_count_before": 105,
-        "freeze_hash": "ba79f364979b81b7b07850348ca29338d1c2fe50c13677a16656763be2d449ff",
+        "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
         "freeze_status": "pre_execution_artifact_freeze",
         "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
         "missing_patterns_after": [],
@@ -21,7 +21,7 @@
         "schema_version": 1,
         "status": "unchanged"
       },
-      "freeze_hash": "ba79f364979b81b7b07850348ca29338d1c2fe50c13677a16656763be2d449ff",
+      "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
       "id": "pilot_artifacts.freeze_manifest",
       "message": "Freeze manifest matches current files.",
       "status": "pass"
@@ -49,20 +49,10 @@
       "status": "pass"
     },
     {
-      "blockers": [
-        {
-          "enforcement": "prompt_only",
-          "matrix_id": "mini_screen_c2",
-          "required_enforcement": [
-            "agent_transcript_audited",
-            "harness_mediated"
-          ],
-          "type": "c2_acceptance_feedback_not_enforced"
-        }
-      ],
+      "blockers": [],
       "id": "c2.acceptance_feedback_enforcement",
-      "message": "C2 visible acceptance is not yet enforced as implementation-time feedback.",
-      "status": "block"
+      "message": "C2 requires executed acceptance feedback and the runner can audit or enforce it.",
+      "status": "pass"
     },
     {
       "checked_checkpoint_slots": 6,
@@ -72,45 +62,25 @@
       "status": "pass"
     },
     {
-      "blockers": [
-        {
-          "enforcement": "prompt_only",
-          "matrix_id": "mini_screen_c2",
-          "required_enforcement": [
-            "agent_transcript_audited",
-            "harness_mediated"
-          ],
-          "type": "c2_acceptance_feedback_not_enforced"
-        }
-      ],
+      "blockers": [],
       "id": "reduced_drift.evidence_gate",
-      "message": "Configured run matrix is not evidence-producing: 1 blocker(s).",
+      "message": "Configured run matrix is evidence-producing for a directional reduced-drift probe.",
       "minimum_checkpoint_depth": 3,
-      "ready": false,
+      "ready": true,
       "required_conditions": [
         "C0",
         "C2"
       ],
-      "status": "block"
+      "status": "pass"
     }
   ],
   "evidence_gate": {
-    "blockers": [
-      {
-        "enforcement": "prompt_only",
-        "matrix_id": "mini_screen_c2",
-        "required_enforcement": [
-          "agent_transcript_audited",
-          "harness_mediated"
-        ],
-        "type": "c2_acceptance_feedback_not_enforced"
-      }
-    ],
-    "message": "Configured run matrix is not evidence-producing: 1 blocker(s).",
-    "ready": false
+    "blockers": [],
+    "message": "Configured run matrix is evidence-producing for a directional reduced-drift probe.",
+    "ready": true
   },
   "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
-  "generated_at": "2026-05-03T17:09:29.974880Z",
+  "generated_at": "2026-05-03T17:27:14.404595Z",
   "matrix_summary": {
     "matrices": [
       {
@@ -143,5 +113,5 @@
   },
   "profile": "mini_screen",
   "schema_version": 1,
-  "status": "blocked"
+  "status": "ready"
 }

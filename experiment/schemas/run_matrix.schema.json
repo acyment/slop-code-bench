@@ -98,6 +98,16 @@
             "invalid_if_not_executed": {
               "type": "boolean"
             },
+            "max_repair_attempts": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "For harness-mediated C2, the number of visible-acceptance failure feedback repair attempts allowed after the initial draft."
+            },
+            "timeout_seconds": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Timeout for each harness-mediated visible acceptance execution."
+            },
             "notes": {
               "type": "string"
             }

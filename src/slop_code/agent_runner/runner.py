@@ -3,7 +3,9 @@
 from __future__ import annotations
 
 import json
+import os
 import queue
+import shlex
 import threading
 import time
 import traceback
@@ -38,9 +40,216 @@ from slop_code.metrics.quality_io import save_quality_metrics
 
 logger = get_logger(__name__)
 
+ACCEPTANCE_GATE_ENV = "SPECCOMMONS_ACCEPTANCE_GATE"
+ACCEPTANCE_GATE_MAX_REPAIRS_ENV = "SPECCOMMONS_ACCEPTANCE_GATE_MAX_REPAIRS"
+ACCEPTANCE_GATE_TIMEOUT_ENV = "SPECCOMMONS_ACCEPTANCE_GATE_TIMEOUT_SECONDS"
+ACCEPTANCE_GATE_DIR = "acceptance_gate"
+TRUTHY_ENV_VALUES = {"1", "true", "yes", "on"}
+
 
 class AgentRunnerError(Exception):
     """Exception raised by AgentRunner."""
+
+
+def _env_flag(name: str) -> bool:
+    return os.environ.get(name, "").strip().lower() in TRUTHY_ENV_VALUES
+
+
+def _env_int(name: str, default: int, *, minimum: int = 0) -> int:
+    raw = os.environ.get(name)
+    if raw is None or not raw.strip():
+        return default
+    try:
+        value = int(raw)
+    except ValueError:
+        logger.warning("Invalid integer environment value", name=name, value=raw)
+        return default
+    return max(minimum, value)
+
+
+def _truncate_text(text: str, limit: int = 20_000) -> str:
+    if len(text) <= limit:
+        return text
+    return text[:limit] + "\n[truncated]"
+
+
+def _write_json(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n")
+
+
+def _read_jsonl(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if not path.is_file():
+        return rows
+    for line in path.read_text(encoding="utf-8").splitlines():
+        stripped = line.strip()
+        if not stripped:
+            continue
+        try:
+            payload = json.loads(stripped)
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            rows.append(payload)
+    return rows
+
+
+def _scenarios_passed(rows: list[dict[str, Any]]) -> bool | None:
+    runnable = [row for row in rows if row.get("status") != "skipped"]
+    if not runnable:
+        return None
+    return all(row.get("status") == "passed" for row in runnable)
+
+
+def _scenario_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return [
+        {
+            "scenario_id": row.get("scenario_id"),
+            "status": row.get("status"),
+            "failure_type": row.get("failure_type"),
+        }
+        for row in rows
+    ]
+
+
+def _acceptance_gate_available(session: Session) -> bool:
+    return (session.working_dir / ".scbench_acceptance" / "runner.py").is_file()
+
+
+def _acceptance_gate_command(
+    *, problem_id: str, checkpoint_id: str, output_dir: Path, run_id: str
+) -> str:
+    parts = [
+        "python",
+        ".scbench_acceptance/runner.py",
+        "--workspace",
+        ".",
+        "--problem-id",
+        problem_id,
+        "--checkpoint-id",
+        checkpoint_id,
+        "--through-checkpoint",
+        "--output-dir",
+        output_dir.as_posix(),
+        "--run-id",
+        run_id,
+    ]
+    return " ".join(shlex.quote(part) for part in parts)
+
+
+def _run_acceptance_gate_attempt(
+    *,
+    session: Session,
+    checkpoint_save_dir: Path,
+    problem_id: str,
+    checkpoint_id: str,
+    attempt_index: int,
+) -> dict[str, Any]:
+    run_id = f"gate-{problem_id}-{checkpoint_id}-attempt-{attempt_index:02d}"
+    output_rel = (
+        Path(".scbench_acceptance")
+        / "gate_results"
+        / checkpoint_id
+        / f"attempt_{attempt_index:02d}"
+    )
+    command = _acceptance_gate_command(
+        problem_id=problem_id,
+        checkpoint_id=checkpoint_id,
+        output_dir=output_rel,
+        run_id=run_id,
+    )
+    started = datetime.now()
+    runtime = session.exec(command=command, disable_setup=True)
+    try:
+        result = runtime.execute(
+            env={},
+            stdin=None,
+            timeout=_env_int(ACCEPTANCE_GATE_TIMEOUT_ENV, 300, minimum=1),
+        )
+    finally:
+        runtime.cleanup()
+    completed = datetime.now()
+    scenarios_path = session.working_dir / output_rel / "scenarios.jsonl"
+    scenario_rows = _read_jsonl(scenarios_path)
+    scenario_passed = _scenarios_passed(scenario_rows)
+    passed = result.exit_code == 0 and scenario_passed is True
+    record = {
+        "schema_version": 1,
+        "problem_id": problem_id,
+        "checkpoint_id": checkpoint_id,
+        "attempt_index": attempt_index,
+        "run_id": run_id,
+        "command": command,
+        "started_at": started.isoformat(),
+        "ended_at": completed.isoformat(),
+        "elapsed_seconds": (completed - started).total_seconds(),
+        "exit_code": result.exit_code,
+        "timed_out": result.timed_out,
+        "passed": passed,
+        "scenario_passed": scenario_passed,
+        "scenario_results": scenario_rows,
+        "scenario_summary": _scenario_summary(scenario_rows),
+        "stdout": _truncate_text(result.stdout),
+        "stderr": _truncate_text(result.stderr),
+    }
+    _write_json(
+        checkpoint_save_dir
+        / ACCEPTANCE_GATE_DIR
+        / f"attempt_{attempt_index:02d}.json",
+        record,
+    )
+    return record
+
+
+def _acceptance_repair_prompt(
+    *,
+    original_task: str,
+    gate_record: dict[str, Any],
+    max_repair_attempts: int,
+) -> str:
+    failed = [
+        row
+        for row in gate_record.get("scenario_summary", [])
+        if row.get("status") != "passed"
+    ]
+    failed_lines = "\n".join(
+        f"- {row.get('scenario_id')}: {row.get('status')} ({row.get('failure_type')})"
+        for row in failed
+    )
+    if not failed_lines:
+        failed_lines = "- acceptance command failed before reporting scenario rows"
+    return f"""Visible acceptance failed after your checkpoint implementation.
+
+This is still the same checkpoint. Continue from the current workspace and repair product code only.
+Do not modify `.feature` files, step definitions, `.scbench_acceptance`, experiment harness files, scoring scripts, schemas, or lock manifests.
+
+Original checkpoint task:
+{original_task}
+
+The experiment harness executed:
+```bash
+{gate_record.get("command", "")}
+```
+
+Exit code: {gate_record.get("exit_code")}
+Timed out: {gate_record.get("timed_out")}
+
+Failing visible scenarios:
+{failed_lines}
+
+stdout:
+```text
+{gate_record.get("stdout", "")}
+```
+
+stderr:
+```text
+{gate_record.get("stderr", "")}
+```
+
+Fix the implementation, run the visible acceptance command yourself, and finish only when it passes or you hit a clear blocker. The harness will rerun visible acceptance before hidden scoring. Maximum harness-mediated repair attempts for this checkpoint: {max_repair_attempts}.
+"""
 
 
 def get_artifacts_path(checkpoint_save_dir: Path, *, compress: bool) -> Path:
@@ -696,6 +905,92 @@ class AgentRunner:
             agent_version=self.run_spec.agent_version,
             model_name=self.run_spec.model_name,
         )
+        acceptance_gate_passed: bool | None = None
+        if (
+            _env_flag(ACCEPTANCE_GATE_ENV)
+            and result is not None
+            and not result.had_error
+            and _acceptance_gate_available(self.session)
+        ):
+            max_repairs = _env_int(
+                ACCEPTANCE_GATE_MAX_REPAIRS_ENV,
+                1,
+                minimum=0,
+            )
+            task = get_task_for_checkpoint(
+                checkpoint_name=checkpoint.name,
+                spec_text=self.run_spec.problem.get_checkpoint_spec(
+                    checkpoint.name
+                ),
+                template=self.run_spec.template,
+                entry_file=self.run_spec.problem.entry_file,
+                environment=self.run_spec.environment,
+                is_first_checkpoint=is_first_checkpoint,
+                output_path=checkpoint_save_dir,
+                agent_type=self.run_spec.agent_type,
+                agent_version=self.run_spec.agent_version,
+                model_name=self.run_spec.model_name,
+            )
+            gate_attempts: list[dict[str, Any]] = []
+            repair_invocations = 0
+            for gate_index in range(1, max_repairs + 2):
+                gate_record = _run_acceptance_gate_attempt(
+                    session=self.session,
+                    checkpoint_save_dir=checkpoint_save_dir,
+                    problem_id=self.run_spec.problem.name,
+                    checkpoint_id=checkpoint.name,
+                    attempt_index=gate_index,
+                )
+                gate_attempts.append(gate_record)
+                acceptance_gate_passed = bool(gate_record["passed"])
+                if acceptance_gate_passed:
+                    break
+                if gate_index > max_repairs:
+                    break
+                repair_task = _acceptance_repair_prompt(
+                    original_task=task,
+                    gate_record=gate_record,
+                    max_repair_attempts=max_repairs,
+                )
+                repair_invocations += 1
+                snapshot_dir, result, diff = _run_inference(
+                    checkpoint_name=checkpoint.name,
+                    session=self.session,
+                    agent=self.agent,
+                    task=repair_task,
+                    save_dir=checkpoint_save_dir,
+                    replay_path=None,
+                    compress_artifacts=compress,
+                )
+                if result is None or result.had_error:
+                    break
+            _write_json(
+                checkpoint_save_dir / ACCEPTANCE_GATE_DIR / "summary.json",
+                {
+                    "schema_version": 1,
+                    "enabled": True,
+                    "mode": "harness_mediated_repair_loop",
+                    "problem_id": self.run_spec.problem.name,
+                    "checkpoint_id": checkpoint.name,
+                    "max_repair_attempts": max_repairs,
+                    "attempt_count": len(gate_attempts),
+                    "repair_attempts_used": repair_invocations,
+                    "passed": acceptance_gate_passed,
+                    "feedback_observed": any(
+                        not attempt.get("passed", False)
+                        for attempt in gate_attempts[:-1]
+                    ),
+                    "attempts": [
+                        {
+                            "attempt_index": attempt["attempt_index"],
+                            "exit_code": attempt["exit_code"],
+                            "passed": attempt["passed"],
+                            "timed_out": attempt["timed_out"],
+                        }
+                        for attempt in gate_attempts
+                    ],
+                },
+            )
         if result is not None:
             reporting.save_agent_checkpoint_info(
                 checkpoint_save_dir,
@@ -762,7 +1057,7 @@ class AgentRunner:
         )
         # Record checkpoint evaluation result for progress tracking
         self.metrics_tracker.record_checkpoint_result(checkpoint.name, report)
-        return AgentCheckpointSummary.from_results(
+        summary = AgentCheckpointSummary.from_results(
             checkpoint_name=checkpoint.name,
             path=checkpoint_save_dir,
             snapshot_dir=snapshot_dir,
@@ -772,6 +1067,9 @@ class AgentRunner:
             pass_policy=self.run_spec.pass_policy,
             evaluation_result=report,
         )
+        if acceptance_gate_passed is False:
+            summary.passed_policy = False
+        return summary
 
     def _load_checkpoint_summary(
         self,

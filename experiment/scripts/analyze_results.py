@@ -139,6 +139,11 @@ def strict_survival(
             break
         if row.get("hidden_tests_passed") is not True:
             break
+        if row.get("condition_id") == "C2":
+            if row.get("visible_acceptance_passed") is not True:
+                break
+            if row.get("c2_feedback_status") != "observed":
+                break
         last_checkpoint_id = str(row.get("checkpoint_id"))
         last_index = index
     missing_count += max(expected - len(rows_by_index), 0)
@@ -170,6 +175,9 @@ def trajectory_summary(
     hidden_failure_after_visible_pass = sum(
         1 for row in checkpoint_rows if row.get("hidden_failure_after_visible_pass") is True
     )
+    c2_feedback_observed_count = sum(
+        1 for row in checkpoint_rows if row.get("c2_feedback_status") == "observed"
+    )
     lock_violation_count = sum(
         1 for row in checkpoint_rows if row.get("protocol_violation") is True
     )
@@ -190,6 +198,7 @@ def trajectory_summary(
         "regression_failure_checkpoint_count": regression_failures,
         "hidden_failure_after_visible_pass_count": hidden_failure_after_visible_pass,
         "visible_acceptance_checkpoint_count": len(visible_rows),
+        "c2_feedback_observed_count": c2_feedback_observed_count,
         "lock_violation_count": lock_violation_count,
         "not_evaluated": not hidden_rows,
     }

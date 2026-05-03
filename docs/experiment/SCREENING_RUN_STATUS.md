@@ -6,14 +6,14 @@ Generated: 2026-05-03
 
 The native execution path is now implemented far enough to run SCBench through a condition-specific fixture without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1, and a paired reduced-drift mini-screen has now run for C0 vs C2 on `code_search` and `file_backup` through checkpoint 3.
 
-This is still directional/pipeline-only evidence. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial and C2 acceptance execution is not yet audited or harness-enforced as implementation-time feedback.
+This is still directional/pipeline-only evidence. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial. C2 acceptance feedback enforcement has now been implemented as a harness-mediated repair loop for future native runs, but the existing reduced-drift probe was run before that gate existed.
 
 ## Seven-Step Run Checklist
 
 | step | status | result |
 | --- | --- | --- |
 | 1. Implement execution bridge | done | `run_trajectory.py` supports `native-dry-run` and `native-run` by rendering condition prompts into a temporary SCBench problem root and invoking native `slop-code run`. |
-| 2. Wire C2 acceptance to snapshots | done for measurement, incomplete for intervention | C2 prompts expose `.scbench_acceptance/runner.py`; post-run snapshot acceptance can be merged into normalized results. Primary C2 evidence still needs audited agent execution or a harness-mediated repair loop. |
+| 2. Wire C2 acceptance to snapshots | done for measurement and intervention gate | C2 prompts expose `.scbench_acceptance/runner.py`; future C2 native runs enable a harness-mediated visible acceptance gate before hidden scoring, and post-run snapshot acceptance is still merged as measurement. |
 | 3. Add screening preflight | done | `validate_full_pilot_preflight.py --profile screening` checks model/agent selection, execution bridge, freeze state, C2 coverage, and C2 executed-feedback enforcement. |
 | 4. Choose fixed runtime settings | done | Screening configs use `codex_auth/gpt-5.3-codex-spark`, Codex CLI `0.128.0`, `thinking: low`, `num_workers: 1`. |
 | 5. Run one paid smoke checkpoint | done | `smoke-c2-code-search-cp1-v2` completed and passed. |
@@ -91,7 +91,7 @@ Primary artifacts:
 
 ## Current Blocker
 
-The screening preflight blocks the full screening matrix because C2 visible acceptance coverage is partial and C2 executed-feedback enforcement is missing:
+The screening preflight blocks the full screening matrix because C2 visible acceptance coverage is partial:
 
 - selected C2 checkpoint slots: 19
 - covered checkpoint slots: 6
@@ -104,14 +104,15 @@ The covered slots are:
 
 The missing C2 slots include later checkpoints for `code_search` and `file_backup`, and all selected checkpoints for `migrate_configs` and `log_query`.
 
-The C2 feedback blocker is:
+The C2 feedback blocker has been addressed for future runs:
 
-- current enforcement mode: `prompt_only`
-- required for primary evidence: `agent_transcript_audited` or `harness_mediated`
+- current enforcement mode: `harness_mediated`
+- native C2 runs set `SPECCOMMONS_ACCEPTANCE_GATE=1`
+- the runner executes visible acceptance after each checkpoint draft and feeds failures back for one repair attempt before hidden scoring
 
 ## Recommended Next Step
 
-First implement EXP-100F so C2 visible acceptance is executed and audited as feedback before checkpoint completion. Then complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
+Next complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
 
 ```bash
 uv run python experiment/scripts/freeze_pilot_artifacts.py snapshot --problems-root ../scb-problems

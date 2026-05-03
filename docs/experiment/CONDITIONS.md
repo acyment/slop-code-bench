@@ -93,12 +93,13 @@ Rules:
 - step definitions are read-only/protected.
 - experiment scripts, scoring scripts, schemas, and lock manifests are read-only/protected.
 - Agent must run the visible acceptance command after material product-code changes and again after the final product-code change before ending each checkpoint.
+- The native C2 runner also performs a harness-mediated visible acceptance gate after the agent's checkpoint draft. If visible acceptance fails, the runner feeds visible failure output back for a bounded repair attempt before hidden scoring.
 - The visible acceptance command must execute the current checkpoint scenarios plus all prior checkpoint scenarios, not future checkpoint scenarios.
 - Primary C2 evidence requires proof that the implementation agent saw and used visible acceptance feedback during the checkpoint. A scorer-only post-hoc acceptance rerun is measurement, not the C2 intervention.
 - Scorer independently reruns acceptance and hidden SCBench tests after each checkpoint.
 - Hidden SCBench pytest tests remain hidden from the implementation agent.
 - Feature, step, prompt, script, schema, and lock files are verified before and after each checkpoint.
-- If the implementation agent does not execute the visible acceptance command, mark the checkpoint or trajectory as `c2_feedback_not_observed`/invalid for the primary C2 comparison.
+- If neither audited agent execution nor the harness-mediated repair loop confirms implementation-time visible feedback, mark the checkpoint or trajectory as `c2_feedback_not_observed`/invalid for the primary C2 comparison.
 
 Primary purpose: isolate executable behavioral harness effect.
 

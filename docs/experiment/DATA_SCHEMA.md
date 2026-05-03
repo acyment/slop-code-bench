@@ -78,6 +78,8 @@ One row per trajectory checkpoint.
   "visible_acceptance_passed": true,
   "visible_acceptance_executed_by_agent": true,
   "visible_acceptance_execution_count": 3,
+  "visible_acceptance_gate_mode": "harness_mediated_repair_loop",
+  "visible_acceptance_gate_passed": true,
   "visible_acceptance_last_execution_after_final_code_change": true,
   "acceptance_feedback_observed": true,
   "c2_feedback_status": "observed|not_observed|not_applicable|unknown",
@@ -113,6 +115,8 @@ C2 feedback fields distinguish the intervention from post-hoc measurement:
 
 - `visible_acceptance_passed`: result of the visible acceptance suite on the checkpoint snapshot.
 - `visible_acceptance_executed_by_agent`: true only when audit data show the implementation agent executed the visible command before checkpoint completion.
+- `visible_acceptance_gate_mode`: records harness-mediated execution when the experiment runner, rather than the agent transcript, executed visible acceptance and fed failures back before hidden scoring.
+- `visible_acceptance_gate_passed`: final result of the implementation-time visible acceptance gate.
 - `visible_acceptance_last_execution_after_final_code_change`: true only when the audited final visible acceptance run occurred after the final product-code change for that checkpoint.
 - `acceptance_feedback_observed`: true when visible acceptance output was available to the implementation agent before checkpoint completion, either by audited command execution or by a harness-mediated repair loop.
 - `c2_feedback_status`: `observed` is required for primary C2 evidence; `not_observed` or `unknown` should be excluded from the primary C2 comparison.

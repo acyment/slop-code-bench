@@ -10,11 +10,13 @@ condition:
   acceptance_harness_visible: true
   acceptance_harness_runnable: true
   acceptance_feedback_policy:
-    mode: mandatory_pre_completion_execution
-    enforcement: prompt_only
+    mode: harness_mediated_repair_loop
+    enforcement: harness_mediated
     scorer_rerun_after_checkpoint: true
     invalid_if_not_executed: true
-    notes: Current bridge exposes the command and reruns post-hoc; primary C2 evidence is blocked until transcript audit or harness-mediated repair confirms execution before checkpoint completion.
+    max_repair_attempts: 1
+    timeout_seconds: 300
+    notes: Native runner executes visible acceptance after each checkpoint draft, feeds visible failures back for one repair attempt, then scorer reruns visible acceptance on the saved snapshot.
   hidden_tests_visible_to_agent: false
   prompt_template: experiment/prompts/gherkin_executable.md
   completion_policy: pass visible acceptance checks and native hidden SCBench core checks after each checkpoint

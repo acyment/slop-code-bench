@@ -63,6 +63,13 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
     )
 
 
+def read_json(path: Path) -> dict[str, Any]:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise TrajectoryError(f"Expected object JSON in {path}")
+    return payload
+
+
 def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as handle:
@@ -292,6 +299,7 @@ def run_native_scbench(
     mode: str,
     seed: int,
     num_workers: int,
+    acceptance_feedback_policy: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     command = [
         "uv",
@@ -315,6 +323,17 @@ def run_native_scbench(
     env = os.environ.copy()
     env["SCBENCH_PROBLEMS_PATH"] = native_problem_root.as_posix()
     env.setdefault("UV_CACHE_DIR", (artifact_root / ".uv-cache").as_posix())
+    if (
+        acceptance_feedback_policy
+        and acceptance_feedback_policy.get("enforcement") == "harness_mediated"
+    ):
+        env["SPECCOMMONS_ACCEPTANCE_GATE"] = "1"
+        env["SPECCOMMONS_ACCEPTANCE_GATE_MAX_REPAIRS"] = str(
+            int(acceptance_feedback_policy.get("max_repair_attempts", 1))
+        )
+        env["SPECCOMMONS_ACCEPTANCE_GATE_TIMEOUT_SECONDS"] = str(
+            int(acceptance_feedback_policy.get("timeout_seconds", 300))
+        )
 
     started_at = utc_now()
     completed = subprocess.run(  # noqa: S603
@@ -436,6 +455,24 @@ def merge_visible_acceptance_results(
         checkpoint_dir = repo_root / checkpoint_dir_rel
         snapshot_dir = checkpoint_dir / "snapshot"
         output_dir = artifact_root / "visible_acceptance" / checkpoint_id
+        gate_summary_path = checkpoint_dir / "acceptance_gate" / "summary.json"
+        if gate_summary_path.is_file():
+            gate_summary = read_json(gate_summary_path)
+            row["acceptance_feedback_observed"] = bool(
+                gate_summary.get("feedback_observed")
+                or gate_summary.get("attempt_count", 0) > 0
+            )
+            row["visible_acceptance_executed_by_agent"] = False
+            row["visible_acceptance_execution_count"] = gate_summary.get(
+                "attempt_count"
+            )
+            row["visible_acceptance_gate_passed"] = gate_summary.get("passed")
+            row["visible_acceptance_gate_mode"] = gate_summary.get("mode")
+            row["c2_feedback_status"] = (
+                "observed" if row["acceptance_feedback_observed"] else "not_observed"
+            )
+        else:
+            row["c2_feedback_status"] = "unknown"
         command = [
             sys.executable,
             runner_path.as_posix(),
@@ -480,6 +517,11 @@ def merge_visible_acceptance_results(
         row["technical_metrics"] = technical
         artifact_paths = dict(row.get("artifact_paths") or {})
         artifact_paths["visible_acceptance"] = rel_path(output_dir, repo_root)
+        if gate_summary_path.is_file():
+            artifact_paths["acceptance_gate"] = rel_path(
+                gate_summary_path.parent,
+                repo_root,
+            )
         row["artifact_paths"] = artifact_paths
 
 
@@ -723,6 +765,9 @@ def run_trajectory(
             mode=mode,
             seed=int(replicate["seed"]),
             num_workers=int(matrix_config.get("runner", {}).get("num_workers", 1)),
+            acceptance_feedback_policy=matrix_config["condition"].get(
+                "acceptance_feedback_policy"
+            ),
         )
         lock_result = lock_after_checkpoint(
             repo_root=repo_root,

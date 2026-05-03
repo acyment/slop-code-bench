@@ -8,6 +8,7 @@ Status:
 - EXP-004 complete: this reproducibility document exists.
 - EXP-070 through EXP-072 complete: protected-file lock checks and dry-run trajectory/subset wrappers exist. These dry runs do not execute model agents or hidden scoring.
 - EXP-100 complete as a pre-execution artifact freeze: `experiment/locks/pilot_artifact_freeze.json`.
+- EXP-100F complete for future C2 runs: native runner has an opt-in harness-mediated visible acceptance gate controlled by `SPECCOMMONS_ACCEPTANCE_GATE=1`.
 - EXP-101 blocked by full-pilot preflight until the execution bridge, fixed model/agent config, and C2 snapshot acceptance integration are complete.
 - EXP-110 through EXP-111 complete as pre-evidence reporting/archive scaffolds. The current report is not a result analysis of a completed pilot.
 
@@ -95,6 +96,16 @@ uv run python experiment/scripts/validate_full_pilot_preflight.py \
 ```
 
 Primary data collection is not valid until that gate returns `ready`.
+
+## Unavoidable Benchmark Changes
+
+The experiment generally keeps additions under `experiment/`, but C2 needed one opt-in native runner hook so visible acceptance can affect implementation before hidden scoring.
+
+- File: `src/slop_code/agent_runner/runner.py`
+- Reason: C2 is not representative if the executable harness is only available or rerun post-hoc. The thesis requires an executable spec workflow that is actually executed as implementation-time feedback.
+- Behavior: when `SPECCOMMONS_ACCEPTANCE_GATE=1`, the checkpoint loop runs `.scbench_acceptance/runner.py` after the agent's checkpoint draft. If visible acceptance fails, the runner feeds visible failure output back to the same agent for a bounded repair attempt before hidden SCBench scoring. The hook writes `acceptance_gate/summary.json` and attempt artifacts under the checkpoint output directory.
+- Default effect: no behavior change unless the environment variable is set by an experiment C2 matrix with `acceptance_feedback_policy.enforcement: harness_mediated`.
+- Comparability note: C0 and C1 keep the native SCBench loop. C2 intentionally adds visible executable feedback; hidden SCBench tests remain the final correctness judge.
 
 ## Current Report And Archive
 
