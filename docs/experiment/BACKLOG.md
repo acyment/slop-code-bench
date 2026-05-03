@@ -307,17 +307,19 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-080 - Export Native SCBench Results
 
 - Phase: Metrics extraction
+- Status: completed in `experiment/scripts/export_results.py`
 - Rationale: Analysis should consume normalized tables.
 - Description: Implement `export_results.py` to parse native SCBench output and emit `runs.jsonl`, `checkpoints.jsonl`, and `technical_metrics.jsonl`.
 - Dependencies: EXP-071, EXP-012
-- Acceptance criteria: exported rows validate against schemas.
+- Acceptance criteria: exported rows validate against the normalized required-field contract and export wrapper dry-runs plus partial native SCBench run directories.
 - Complexity: L
-- Implementation notes: Preserve links to native artifacts.
+- Implementation notes: Preserves links to native artifacts and writes `runs.jsonl`, `checkpoints.jsonl`, `technical_metrics.jsonl`, `artifacts.jsonl`, and `export_summary.json`.
 - Risks/unknowns: missing metric files for failed checkpoints.
 
 ### EXP-081 - Compute Drift Metrics
 
 - Phase: Metrics extraction
+- Status: completed in `experiment/scripts/analyze_results.py`
 - Rationale: Need trajectory-level comparisons.
 - Description: Implement strict survival, regression rate, hidden failure after visible pass, verbosity/erosion slopes, change amplification, dependency creep, and runtime growth.
 - Dependencies: EXP-080
@@ -331,10 +333,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-090 - Run MVP
 
 - Phase: Pilot dry run
+- Status: completed as dry-run/preflight in `docs/experiment/MVP_DRY_RUN_REPORT.md`
 - Rationale: Validate the whole pipeline before spending on full pilot.
 - Description: Run 2 problems, C0 vs C2, 1 replicate, 1 model/harness.
 - Dependencies: EXP-041, EXP-051, EXP-071, EXP-080
-- Acceptance criteria: 4 trajectories complete or fail with classified reasons; exports and report are generated.
+- Acceptance criteria: 4 dry-run trajectories prepare successfully or fail with classified reasons; exports and report are generated. Evidence-producing agent execution remains blocked on the native execution bridge.
 - Complexity: L
 - Implementation notes: Do not interpret results as evidence beyond pipeline validation.
 - Risks/unknowns: agent cost/API availability.
@@ -342,10 +345,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-091 - Fix Pipeline Issues From MVP
 
 - Phase: Pilot dry run
+- Status: completed for dry-run/preflight; real-run fixes are deferred to execution-bridge work.
 - Rationale: MVP should surface prompt, lock, harness, and export bugs.
 - Description: Triage failures, patch harness/wrapper/export code, and rerun MVP if needed.
 - Dependencies: EXP-090
-- Acceptance criteria: MVP can be reproduced from clean checkout.
+- Acceptance criteria: MVP dry-run can be reproduced from clean checkout; native execution blockers are recorded before any costly run.
 - Complexity: M
 - Implementation notes: Record all changes in reproducibility/deviation logs.
 - Risks/unknowns: fixing harness after seeing outcomes can bias full pilot; freeze before full run.

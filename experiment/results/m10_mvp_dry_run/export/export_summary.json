@@ -1,0 +1,14 @@
+{
+  "artifact_count": 22,
+  "checkpoint_count": 18,
+  "generated_at": "2026-05-03T14:32:25.338514Z",
+  "input_runs": [
+    "/private/tmp/scbench-m10-mvp-dry-run-v2/code_search/replicate_01/m10dryv2-mvp_c0-code_search-r01",
+    "/private/tmp/scbench-m10-mvp-dry-run-v2/code_search/replicate_01/m10dryv2-mvp_c2-code_search-r01",
+    "/private/tmp/scbench-m10-mvp-dry-run-v2/file_backup/replicate_01/m10dryv2-mvp_c0-file_backup-r01",
+    "/private/tmp/scbench-m10-mvp-dry-run-v2/file_backup/replicate_01/m10dryv2-mvp_c2-file_backup-r01"
+  ],
+  "run_count": 4,
+  "schema_version": 1,
+  "technical_metric_count": 18
+}

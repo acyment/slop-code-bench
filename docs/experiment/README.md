@@ -95,6 +95,9 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `../../experiment/scripts/validate_locks.py`: lock violation smoke check using temporary files.
 - `../../experiment/scripts/run_trajectory.py`: one-trajectory dry-run integration wrapper.
 - `../../experiment/scripts/run_pilot_subset.py`: MVP/pilot subset dry-run wrapper.
+- `../../experiment/scripts/export_results.py`: normalized result exporter for wrapper dry-runs and native SCBench artifacts.
+- `../../experiment/scripts/analyze_results.py`: trajectory and technical-drift summary generator.
+- `MVP_DRY_RUN_REPORT.md`: Milestone 10 preflight run report.
 
 ## Proposed First Pilot
 
@@ -217,3 +220,21 @@ uv run python experiment/scripts/run_pilot_subset.py \
 ```
 
 Execution mode remains a later task: the wrapper currently records planned native SCBench and visible acceptance commands without running model agents or hidden scoring.
+
+## Metrics Export And MVP Dry Run
+
+Milestone 9 adds normalized export and analysis scripts. Milestone 10 ran the MVP preflight as a dry-run across `code_search` and `file_backup`, C0 and C2, one replicate each. The dry-run produced 4 trajectory records and 18 checkpoint records, all classified as `dry_run_prepared` and `not_evaluated`.
+
+Export a dry-run root and analyze it with:
+
+```bash
+uv run python experiment/scripts/export_results.py \
+  --input-root /tmp/scbench-m10-mvp-dry-run-v2 \
+  --output-dir experiment/results/m10_mvp_dry_run/export
+
+uv run python experiment/scripts/analyze_results.py \
+  --results-dir experiment/results/m10_mvp_dry_run/export \
+  --output-dir experiment/results/m10_mvp_dry_run/analysis
+```
+
+The current MVP result is a pipeline validation only. It does not execute implementation agents, visible acceptance tests against agent snapshots, or hidden SCBench scoring.

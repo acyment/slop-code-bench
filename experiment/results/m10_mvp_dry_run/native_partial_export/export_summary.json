@@ -1,0 +1,11 @@
+{
+  "artifact_count": 2,
+  "checkpoint_count": 0,
+  "generated_at": "2026-05-03T14:32:25.394019Z",
+  "input_runs": [
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/native_mvp/c0_code_search_r01_codex_spark"
+  ],
+  "run_count": 1,
+  "schema_version": 1,
+  "technical_metric_count": 0
+}

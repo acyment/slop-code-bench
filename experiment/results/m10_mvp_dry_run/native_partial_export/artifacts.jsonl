@@ -1,0 +1,2 @@
+{"artifact_type": "native_partial_run", "condition_id": "C0", "path": "experiment/runs/native_mvp/c0_code_search_r01_codex_spark", "problem_id": "code_search", "run_id": "c0_code_search_r01_codex_spark-code_search", "schema_version": 1}
+{"artifact_type": "native_run_log", "condition_id": "C0", "path": "experiment/runs/native_mvp/c0_code_search_r01_codex_spark/run_agent.log", "problem_id": "code_search", "run_id": "c0_code_search_r01_codex_spark-code_search", "schema_version": 1}
