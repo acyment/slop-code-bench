@@ -119,6 +119,78 @@ Feature: Structure-aware pattern rules with metavariables
     And stdout includes a match whose "match" value spans the if line and return line
     And stdout includes captures for "$COND" with text "flag" and "$VALUE" with text "result"
 
+  @edge @positive @cli @jsonl
+  Scenario: Expression and string captures preserve complete source boundaries
+    Given a file named "rules.json" contains:
+      """
+      [
+        {"id":"py-print-value","kind":"pattern","pattern":"print($VALUE)","languages":["python"]},
+        {"id":"cpp-return-value","kind":"pattern","pattern":"return $VALUE;","languages":["cpp"]},
+        {"id":"js-label-value","kind":"pattern","pattern":"const label = $VALUE;","languages":["javascript"]}
+      ]
+      """
+    And a file named "repo/calc.py" contains:
+      """
+      print(99)
+      print(total + tax)
+      """
+    And a file named "repo/engine.cpp" contains:
+      """
+      int run() {
+        return total + fee;
+      }
+      """
+    And a file named "repo/labels.js" contains:
+      """
+      const label = "alpha\nbeta";
+      const label = `row1
+      row2`;
+      """
+    When I run the tool with arguments:
+      | argument |
+      | repo |
+      | --rules |
+      | rules.json |
+    Then the exit status is 0
+    And stdout includes Python print captures for "99" and "total + tax"
+    And stdout includes a C++ return capture for "total + fee"
+    And stdout includes JavaScript captures preserving escaped strings and backtick strings
+
+  @edge @positive @cli @jsonl
+  Scenario: List comprehension and C++ block patterns preserve capture boundaries
+    Given a file named "rules.json" contains:
+      """
+      [
+        {"id":"list-comp","kind":"pattern","pattern":"[$EXPR for $ITEM in $ITER]","languages":["python"]},
+        {"id":"guard-return","kind":"pattern","pattern":"if ($COND) {\n    return $VALUE;\n  }","languages":["cpp"]}
+      ]
+      """
+    And a file named "repo/views.py" contains:
+      """
+      names = [user.name for user in users]
+      ids = [row.id for row in rows]
+      """
+    And a file named "repo/guards.cpp" contains:
+      """
+      int choose(int count) {
+        if (count > 1) {
+          return count + 1;
+        }
+        if (count) {
+          return count;
+        }
+        return 0;
+      }
+      """
+    When I run the tool with arguments:
+      | argument |
+      | repo |
+      | --rules |
+      | rules.json |
+    Then the exit status is 0
+    And stdout includes list-comprehension captures for expression, item, and iterable text
+    And stdout includes C++ if-block captures for condition and returned value text
+
   @regression @positive @cli
   Scenario: Exact and regex rules from previous checkpoints still produce match lines
     Given a file named "rules.json" contains:

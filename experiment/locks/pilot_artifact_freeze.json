@@ -1,6 +1,6 @@
 {
   "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
-  "created_at": "2026-05-03T20:18:40.864354Z",
+  "created_at": "2026-05-03T23:18:29.357066Z",
   "excluded_paths": [],
   "files": {
     "docs/experiment/ACCEPTANCE_HARNESS.md": {
@@ -8,8 +8,8 @@
       "size_bytes": 2815
     },
     "docs/experiment/BACKLOG.md": {
-      "sha256": "f344b781ffd3cefb4da076d9ea4301172ed4fc17d6a3fb9419d98e2a429621c0",
-      "size_bytes": 47241
+      "sha256": "2936cecdd8a298093449d3f5eb81ef85752ac0d552c6cfa8d9edaa83f5cf51e7",
+      "size_bytes": 56946
     },
     "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
       "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
@@ -76,8 +76,8 @@
       "size_bytes": 2365
     },
     "docs/experiment/SCREENING_RUN_STATUS.md": {
-      "sha256": "e1ea18fc5030d40041834cf289674792cb18f60dd29c78c7c43329d8a47ef548",
-      "size_bytes": 6388
+      "sha256": "cad4d13e520cd1c0f3703dc9fb468b4300260790748b653c7ac57532d5e65026",
+      "size_bytes": 9472
     },
     "docs/experiment/SCREENING_SUBSET.md": {
       "sha256": "a157cd071b3ed5357e452b19d3767203fffdae8e7a85bed7adb25828583569d7",
@@ -160,8 +160,8 @@
       "size_bytes": 2530
     },
     "experiment/features/code_search/checkpoint_003.feature": {
-      "sha256": "4a1ae8b950372b1e3df58765a641398071746678ccdcbab71cfd12f4b8031448",
-      "size_bytes": 4999
+      "sha256": "bc000fffadf7432ad120313bc9de82e6251c10a9d3ddcc23a90f8e1ccf8e0bd4",
+      "size_bytes": 7371
     },
     "experiment/features/code_search/checkpoint_004.feature": {
       "sha256": "50e4492930329d69d3cfaa03735454931a910759228f7532e18fef9015087bd3",
@@ -424,26 +424,26 @@
       "size_bytes": 4958
     },
     "experiment/steps/acceptance/coverage_ledger.yaml": {
-      "sha256": "843d046d3936661a68d7e71f61971ae9e16c8c168230ad5dd59c9c5253234b70",
-      "size_bytes": 8078
+      "sha256": "cd3bfb8e4cb64efcd7b8e63241112a1f437fa85b626a11e23b772938864a141d",
+      "size_bytes": 8903
     },
     "experiment/steps/acceptance/results.py": {
       "sha256": "f398ebd6a57209b1ec3b29660d746c65723307023be8c636b860fce8ee94549c",
       "size_bytes": 1452
     },
     "experiment/steps/acceptance/standalone_runner.py": {
-      "sha256": "58e27ad3578304dddeab7ffc0a232a68eebbe40ae26df4951dd568c273a206a2",
-      "size_bytes": 61369
+      "sha256": "9eba7a8e31e73e010a12c31d47b73b82ef5cd4006feebc1351e8ed7b845f60bb",
+      "size_bytes": 72431
     }
   },
-  "freeze_created_at": "2026-05-03T20:18:40.919978Z",
-  "freeze_hash": "9ed3dcc5ce290ccc13e7ce5deac80b8e08546e3980d5f3f87078996761b34405",
+  "freeze_created_at": "2026-05-03T23:18:29.415059Z",
+  "freeze_hash": "51af9690b9640c235c9738835e451877edd714e807a73fe559fc9a90b9355ba9",
   "freeze_schema_version": 1,
   "freeze_status": "pre_execution_artifact_freeze",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
     "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
-    "head_commit_at_manifest_generation": "f00fdb8bf6db8be5291f98538ed903deb425198e"
+    "head_commit_at_manifest_generation": "d6fe13de7cc94d0709990a29d6b9d0d116c4eb0b"
   },
   "locked_paths": [
     "docs/experiment/**",
@@ -457,7 +457,7 @@
     "experiment/scripts/**",
     "experiment/schemas/**"
   ],
-  "manifest_hash": "c58d101a5014d9445b0ab1e5aae819e6741b0c3eaf3c8e79e8625f2f16f2a7e1",
+  "manifest_hash": "4d1d43174c8840072ab09490c7a29df41192f2a31c91d2253e9f8cbda34b8d37",
   "matrix_summary": {
     "conditions": [
       "C0",

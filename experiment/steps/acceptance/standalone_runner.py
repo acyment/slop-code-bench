@@ -6,6 +6,8 @@ from __future__ import annotations
 import argparse
 import ast
 import json
+import os
+import shutil
 import subprocess
 import sys
 import time
@@ -15,6 +17,13 @@ from tempfile import TemporaryDirectory
 from typing import Any
 
 ScenarioFunc = Callable[[Path, Path], tuple[str | None, str | None]]
+
+ENTRYPOINT_TEMPLATE_BY_SCRIPT = {
+    "code_search.py": "scbench_uv_run_code_search",
+    "backup_scheduler.py": "scbench_uv_run_backup_scheduler",
+}
+
+LAST_COMMAND_RESULT: dict[str, Any] | None = None
 
 
 class AcceptanceError(AssertionError):
@@ -129,14 +138,55 @@ def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
             handle.write(json.dumps(row, sort_keys=True) + "\n")
 
 
+def append_jsonl(path: Path, row: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(row, sort_keys=True) + "\n")
+
+
+def benchmark_equivalent_command(
+    command: list[str], *, cwd: Path
+) -> tuple[list[str], str, str | None]:
+    if len(command) < 2 or command[0] != sys.executable:
+        return command, "custom", "not a product-script invocation"
+
+    script_path = Path(command[1])
+    script_name = script_path.name
+    template_id = ENTRYPOINT_TEMPLATE_BY_SCRIPT.get(script_name)
+    if template_id is None:
+        return command, "custom", "product script has no benchmark entrypoint template"
+
+    workspace_script = (cwd / script_name).resolve()
+    try:
+        resolved_script = script_path.resolve()
+    except OSError:
+        resolved_script = script_path
+    if resolved_script != workspace_script:
+        return command, "custom", "product script is not the workspace entrypoint"
+
+    return ["uv", "run", script_name, *command[2:]], template_id, None
+
+
 def run_command(
     command: list[str], *, cwd: Path, artifact_dir: Path, name: str
 ) -> dict[str, Any]:
+    global LAST_COMMAND_RESULT
     artifact_dir.mkdir(parents=True, exist_ok=True)
-    started = time.perf_counter()
-    completed = subprocess.run(  # noqa: S603
+    effective_command, command_template_id, waiver_reason = benchmark_equivalent_command(
         command,
         cwd=cwd,
+    )
+    env = None
+    environment_overrides: dict[str, str | None] = {}
+    if command_template_id.startswith("scbench_uv_run_"):
+        env = os.environ.copy()
+        env.pop("VIRTUAL_ENV", None)
+        environment_overrides["VIRTUAL_ENV"] = None
+    started = time.perf_counter()
+    completed = subprocess.run(  # noqa: S603
+        effective_command,
+        cwd=cwd,
+        env=env,
         text=True,
         capture_output=True,
         check=False,
@@ -144,16 +194,44 @@ def run_command(
     duration_ms = (time.perf_counter() - started) * 1000
     stdout_path = artifact_dir / f"{name}.stdout"
     stderr_path = artifact_dir / f"{name}.stderr"
+    command_path = artifact_dir / f"{name}.command.json"
+    command_log_path = artifact_dir / "commands.jsonl"
     write_text(stdout_path, completed.stdout)
     write_text(stderr_path, completed.stderr)
-    return {
+    command_metadata = {
+        "schema_version": 1,
+        "name": name,
+        "command": effective_command,
+        "original_command": command,
+        "cwd": cwd.as_posix(),
+        "runner_python": sys.executable,
+        "uv_executable": shutil.which("uv"),
+        "environment_overrides": environment_overrides,
+        "command_template_id": command_template_id,
+        "entrypoint_waiver_reason": waiver_reason,
+        "exit_code": completed.returncode,
+        "duration_ms": duration_ms,
+        "stdout_path": stdout_path.as_posix(),
+        "stderr_path": stderr_path.as_posix(),
+    }
+    write_text(command_path, json.dumps(command_metadata, indent=2, sort_keys=True) + "\n")
+    append_jsonl(command_log_path, command_metadata)
+    result = {
         "exit_code": completed.returncode,
         "stdout": completed.stdout,
         "stderr": completed.stderr,
         "stdout_path": stdout_path.as_posix(),
         "stderr_path": stderr_path.as_posix(),
+        "command_path": command_path.as_posix(),
+        "command_log_path": command_log_path.as_posix(),
+        "command": effective_command,
+        "original_command": command,
+        "command_template_id": command_template_id,
+        "entrypoint_waiver_reason": waiver_reason,
         "duration_ms": duration_ms,
     }
+    LAST_COMMAND_RESULT = result
+    return result
 
 
 def parse_json_lines(text: str) -> list[Any]:
@@ -676,8 +754,10 @@ def scenario_code_search_cp3_pattern_edge_semantics(
     optional_rows = rows_for_rule(rows, "optional-item")
     if [row.get("match") for row in optional_rows] != ["[]", "[value]"]:
         raise ScenarioFailureError("optional metavariable matches are missing")
-    if "$X" in optional_rows[0].get("captures", {}):
-        raise ScenarioFailureError("absent optional metavariable must not be captured")
+    if "captures" in optional_rows[0]:
+        raise ScenarioFailureError(
+            "absent optional metavariable must omit the captures field"
+        )
     assert_capture_text(optional_rows[1], "$X", "value")
 
     dollar_rows = rows_for_rule(rows, "dollar-var")
@@ -772,6 +852,183 @@ def scenario_code_search_cp3_multiline_python_captures(
             raise ScenarioFailureError("multiline Python pattern did not match expected output")
     assert_capture_text(row, "$COND", "flag")
     assert_capture_text(row, "$VALUE", "result")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_code_search_cp3_expression_capture_boundaries(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "code_search.py")
+    artifact_dir = artifact_root / "code_search" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="code-search-acceptance-") as tmp:
+        scratch = Path(tmp)
+        write_text(
+            scratch / "rules.json",
+            json.dumps(
+                [
+                    {
+                        "id": "py-print-value",
+                        "kind": "pattern",
+                        "pattern": "print($VALUE)",
+                        "languages": ["python"],
+                    },
+                    {
+                        "id": "cpp-return-value",
+                        "kind": "pattern",
+                        "pattern": "return $VALUE;",
+                        "languages": ["cpp"],
+                    },
+                    {
+                        "id": "js-label-value",
+                        "kind": "pattern",
+                        "pattern": "const label = $VALUE;",
+                        "languages": ["javascript"],
+                    },
+                ]
+            ),
+        )
+        write_text(
+            scratch / "repo" / "calc.py",
+            'print(99)\nprint(total + tax)\n',
+        )
+        write_text(
+            scratch / "repo" / "engine.cpp",
+            "int run() {\n  return total + fee;\n}\n",
+        )
+        write_text(
+            scratch / "repo" / "labels.js",
+            'const label = "alpha\\nbeta";\nconst label = `row1\nrow2`;\n',
+        )
+        result = run_command(
+            [
+                sys.executable,
+                str(script_path),
+                str(scratch / "repo"),
+                "--rules",
+                str(scratch / "rules.json"),
+            ],
+            cwd=workspace,
+            artifact_dir=artifact_dir,
+            name="code_search_cp003_expression_capture_boundaries",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = assert_json_line_count(result["stdout"], 5)
+    assert_output_sorted_by_file_position(rows)
+
+    py_rows = rows_for_rule(rows, "py-print-value")
+    if [row.get("match") for row in py_rows] != ["print(99)", "print(total + tax)"]:
+        raise ScenarioFailureError("Python print pattern must capture both simple and expression values")
+    assert_capture_text(py_rows[0], "$VALUE", "99")
+    assert_capture_text(py_rows[1], "$VALUE", "total + tax")
+
+    cpp_rows = rows_for_rule(rows, "cpp-return-value")
+    if len(cpp_rows) != 1 or cpp_rows[0].get("match") != "return total + fee;":
+        raise ScenarioFailureError("C++ return pattern must capture the whole return expression")
+    assert_capture_text(cpp_rows[0], "$VALUE", "total + fee")
+
+    js_rows = rows_for_rule(rows, "js-label-value")
+    if [row.get("match") for row in js_rows] != [
+        'const label = "alpha\\nbeta";',
+        "const label = `row1\nrow2`;",
+    ]:
+        raise ScenarioFailureError("JavaScript string captures must preserve quoted/backtick boundaries")
+    assert_capture_text(js_rows[0], "$VALUE", '"alpha\\nbeta"')
+    assert_capture_text(js_rows[1], "$VALUE", "`row1\nrow2`")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_code_search_cp3_comprehension_and_cpp_blocks(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "code_search.py")
+    artifact_dir = artifact_root / "code_search" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="code-search-acceptance-") as tmp:
+        scratch = Path(tmp)
+        write_text(
+            scratch / "rules.json",
+            json.dumps(
+                [
+                    {
+                        "id": "list-comp",
+                        "kind": "pattern",
+                        "pattern": "[$EXPR for $ITEM in $ITER]",
+                        "languages": ["python"],
+                    },
+                    {
+                        "id": "guard-return",
+                        "kind": "pattern",
+                        "pattern": "if ($COND) {\n    return $VALUE;\n  }",
+                        "languages": ["cpp"],
+                    },
+                ]
+            ),
+        )
+        write_text(
+            scratch / "repo" / "views.py",
+            (
+                "names = [user.name for user in users]\n"
+                "ids = [row.id for row in rows]\n"
+            ),
+        )
+        write_text(
+            scratch / "repo" / "guards.cpp",
+            (
+                "int choose(int count) {\n"
+                "  if (count > 1) {\n"
+                "    return count + 1;\n"
+                "  }\n"
+                "  if (count) {\n"
+                "    return count;\n"
+                "  }\n"
+                "  return 0;\n"
+                "}\n"
+            ),
+        )
+        result = run_command(
+            [
+                sys.executable,
+                str(script_path),
+                str(scratch / "repo"),
+                "--rules",
+                str(scratch / "rules.json"),
+            ],
+            cwd=workspace,
+            artifact_dir=artifact_dir,
+            name="code_search_cp003_comprehension_and_cpp_blocks",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = assert_json_line_count(result["stdout"], 4)
+    assert_output_sorted_by_file_position(rows)
+
+    comp_rows = rows_for_rule(rows, "list-comp")
+    if [row.get("match") for row in comp_rows] != [
+        "[user.name for user in users]",
+        "[row.id for row in rows]",
+    ]:
+        raise ScenarioFailureError("list comprehension patterns must capture both examples")
+    assert_capture_text(comp_rows[0], "$EXPR", "user.name")
+    assert_capture_text(comp_rows[0], "$ITEM", "user")
+    assert_capture_text(comp_rows[0], "$ITER", "users")
+    assert_capture_text(comp_rows[1], "$EXPR", "row.id")
+    assert_capture_text(comp_rows[1], "$ITEM", "row")
+    assert_capture_text(comp_rows[1], "$ITER", "rows")
+
+    block_rows = rows_for_rule(rows, "guard-return")
+    if [row.get("match") for row in block_rows] != [
+        "if (count > 1) {\n    return count + 1;\n  }",
+        "if (count) {\n    return count;\n  }",
+    ]:
+        raise ScenarioFailureError("multiline C++ block patterns must capture both guarded returns")
+    assert_capture_text(block_rows[0], "$COND", "count > 1")
+    assert_capture_text(block_rows[0], "$VALUE", "count + 1")
+    assert_capture_text(block_rows[1], "$COND", "count")
+    assert_capture_text(block_rows[1], "$VALUE", "count")
     return result["stdout_path"], result["stderr_path"]
 
 
@@ -1610,6 +1867,22 @@ SCENARIO_SPECS: list[dict[str, Any]] = [
         "scenario_func": scenario_code_search_cp3_multiline_python_captures,
     },
     {
+        "problem_id": "code_search",
+        "checkpoint_index": 3,
+        "scenario_id": "code_search.cp003.expression-capture-boundaries",
+        "scenario_name": "Workspace product captures simple expressions and string literal boundaries",
+        "tags": ["problem:code_search", "checkpoint:3", "edge", "positive", "cli"],
+        "scenario_func": scenario_code_search_cp3_expression_capture_boundaries,
+    },
+    {
+        "problem_id": "code_search",
+        "checkpoint_index": 3,
+        "scenario_id": "code_search.cp003.comprehension-and-cpp-blocks",
+        "scenario_name": "Workspace product captures list comprehensions and multiline C++ blocks",
+        "tags": ["problem:code_search", "checkpoint:3", "edge", "positive", "cli"],
+        "scenario_func": scenario_code_search_cp3_comprehension_and_cpp_blocks,
+    },
+    {
         "problem_id": "file_backup",
         "checkpoint_index": 1,
         "scenario_id": "file_backup.cp001.workspace-cli-events",
@@ -1699,11 +1972,15 @@ def run_scenario(
     artifact_root: Path,
     spec: dict[str, Any],
 ) -> dict[str, Any]:
+    global LAST_COMMAND_RESULT
     started = time.perf_counter()
     status = "passed"
     failure_type: str | None = None
     stdout_path: str | None = None
     stderr_path: str | None = None
+    command_path: str | None = None
+    command_log_path: str | None = None
+    LAST_COMMAND_RESULT = None
     try:
         stdout_path, stderr_path = spec["scenario_func"](workspace, artifact_root)
     except ScenarioFailureError:
@@ -1718,6 +1995,11 @@ def run_scenario(
     except Exception:  # noqa: BLE001
         status = "error"
         failure_type = "harness_error"
+    if LAST_COMMAND_RESULT is not None:
+        stdout_path = stdout_path or LAST_COMMAND_RESULT.get("stdout_path")
+        stderr_path = stderr_path or LAST_COMMAND_RESULT.get("stderr_path")
+        command_path = LAST_COMMAND_RESULT.get("command_path")
+        command_log_path = LAST_COMMAND_RESULT.get("command_log_path")
     duration_ms = (time.perf_counter() - started) * 1000
     checkpoint = f"checkpoint_{int(spec['checkpoint_index'])}"
     return {
@@ -1737,6 +2019,8 @@ def run_scenario(
         "duration_ms": duration_ms,
         "stdout_path": stdout_path,
         "stderr_path": stderr_path,
+        "command_path": command_path,
+        "command_log_path": command_log_path,
     }
 
 

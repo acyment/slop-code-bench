@@ -152,7 +152,12 @@ Key finding:
 - `file_backup`: currently unsuitable for drift measurement because all conditions fail checkpoint 1; C2 visible examples allowed a brittle YAML parser that handled hand-written Gherkin examples but failed benchmark-style valid YAML fixture shapes.
 - All C2 acceptance gates passed on first attempt, so C2 execution produced no repair feedback in EXP-100R.
 
-Next complete EXP-100T through EXP-100X before another meaningful run: align visible runner commands with benchmark entrypoints, add `file_backup` fixture-shape parity checks, tighten `code_search` checkpoint 3 pattern acceptance, add near-miss metrics, and decide whether to keep or replace `file_backup`.
+EXP-100T and EXP-100V are complete:
+
+- visible C2 acceptance now uses benchmark-equivalent `uv run <script>` entrypoints for `code_search` and `file_backup` and records command provenance artifacts.
+- `code_search` checkpoint 3 acceptance now catches the remaining EXP-100R C2 near-miss snapshots while the reference checkpoint 3 solution still passes.
+
+Next complete EXP-100U, EXP-100W, and EXP-100X before another meaningful run: add `file_backup` fixture-shape parity checks, add near-miss metrics, and decide whether to keep or replace `file_backup`.
 
 After that, complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
 

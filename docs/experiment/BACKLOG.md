@@ -599,13 +599,13 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100T - Align C2 Visible Runner With Benchmark Entrypoints
 
 - Phase: Full pilot run
-- Status: pending
+- Status: completed; visible acceptance now normalizes selected product-script calls to SCBench-style `uv run <script>` entrypoints and records command provenance artifacts
 - Rationale: C2 visible acceptance should exercise the same command shape as SCBench hidden evaluation wherever possible. EXP-100S found that visible acceptance currently invokes product scripts through the experiment runner's Python interpreter, while hidden evaluation uses benchmark entrypoints such as `uv run <script>`.
 - Description: Update the visible acceptance runner so each problem can declare and use its benchmark-equivalent command template. Add a runner-level check that records the exact command, interpreter, and working directory used for every visible scenario.
 - Dependencies: EXP-100S
 - Acceptance criteria: C2 visible scenario artifacts record benchmark-equivalent command templates; `file_backup` and `code_search` visible scenarios run through the same entrypoint form used by hidden evaluation unless explicitly waived; exports include visible command provenance; existing reference-solution acceptance still passes.
 - Complexity: M
-- Implementation notes: Preserve scenario logic while swapping command execution. If a direct hidden-equivalent entrypoint is unsafe or unavailable, record a structured waiver field so later analysis can flag the confound.
+- Implementation notes: `standalone_runner.py` rewrites workspace entrypoint invocations for `code_search.py` and `backup_scheduler.py` to `uv run code_search.py ...` / `uv run backup_scheduler.py ...`, strips the parent `VIRTUAL_ENV` for these `uv` subprocesses to avoid local environment leakage, and writes per-scenario `*.command.json` plus `commands.jsonl` artifacts with original command, effective command, runner Python, uv path, template id, cwd, duration, exit code, and waiver reason. Reference `code_search` checkpoint 3 and `file_backup` checkpoint 1 solutions pass through the normalized entrypoints.
 - Risks/unknowns: Some problems may rely on different environment setup for visible tests; command parity can expose previously hidden fixture issues.
 
 ### EXP-100U - Add `file_backup` Fixture-Shape Acceptance Parity
@@ -623,13 +623,13 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100V - Tighten `code_search` Checkpoint 3 Pattern Acceptance
 
 - Phase: Full pilot run
-- Status: pending
+- Status: completed; checkpoint 3 acceptance now catches the EXP-100R C2 `code_search` near-miss snapshots while preserving reference-solution pass
 - Rationale: EXP-100S found that C2 substantially improved `code_search` checkpoint 3 hidden subtest pass rate but missed strict pass due under-covered pattern-semantics edges.
 - Description: Add original-spec-parity visible checks for exact optional-metavariable JSON shape, multiple optional present captures, JavaScript escaped/backtick string capture boundaries, simple numeric/expression captures in Python and C++, list-comprehension patterns, and multiline C++ block patterns.
 - Dependencies: EXP-100S, EXP-100T
 - Acceptance criteria: current EXP-100R C2 `code_search` checkpoint 3 snapshots fail at least one new visible scenario that corresponds to their remaining failure cluster; reference checkpoint 3 solution passes; existing strengthened scenarios continue to pass on reference solutions.
 - Complexity: L
-- Implementation notes: Do not mirror hidden tests verbatim. Use the original checkpoint prose and Gherkin domain language to construct representative examples with different names/data.
+- Implementation notes: Tightened optional-metavariable semantics so absent optional captures must omit the `captures` field. Added executable Gherkin/runner coverage for Python/C++ expression capture boundaries, JavaScript escaped/backtick string boundaries, Python list-comprehension captures, and multiline C++ guard-return block captures. The reference checkpoint 3 solution passes all eight through-checkpoint `code_search` scenarios. Prior EXP-100R C2 checkpoint 3 snapshots now fail visible acceptance: r01 fails optional capture shape, r02 fails optional capture shape plus expression/string boundaries, and r03 fails expression/string boundaries plus comprehension/C++ block boundaries.
 - Risks/unknowns: Pattern semantics can explode into a full parser project; keep cases focused on already-observed representative semantic gaps.
 
 ### EXP-100W - Add Near-Miss Metrics For Failed Checkpoints
