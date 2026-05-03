@@ -1,0 +1,3 @@
+{"rule_id":"plaintext","file":"A.py","language":"python","start":{"line":3,"col":8},"end":{"line":3,"col":18},"match":"plaintext:"}
+{"rule_id":"regex_rule","file":"A.py","language":"python","start":{"line":5,"col":1},"end":{"line":5,"col":6},"match":"hello"}
+{"rule_id":"regex_rule","file":"A.py","language":"python","start":{"line":6,"col":1},"end":{"line":6,"col":12},"match":"hello world"}

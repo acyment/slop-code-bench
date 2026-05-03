@@ -167,6 +167,14 @@
         },
         "pass_policy": {
           "type": "string"
+        },
+        "thinking": {
+          "type": "string",
+          "enum": ["none", "disabled", "low", "medium", "high", "xhigh"]
+        },
+        "num_workers": {
+          "type": "integer",
+          "minimum": 1
         }
       }
     },

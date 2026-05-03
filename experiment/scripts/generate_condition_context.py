@@ -228,9 +228,12 @@ def acceptance_command_text(
         return "No visible acceptance command is provided for this condition."
     run_id = f"{condition_id.lower()}-{problem_id}-{checkpoint_id}"
     return (
-        "uv run python experiment/scripts/run_acceptance_smoke.py "
-        "--problems-root ../scb-problems "
-        "--output-dir experiment/results/acceptance_smoke "
+        "python .scbench_acceptance/runner.py "
+        "--workspace . "
+        f"--problem-id {problem_id} "
+        f"--checkpoint-id {checkpoint_id} "
+        "--through-checkpoint "
+        f"--output-dir .scbench_acceptance/results/{run_id} "
         f"--run-id {run_id}"
     )
 

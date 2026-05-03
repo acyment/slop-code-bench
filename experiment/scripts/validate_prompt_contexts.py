@@ -104,7 +104,8 @@ def validate_c1_prompt(text: str, metadata: dict) -> None:
 def validate_c2_prompt(text: str, metadata: dict) -> None:
     require_contains(text, "Feature:", "C2 prompt")
     require_contains(text, "@problem_code_search", "C2 prompt")
-    require_contains(text, "run_acceptance_smoke.py", "C2 prompt")
+    require_contains(text, ".scbench_acceptance/runner.py", "C2 prompt")
+    require_absent(text, "run_acceptance_smoke.py", "C2 prompt")
     require_contains(text, "experiment/features/**", "C2 prompt")
     if not metadata["includes_gherkin_context"]:
         raise PromptValidationError("C2 metadata must include feature context")

@@ -198,8 +198,8 @@ def build_freeze_manifest(
             "status": "blocked",
             "reason": (
                 "The artifact package is frozen, but the full pilot should not run "
-                "until the native execution bridge and C2 snapshot acceptance "
-                "integration are implemented."
+                "until locked C2 visible acceptance coverage exists for every "
+                "selected C2 problem checkpoint."
             ),
         },
     }

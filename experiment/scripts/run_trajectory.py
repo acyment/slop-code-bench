@@ -5,14 +5,20 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import shutil
+import subprocess
+import sys
 from dataclasses import dataclass
 from datetime import UTC
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import export_results
 import generate_condition_context as prompt_context
 import verify_locks
+import yaml
 from git import Repo
 
 
@@ -120,6 +126,361 @@ def ordered_checkpoints(
         problems_root / problem_id / "config.yaml"
     )
     return problem_config, prompt_context.ordered_checkpoints(problem_config)
+
+
+def checkpoint_limit_slice(checkpoints: list[str], checkpoint_limit: int | None) -> list[str]:
+    if checkpoint_limit is None:
+        return checkpoints
+    if checkpoint_limit <= 0:
+        raise TrajectoryError("--checkpoint-limit must be greater than zero")
+    return checkpoints[:checkpoint_limit]
+
+
+def write_yaml(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        yaml.safe_dump(payload, sort_keys=False),
+        encoding="utf-8",
+    )
+
+
+def stage_acceptance_asset(
+    *,
+    repo_root: Path,
+    problem_dir: Path,
+    problem_id: str,
+    checkpoint_count: int,
+) -> None:
+    asset_root = problem_dir / "experiment_acceptance"
+    asset_root.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(
+        repo_root / "experiment" / "steps" / "acceptance" / "standalone_runner.py",
+        asset_root / "runner.py",
+    )
+
+    features_src = repo_root / "experiment" / "features" / problem_id
+    features_dst = asset_root / "features" / problem_id
+    features_dst.mkdir(parents=True, exist_ok=True)
+    for index in range(1, checkpoint_count + 1):
+        feature_path = features_src / f"checkpoint_{index:03d}.feature"
+        if feature_path.is_file():
+            shutil.copy2(feature_path, features_dst / feature_path.name)
+
+
+def prepare_native_problem_fixture(
+    *,
+    repo_root: Path,
+    source_problems_root: Path,
+    artifact_root: Path,
+    matrix_config: dict[str, Any],
+    config_path: Path,
+    problem_id: str,
+    checkpoint_ids: list[str],
+) -> Path:
+    native_problem_root = artifact_root / "native_problem_root"
+    problem_dir = native_problem_root / problem_id
+    if problem_dir.exists():
+        shutil.rmtree(problem_dir)
+    shutil.copytree(source_problems_root / problem_id, problem_dir)
+
+    config_payload = prompt_context.load_yaml(problem_dir / "config.yaml")
+    checkpoints_payload = config_payload.get("checkpoints")
+    if not isinstance(checkpoints_payload, dict):
+        raise TrajectoryError(f"{problem_id} config has no checkpoints mapping")
+    config_payload["checkpoints"] = {
+        checkpoint_id: checkpoints_payload[checkpoint_id]
+        for checkpoint_id in checkpoint_ids
+    }
+
+    if matrix_config["condition"]["id"] == "C2":
+        stage_acceptance_asset(
+            repo_root=repo_root,
+            problem_dir=problem_dir,
+            problem_id=problem_id,
+            checkpoint_count=len(checkpoint_ids),
+        )
+        static_assets = dict(config_payload.get("static_assets") or {})
+        static_assets["speccommons_acceptance"] = {
+            "path": "experiment_acceptance",
+            "save_path": ".scbench_acceptance",
+        }
+        config_payload["static_assets"] = static_assets
+
+    write_yaml(problem_dir / "config.yaml", config_payload)
+
+    prompt_output_dir = artifact_root / "condition_prompts"
+    for checkpoint_id in checkpoint_ids:
+        rendered = prompt_context.render_condition_context(
+            config_path=config_path,
+            problem_id=problem_id,
+            checkpoint_ref=checkpoint_id,
+            problems_root=source_problems_root,
+            output_dir=prompt_output_dir,
+        )
+        shutil.copy2(rendered.prompt_path, problem_dir / f"{checkpoint_id}.md")
+
+    return native_problem_root
+
+
+def write_passthrough_prompt_template(artifact_root: Path) -> Path:
+    path = artifact_root / "native_passthrough_prompt.jinja"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text("{{ spec.strip() }}\n", encoding="utf-8")
+    return path
+
+
+def native_model_string(matrix_config: dict[str, Any]) -> str:
+    model = matrix_config["model"]
+    return f"{model['provider']}/{model['name']}"
+
+
+def write_native_agent_config(
+    *, repo_root: Path, artifact_root: Path, matrix_config: dict[str, Any]
+) -> Path:
+    base_config = prompt_context.load_yaml(
+        repo_root / "configs" / "agents" / f"{matrix_config['agent_harness']['id']}.yaml"
+    )
+    base_config["version"] = matrix_config["agent_harness"]["version"]
+    config_path = artifact_root / "native_agent_config.yaml"
+    write_yaml(config_path, base_config)
+    return config_path
+
+
+def write_native_run_config(
+    *,
+    repo_root: Path,
+    artifact_root: Path,
+    matrix_config: dict[str, Any],
+    problem_id: str,
+    prompt_template_path: Path,
+) -> Path:
+    runner = matrix_config.get("runner", {})
+    agent_config_path = write_native_agent_config(
+        repo_root=repo_root,
+        artifact_root=artifact_root,
+        matrix_config=matrix_config,
+    )
+    config = {
+        "agent": agent_config_path.as_posix(),
+        "environment": runner.get("native_environment", "docker-python3.12-uv"),
+        "prompt": prompt_template_path.as_posix(),
+        "model": {
+            "provider": matrix_config["model"]["provider"],
+            "name": matrix_config["model"]["name"],
+        },
+        "thinking": runner.get("thinking", "low"),
+        "pass_policy": runner.get("pass_policy", "core-cases"),
+        "problems": [problem_id],
+        "save_dir": (artifact_root / "native").as_posix(),
+        "save_template": "run",
+    }
+    config_path = artifact_root / "native_run_config.yaml"
+    write_yaml(config_path, config)
+    return config_path
+
+
+def native_run_dir(artifact_root: Path) -> Path:
+    return artifact_root / "native" / "run"
+
+
+def run_native_scbench(
+    *,
+    artifact_root: Path,
+    native_problem_root: Path,
+    native_config_path: Path,
+    problem_id: str,
+    mode: str,
+    seed: int,
+    num_workers: int,
+) -> dict[str, Any]:
+    command = [
+        "uv",
+        "run",
+        "slop-code",
+        "--overwrite",
+        "--quiet",
+        "--seed",
+        str(seed),
+        "run",
+        "--config",
+        native_config_path.as_posix(),
+        "--problem",
+        problem_id,
+        "--num-workers",
+        str(num_workers),
+        "--no-live-progress",
+    ]
+    if mode == "native-dry-run":
+        command.append("--dry-run")
+    env = os.environ.copy()
+    env["SCBENCH_PROBLEMS_PATH"] = native_problem_root.as_posix()
+    env.setdefault("UV_CACHE_DIR", (artifact_root / ".uv-cache").as_posix())
+
+    started_at = utc_now()
+    completed = subprocess.run(  # noqa: S603
+        command,
+        cwd=repo_root_from_script(),
+        env=env,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    ended_at = utc_now()
+    command_record = {
+        "schema_version": 1,
+        "command": command,
+        "mode": mode,
+        "started_at": started_at,
+        "ended_at": ended_at,
+        "exit_code": completed.returncode,
+        "stdout_path": (artifact_root / "native_command.stdout").as_posix(),
+        "stderr_path": (artifact_root / "native_command.stderr").as_posix(),
+        "native_problem_root": native_problem_root.as_posix(),
+        "native_config_path": native_config_path.as_posix(),
+        "native_run_dir": native_run_dir(artifact_root).as_posix(),
+    }
+    write_json(artifact_root / "native_command.json", command_record)
+    (artifact_root / "native_command.stdout").write_text(
+        completed.stdout,
+        encoding="utf-8",
+    )
+    (artifact_root / "native_command.stderr").write_text(
+        completed.stderr,
+        encoding="utf-8",
+    )
+    return command_record
+
+
+def export_native_run(
+    *,
+    artifact_root: Path,
+    matrix_config: dict[str, Any],
+    run_id: str,
+    problem_id: str,
+    replicate_id: int,
+    repo_root: Path,
+    experiment_commit: str,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+    export_dir = artifact_root / "normalized"
+    summary = export_results.export_runs(
+        input_runs=[native_run_dir(artifact_root)],
+        output_dir=export_dir,
+        repo_root=repo_root,
+        overrides={
+            "run_id": run_id,
+            "condition_id": matrix_config["condition"]["id"],
+            "problem_id": problem_id,
+            "replicate_id": replicate_id,
+            "model": native_model_string(matrix_config),
+            "agent_harness": matrix_config["agent_harness"]["id"],
+            "agent_version": matrix_config["agent_harness"]["version"],
+            "benchmark_commit": matrix_config["runner"]["benchmark_commit"],
+            "problems_commit": matrix_config["runner"]["problem_commit"],
+        },
+    )
+    run_rows = export_results.read_jsonl(export_dir / "runs.jsonl")
+    checkpoint_rows = export_results.read_jsonl(export_dir / "checkpoints.jsonl")
+    if not run_rows:
+        raise TrajectoryError(f"native export produced no run rows: {summary}")
+    run_record = run_rows[0]
+    run_record["experiment_commit"] = experiment_commit
+    return run_record, checkpoint_rows
+
+
+def read_jsonl(path: Path) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    if not path.is_file():
+        return rows
+    with path.open("r", encoding="utf-8") as handle:
+        for line in handle:
+            stripped = line.strip()
+            if stripped:
+                payload = json.loads(stripped)
+                if isinstance(payload, dict):
+                    rows.append(payload)
+    return rows
+
+
+def visible_acceptance_passed(rows: list[dict[str, Any]]) -> bool | None:
+    runnable = [row for row in rows if row.get("status") != "skipped"]
+    if not runnable:
+        return None
+    return all(row.get("status") == "passed" for row in runnable)
+
+
+def sum_duration_ms(rows: list[dict[str, Any]]) -> float | None:
+    durations = [
+        float(row["duration_ms"])
+        for row in rows
+        if isinstance(row.get("duration_ms"), int | float)
+    ]
+    if not durations:
+        return None
+    return sum(durations)
+
+
+def merge_visible_acceptance_results(
+    *,
+    repo_root: Path,
+    artifact_root: Path,
+    run_id: str,
+    problem_id: str,
+    checkpoint_rows: list[dict[str, Any]],
+) -> None:
+    runner_path = repo_root / "experiment/steps/acceptance/standalone_runner.py"
+    for row in checkpoint_rows:
+        checkpoint_id = str(row["checkpoint_id"])
+        checkpoint_dir_rel = row.get("artifact_paths", {}).get("checkpoint_dir")
+        if not checkpoint_dir_rel:
+            continue
+        checkpoint_dir = repo_root / checkpoint_dir_rel
+        snapshot_dir = checkpoint_dir / "snapshot"
+        output_dir = artifact_root / "visible_acceptance" / checkpoint_id
+        command = [
+            sys.executable,
+            runner_path.as_posix(),
+            "--workspace",
+            snapshot_dir.as_posix(),
+            "--problem-id",
+            problem_id,
+            "--checkpoint-id",
+            checkpoint_id,
+            "--through-checkpoint",
+            "--output-dir",
+            output_dir.as_posix(),
+            "--run-id",
+            run_id,
+        ]
+        completed = subprocess.run(  # noqa: S603
+            command,
+            cwd=repo_root,
+            text=True,
+            capture_output=True,
+            check=False,
+        )
+        write_json(
+            output_dir / "command.json",
+            {
+                "schema_version": 1,
+                "command": command,
+                "exit_code": completed.returncode,
+                "stdout": completed.stdout,
+                "stderr": completed.stderr,
+            },
+        )
+        scenario_rows = read_jsonl(output_dir / "scenarios.jsonl")
+        passed = visible_acceptance_passed(scenario_rows)
+        row["visible_acceptance_passed"] = passed
+        row["scenario_results"] = scenario_rows
+        row["hidden_failure_after_visible_pass"] = (
+            passed is True and row.get("hidden_tests_passed") is False
+        )
+        technical = dict(row.get("technical_metrics") or {})
+        technical["acceptance_runtime_ms"] = sum_duration_ms(scenario_rows)
+        row["technical_metrics"] = technical
+        artifact_paths = dict(row.get("artifact_paths") or {})
+        artifact_paths["visible_acceptance"] = rel_path(output_dir, repo_root)
+        row["artifact_paths"] = artifact_paths
 
 
 def lock_before_checkpoint(
@@ -295,9 +656,10 @@ def run_trajectory(
     mode: str,
     run_id: str | None = None,
     run_root_override: Path | None = None,
+    checkpoint_limit: int | None = None,
 ) -> TrajectoryResult:
-    if mode != "dry-run":
-        raise TrajectoryError("only dry-run mode is implemented for Milestone 8")
+    if mode not in {"dry-run", "native-dry-run", "native-run"}:
+        raise TrajectoryError(f"unsupported mode: {mode}")
 
     repo_root = repo_root_from_script()
     matrix_config = load_run_matrix(config_path)
@@ -309,6 +671,7 @@ def run_trajectory(
         problems_root=problems_root,
         problem_id=problem_id,
     )
+    selected_checkpoints = checkpoint_limit_slice(checkpoints, checkpoint_limit)
     current_run_id = run_id or default_run_id(
         matrix_id=matrix_id,
         condition_id=condition_id,
@@ -329,7 +692,147 @@ def run_trajectory(
     started_at = utc_now()
     checkpoint_records: list[dict[str, Any]] = []
 
-    for checkpoint_index, checkpoint_id in enumerate(checkpoints, start=1):
+    if mode in {"native-dry-run", "native-run"}:
+        before_manifest = lock_before_checkpoint(
+            repo_root=repo_root,
+            lock_policy=matrix_config["lock_policy"],
+            checkpoint_dir=root,
+        )
+        native_problem_root = prepare_native_problem_fixture(
+            repo_root=repo_root,
+            source_problems_root=problems_root,
+            artifact_root=root,
+            matrix_config=matrix_config,
+            config_path=config_path,
+            problem_id=problem_id,
+            checkpoint_ids=selected_checkpoints,
+        )
+        prompt_template_path = write_passthrough_prompt_template(root)
+        native_config_path = write_native_run_config(
+            repo_root=repo_root,
+            artifact_root=root,
+            matrix_config=matrix_config,
+            problem_id=problem_id,
+            prompt_template_path=prompt_template_path,
+        )
+        command_record = run_native_scbench(
+            artifact_root=root,
+            native_problem_root=native_problem_root,
+            native_config_path=native_config_path,
+            problem_id=problem_id,
+            mode=mode,
+            seed=int(replicate["seed"]),
+            num_workers=int(matrix_config.get("runner", {}).get("num_workers", 1)),
+        )
+        lock_result = lock_after_checkpoint(
+            repo_root=repo_root,
+            before_manifest=before_manifest,
+            checkpoint_dir=root,
+        )
+        if command_record["exit_code"] != 0:
+            run_record = {
+                "schema_version": 1,
+                "run_id": current_run_id,
+                "condition_id": condition_id,
+                "problem_id": problem_id,
+                "replicate_id": replicate_id,
+                "replicate_seed": int(replicate["seed"]),
+                "model": native_model_string(matrix_config),
+                "agent_harness": matrix_config["agent_harness"]["id"],
+                "agent_version": matrix_config["agent_harness"]["version"],
+                "benchmark_repo": matrix_config["runner"]["benchmark_repo"],
+                "benchmark_commit": matrix_config["runner"]["benchmark_commit"],
+                "problems_repo": matrix_config["runner"]["problem_repo"],
+                "problems_commit": matrix_config["runner"]["problem_commit"],
+                "experiment_commit": experiment_commit,
+                "started_at": started_at,
+                "ended_at": utc_now(),
+                "status": "native_dry_run_failed"
+                if mode == "native-dry-run"
+                else "infrastructure_failure",
+                "mode": mode,
+                "checkpoint_count_expected": len(selected_checkpoints),
+                "checkpoint_count_completed": 0,
+                "strict_survival_checkpoint": None,
+                "artifact_root": rel_path(root, repo_root),
+                "native_command_exit_code": command_record["exit_code"],
+                "lock_status": lock_result["status"],
+                "protocol_violation": lock_result["protocol_violation"],
+            }
+            write_json(root / "run.json", run_record)
+            write_jsonl(root / "checkpoints.jsonl", [])
+            return TrajectoryResult(
+                run_id=current_run_id,
+                artifact_root=root,
+                run_record=run_record,
+                checkpoint_records=[],
+            )
+        if mode == "native-dry-run":
+            run_record = {
+                "schema_version": 1,
+                "run_id": current_run_id,
+                "condition_id": condition_id,
+                "problem_id": problem_id,
+                "replicate_id": replicate_id,
+                "replicate_seed": int(replicate["seed"]),
+                "model": native_model_string(matrix_config),
+                "agent_harness": matrix_config["agent_harness"]["id"],
+                "agent_version": matrix_config["agent_harness"]["version"],
+                "benchmark_repo": matrix_config["runner"]["benchmark_repo"],
+                "benchmark_commit": matrix_config["runner"]["benchmark_commit"],
+                "problems_repo": matrix_config["runner"]["problem_repo"],
+                "problems_commit": matrix_config["runner"]["problem_commit"],
+                "experiment_commit": experiment_commit,
+                "started_at": started_at,
+                "ended_at": utc_now(),
+                "status": "native_dry_run_prepared",
+                "mode": mode,
+                "checkpoint_count_expected": len(selected_checkpoints),
+                "checkpoint_count_completed": 0,
+                "strict_survival_checkpoint": None,
+                "artifact_root": rel_path(root, repo_root),
+                "native_command_exit_code": command_record["exit_code"],
+                "lock_status": lock_result["status"],
+                "protocol_violation": lock_result["protocol_violation"],
+            }
+            write_json(root / "run.json", run_record)
+            write_jsonl(root / "checkpoints.jsonl", [])
+            return TrajectoryResult(
+                run_id=current_run_id,
+                artifact_root=root,
+                run_record=run_record,
+                checkpoint_records=[],
+            )
+        native_run_record, native_checkpoint_records = export_native_run(
+            artifact_root=root,
+            matrix_config=matrix_config,
+            run_id=current_run_id,
+            problem_id=problem_id,
+            replicate_id=replicate_id,
+            repo_root=repo_root,
+            experiment_commit=experiment_commit,
+        )
+        if condition_id == "C2":
+            merge_visible_acceptance_results(
+                repo_root=repo_root,
+                artifact_root=root,
+                run_id=current_run_id,
+                problem_id=problem_id,
+                checkpoint_rows=native_checkpoint_records,
+            )
+        native_run_record["mode"] = mode
+        native_run_record["lock_status"] = lock_result["status"]
+        native_run_record["protocol_violation"] = lock_result["protocol_violation"]
+        write_json(root / "run.json", native_run_record)
+        write_jsonl(root / "checkpoints.jsonl", native_checkpoint_records)
+        return TrajectoryResult(
+            run_id=current_run_id,
+            artifact_root=root,
+            run_record=native_run_record,
+            checkpoint_records=native_checkpoint_records,
+        )
+
+    for checkpoint_index, checkpoint_id in enumerate(selected_checkpoints, start=1):
         checkpoint_started = utc_now()
         checkpoint_dir = root / "checkpoints" / checkpoint_id
         checkpoint_dir.mkdir(parents=True, exist_ok=True)
@@ -407,7 +910,7 @@ def run_trajectory(
         "ended_at": ended_at,
         "status": run_status,
         "mode": mode,
-        "checkpoint_count_expected": len(problem_config["checkpoints"]),
+        "checkpoint_count_expected": len(selected_checkpoints),
         "checkpoint_count_completed": len(checkpoint_records),
         "strict_survival_checkpoint": None,
         "artifact_root": rel_path(root, repo_root),
@@ -433,9 +936,18 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=repo_root_from_script().parent / "scb-problems",
     )
-    parser.add_argument("--mode", choices=["dry-run"], default="dry-run")
+    parser.add_argument(
+        "--mode",
+        choices=["dry-run", "native-dry-run", "native-run"],
+        default="dry-run",
+    )
     parser.add_argument("--run-id")
     parser.add_argument("--run-root", type=Path)
+    parser.add_argument(
+        "--checkpoint-limit",
+        type=int,
+        help="Limit the prepared native fixture to the first N checkpoints.",
+    )
     parser.add_argument("--print-json", action="store_true")
     return parser.parse_args()
 
@@ -450,6 +962,7 @@ def main() -> int:
         mode=args.mode,
         run_id=args.run_id,
         run_root_override=args.run_root.resolve() if args.run_root else None,
+        checkpoint_limit=args.checkpoint_limit,
     )
     if args.print_json:
         print(json.dumps(result.run_record, indent=2, sort_keys=True))

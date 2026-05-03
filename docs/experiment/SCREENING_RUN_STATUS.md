@@ -1,0 +1,89 @@
+# Screening Run Status
+
+Generated: 2026-05-03
+
+## Current Status
+
+The native execution path is now implemented far enough to run SCBench through a condition-specific fixture without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1.
+
+This is not primary experiment evidence. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial.
+
+## Seven-Step Run Checklist
+
+| step | status | result |
+| --- | --- | --- |
+| 1. Implement execution bridge | done | `run_trajectory.py` supports `native-dry-run` and `native-run` by rendering condition prompts into a temporary SCBench problem root and invoking native `slop-code run`. |
+| 2. Wire C2 acceptance to snapshots | done for covered checkpoints | C2 prompts expose `.scbench_acceptance/runner.py`; post-run snapshot acceptance can be merged into normalized results. |
+| 3. Add screening preflight | done | `validate_full_pilot_preflight.py --profile screening` checks model/agent selection, execution bridge, freeze state, and C2 coverage. |
+| 4. Choose fixed runtime settings | done | Screening configs use `codex_auth/gpt-5.3-codex-spark`, Codex CLI `0.128.0`, `thinking: low`, `num_workers: 1`. |
+| 5. Run one paid smoke checkpoint | done | `smoke-c2-code-search-cp1-v2` completed and passed. |
+| 6. Run screening matrix | blocked | C2 coverage has locked scenarios for 2 of 19 selected checkpoint slots; 17 slots are missing. |
+| 7. Export/analyze/report | done for smoke | Normalized smoke result and analysis are under `experiment/results/paid_smoke_c2_code_search_cp1_v2/`. |
+
+## Paid Smoke Result
+
+Run: `smoke-c2-code-search-cp1-v2`
+
+Condition/problem/checkpoint: `C2 / code_search / checkpoint_1`
+
+Key result:
+
+- Native SCBench run status: `completed`
+- Visible acceptance: passed (`code_search.cp001.workspace-cli-search`)
+- Hidden SCBench tests: passed
+- Core tests: 7/7
+- Total hidden tests collected: 13
+- Regression failures: 0
+- Hidden failure after visible pass: 0
+- Agent reported cost: `$0.0325127`
+- Agent duration: `41.37s`
+- Hidden eval duration: `4.64s`
+- Agent steps: 34
+- Net input tokens: 412,262
+- Net output tokens: 8,298
+- Net reasoning tokens: 2,999
+
+Primary artifacts:
+
+- Native run: `experiment/runs/paid_smoke/code_search/replicate_01/smoke-c2-code-search-cp1-v2/native/run`
+- Normalized export: `experiment/results/paid_smoke_c2_code_search_cp1_v2/`
+- Analysis summary: `experiment/results/paid_smoke_c2_code_search_cp1_v2/analysis/summary.json`
+- Screening preflight: `experiment/results/screening_preflight/preflight.json`
+
+## Important Interpretation
+
+The smoke result validates that the pipeline can:
+
+- run Codex through SCBench using condition-specific checkpoint prompts,
+- expose a workspace-local C2 visible acceptance command,
+- preserve native hidden SCBench scoring,
+- export hidden correctness and technical metrics,
+- merge visible acceptance results into normalized result rows.
+
+It does not show a tendency between C0, C1, and C2. There is only one C2 checkpoint and no paired baseline run in this smoke.
+
+## Current Blocker
+
+The screening preflight blocks the full screening matrix because C2 visible acceptance coverage is partial:
+
+- selected C2 checkpoint slots: 19
+- covered checkpoint slots: 2
+- missing checkpoint slots: 17
+
+The covered slots are:
+
+- `code_search` checkpoint 1
+- `file_backup` checkpoint 1
+
+The missing C2 slots include later checkpoints for `code_search` and `file_backup`, and all selected checkpoints for `migrate_configs` and `log_query`.
+
+## Recommended Next Step
+
+Implement locked visible acceptance scenarios for the remaining selected screening checkpoints, then rerun:
+
+```bash
+uv run python experiment/scripts/freeze_pilot_artifacts.py snapshot --problems-root ../scb-problems
+uv run python experiment/scripts/validate_full_pilot_preflight.py --profile screening --problems-root ../scb-problems --output-dir experiment/results/screening_preflight
+```
+
+Only run the full screening matrix after that preflight returns `ready`.

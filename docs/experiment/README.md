@@ -105,6 +105,7 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `MVP_DRY_RUN_REPORT.md`: Milestone 10 preflight run report.
 - `FULL_PILOT_RUN_GATE.md`: Milestone 11 freeze and full-pilot execution gate.
 - `PILOT_REPORTING.md`: Milestone 12 reporting and archive commands.
+- `SCREENING_RUN_STATUS.md`: current native-run status, paid smoke result, and screening blocker.
 
 ## Proposed First Pilot
 
@@ -196,7 +197,7 @@ uv run python experiment/scripts/validate_prompt_contexts.py \
 
 ## Runner Integration Dry Run
 
-Milestone 8 adds the first runner-integration layer. It does not launch an implementation agent and does not run hidden evaluation. It prepares the trajectory artifact tree, renders prompts for every checkpoint, hashes protected files before/after each checkpoint, and emits `run.json` plus `checkpoints.jsonl` records.
+Milestone 8 started as a dry-run integration layer. The wrapper now also supports `native-dry-run` and `native-run`: it prepares a condition-specific temporary SCBench problem root, renders prompts into checkpoint specs, invokes native `slop-code run`, preserves hidden benchmark evaluation, and exports normalized result rows.
 
 Validate lock enforcement with:
 
@@ -216,6 +217,22 @@ uv run python experiment/scripts/run_trajectory.py \
   --run-root /tmp/scbench-m8-runs \
   --run-id milestone8-smoke
 ```
+
+Run a one-checkpoint native dry-run without spending model calls:
+
+```bash
+uv run python experiment/scripts/run_trajectory.py \
+  --config experiment/configs/screening_c2.yaml \
+  --problem code_search \
+  --replicate-id 1 \
+  --problems-root ../scb-problems \
+  --mode native-dry-run \
+  --checkpoint-limit 1 \
+  --run-root /tmp/scbench-native-dry \
+  --run-id dry-c2-code-search-cp1
+```
+
+The latest paid smoke result is documented in `SCREENING_RUN_STATUS.md`.
 
 Render an MVP subset dry run with:
 

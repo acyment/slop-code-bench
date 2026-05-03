@@ -1,0 +1,2 @@
+{"artifact_type": "native_checkpoint", "checkpoint_id": "checkpoint_1", "condition_id": "C2", "path": "experiment/runs/paid_smoke/code_search/replicate_01/smoke-c2-code-search-cp1-v2/native/run/code_search/checkpoint_1", "problem_id": "code_search", "run_id": "smoke-c2-code-search-cp1-v2", "schema_version": 1}
+{"artifact_type": "native_problem_run", "condition_id": "C2", "path": "experiment/runs/paid_smoke/code_search/replicate_01/smoke-c2-code-search-cp1-v2/native/run/code_search", "problem_id": "code_search", "run_id": "smoke-c2-code-search-cp1-v2", "schema_version": 1}

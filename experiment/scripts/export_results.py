@@ -499,7 +499,12 @@ def export_dry_run(
 
 
 def discover_native_problem_dirs(run_dir: Path) -> list[Path]:
-    if (run_dir / "run_info.yaml").is_file() or list(run_dir.glob("checkpoint_*")):
+    checkpoint_dirs = [
+        path
+        for path in run_dir.glob("checkpoint_*")
+        if path.is_dir() and checkpoint_index_from_name(path.name)
+    ]
+    if (run_dir / "run_info.yaml").is_file() or checkpoint_dirs:
         return [run_dir]
     problem_dirs = [
         path

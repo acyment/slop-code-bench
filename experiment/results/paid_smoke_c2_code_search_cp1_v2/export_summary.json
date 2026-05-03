@@ -1,0 +1,11 @@
+{
+  "artifact_count": 2,
+  "checkpoint_count": 1,
+  "generated_at": "2026-05-03T15:50:18.097642Z",
+  "input_runs": [
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/paid_smoke/code_search/replicate_01/smoke-c2-code-search-cp1-v2/native/run"
+  ],
+  "run_count": 1,
+  "schema_version": 1,
+  "technical_metric_count": 1
+}

@@ -99,6 +99,7 @@ def run_subset(
     problem_filter: list[str] | None,
     replicate_filter: list[int] | None,
     run_id_prefix: str,
+    checkpoint_limit: int | None,
 ) -> list[dict[str, Any]]:
     repo_root = repo_root_from_script()
     summaries: list[dict[str, Any]] = []
@@ -124,6 +125,7 @@ def run_subset(
                     mode=mode,
                     run_id=run_id,
                     run_root_override=run_root.resolve() if run_root else None,
+                    checkpoint_limit=checkpoint_limit,
                 )
                 summaries.append(result.run_record)
                 print(
@@ -136,7 +138,11 @@ def run_subset(
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--subset", choices=sorted(SUBSET_CONFIGS), required=True)
-    parser.add_argument("--mode", choices=["dry-run"], default="dry-run")
+    parser.add_argument(
+        "--mode",
+        choices=["dry-run", "native-dry-run", "native-run"],
+        default="dry-run",
+    )
     parser.add_argument(
         "--problems-root",
         type=Path,
@@ -166,6 +172,11 @@ def parse_args() -> argparse.Namespace:
         help="Prefix used to create deterministic run ids.",
     )
     parser.add_argument(
+        "--checkpoint-limit",
+        type=int,
+        help="Limit each trajectory to the first N checkpoints.",
+    )
+    parser.add_argument(
         "--summary-jsonl",
         type=Path,
         help="Optional path for aggregate run records.",
@@ -184,6 +195,7 @@ def main() -> int:
         problem_filter=args.problem,
         replicate_filter=args.replicate_id,
         run_id_prefix=args.run_id_prefix,
+        checkpoint_limit=args.checkpoint_limit,
     )
     if args.summary_jsonl is not None:
         write_jsonl(args.summary_jsonl, summaries)

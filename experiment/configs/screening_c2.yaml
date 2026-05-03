@@ -20,14 +20,14 @@ replicates:
   - replicate_id: 1
     seed: 6101
 model:
-  provider: TBD_PROVIDER
-  name: TBD_FIXED_MODEL
+  provider: codex_auth
+  name: gpt-5.3-codex-spark
   temperature: 0
-  notes: Set before execution; must match screening C0 and C1.
+  notes: Fixed across screening C0/C1/C2 for the first native run.
 agent_harness:
-  id: TBD_AGENT_HARNESS
-  version: TBD_AGENT_VERSION
-  notes: Set before execution; must match screening C0 and C1.
+  id: codex
+  version: 0.128.0
+  notes: Local Codex CLI authenticated through codex_auth.
 runner:
   benchmark_repo: SprocketLab/slop-code-bench
   benchmark_commit: 03bf1f56752bdb4dc3e607d291870972ddd5f214
@@ -35,6 +35,8 @@ runner:
   problem_commit: 8be2bd10bad43a3c0068bdafd05f8eb065a7dc80
   native_environment: configs/environments/docker-python3.12-uv.yaml
   pass_policy: core-cases
+  thinking: low
+  num_workers: 1
 outputs:
   run_root: experiment/runs/screening_c2
   normalized_results_jsonl: experiment/results/screening_c2_checkpoint_results.jsonl
