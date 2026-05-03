@@ -1,10 +1,10 @@
 # Pilot Artifact Archive Manifest
 
-Generated at: `2026-05-03T14:47:54.663821Z`
+Generated at: `2026-05-03T15:00:50.992004Z`
 Archive status: `pre_evidence_artifact_archive`
-File count: `118`
-Total bytes: `674627`
-Head commit: `5bc94f3c637357f57ec29560b7442246ea8c61d1`
+File count: `122`
+Total bytes: `684055`
+Head commit: `457d1a249fe57bb1cd50395ce61509dec72eb541`
 
 ## Files
 
@@ -22,12 +22,13 @@ Head commit: `5bc94f3c637357f57ec29560b7442246ea8c61d1`
 | docs/experiment/METRIC_FIELD_MAP.md | 13198 | `54f7e22e12ce6418b80ffa024a6e5d1e0ce25f068af7f4838bb342964c2800d6` |
 | docs/experiment/MVP_DRY_RUN_REPORT.md | 3575 | `38c7dcfbaccc47d6efb77c6315d8c9ed20f164a6826e505d28536931144f840c` |
 | docs/experiment/PILOT_REPORTING.md | 1862 | `6bf527f3d69c3954c4547edab9de7e9372a62a3b73d8457ed5e7dfda2733d606` |
-| docs/experiment/PROBLEM_SELECTION.md | 6404 | `43c94ef610bb371e963f69b5f4310e418802e558e18aae75eac5c8db5f0b99e2` |
+| docs/experiment/PROBLEM_SELECTION.md | 7046 | `49f4ec74db0525d3163ca001ecf8260acf5737172f78d9fd41ef194b02bc7f6e` |
 | docs/experiment/PROMPT_TEMPLATES.md | 5984 | `c2fdc4d7c7e20a84bed0d7342681cbb641dd9c9959b2b492da5d4a99dca24865` |
-| docs/experiment/README.md | 13741 | `e82021b0125b70e49c6ced6b78bb2a3ea9427f0a764010672df509d70bd235b0` |
+| docs/experiment/README.md | 14213 | `eca9237f6eb908724aa3b088476394e04e47da71d40eec1862e130d18178296b` |
 | docs/experiment/REPO_FORK_PLAN.md | 5098 | `33202aab785830c49b86ea74f17b9462e2578175a19eb4e83324d6d08a8a3dd7` |
 | docs/experiment/RISK_REGISTER.md | 3042 | `4d4e4c67373c7694567950449cc0b53366e4cce6392ba864d30e4460bafebc82` |
 | docs/experiment/ROADMAP.md | 2365 | `68ba4484de2bbb2330e65b8fa9bc953b1cec1e3271aec713d96ab79cc68b429a` |
+| docs/experiment/SCREENING_SUBSET.md | 2387 | `a157cd071b3ed5357e452b19d3767203fffdae8e7a85bed7adb25828583569d7` |
 | experiment/FORK_SETUP.md | 1928 | `01e6116f410f791736ec9f7aba88043d59678e95c3c8855d501ab4822ca374ba` |
 | experiment/README.md | 1893 | `1103ec370deb9d840afb8cbb3eb8d92229318f8f0a44ed6dfd113ae8dbedb97d` |
 | experiment/REPRODUCIBILITY.md | 7328 | `716de9d6d4cd88f77ca5ed742b0d1a48e2dd0315ea0d4f3e6198e3da02dc9faf` |
@@ -37,6 +38,9 @@ Head commit: `5bc94f3c637357f57ec29560b7442246ea8c61d1`
 | experiment/configs/pilot_c0.yaml | 1507 | `477e1606b75ff66242f36fe45e2ead53be522cbdea5648a23bb1640de74ad2b1` |
 | experiment/configs/pilot_c1.yaml | 1846 | `1ab23f38058919a9c75b1de34e01aa956621fbe2fc2a782434a01ee081a534e5` |
 | experiment/configs/pilot_c2.yaml | 1803 | `8a14a2cc1c41c1935297f761925fbc236114daa59b6680058cbb4f159d6d2662` |
+| experiment/configs/screening_c0.yaml | 1449 | `554b4ff6f409824c6ff650b9cba719f5a651b8d64a8552d12c44468a1335d284` |
+| experiment/configs/screening_c1.yaml | 1764 | `2f4b180ab2532817f27c8dae876f846a1fd88c03b2a014dd232667d23dd537bc` |
+| experiment/configs/screening_c2.yaml | 1721 | `7acff0b2a07f28d3dd9293d8408df783fbc5b63f81bc3335ba02e2d7f816391f` |
 | experiment/features/.gitkeep | 7 | `1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd` |
 | experiment/features/CONVERSION_LEDGER.md | 5516 | `d32c58d52a132b19a37d56f9fccbec9b5804a16c094f3eeb89da876467daafb2` |
 | experiment/features/README.md | 3178 | `9c19a1277d7401539d9fb44a07e48286a5209f14c13acd3985c5f742a89a1766` |
@@ -70,7 +74,7 @@ Head commit: `5bc94f3c637357f57ec29560b7442246ea8c61d1`
 | experiment/features/textdrop/checkpoint_005.feature | 1909 | `c6f5c2807c2328a5c63423f0d3ccacec9dff84c3b37deb3591e23f960dde584f` |
 | experiment/features/textdrop/checkpoint_006.feature | 2263 | `5c6abb7992b2cb2290ef055566b2b396ee84f358787b9add131841bb58ecdd1f` |
 | experiment/locks/.gitkeep | 7 | `1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd` |
-| experiment/locks/pilot_artifact_freeze.json | 20211 | `436794409356e76e57c70620e09f07299c9476a0d52094921e6ff0a464faaf44` |
+| experiment/locks/pilot_artifact_freeze.json | 20990 | `7798f661e08e5a1d4a2766a72ab2d018a80c66c710438cb1c47d677260feb69a` |
 | experiment/prompts/.gitkeep | 7 | `1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd` |
 | experiment/prompts/architecture_probe.md | 618 | `3bb035dabccb60c4eb84beb79401c46c659ee93a0f054820352837501af212c7` |
 | experiment/prompts/baseline_prose.md | 440 | `8c12871e2de13b9611b259f324af1ddfa39445286c6a5321cb687815843badf8` |
@@ -95,10 +99,10 @@ Head commit: `5bc94f3c637357f57ec29560b7442246ea8c61d1`
 | experiment/results/m10_mvp_dry_run/native_partial_export/export_summary.json | 308 | `afc8ee26adaf760568a69277e897cbf2f8447ade7fca6d8b84011abbb32b4fb4` |
 | experiment/results/m10_mvp_dry_run/native_partial_export/runs.jsonl | 751 | `eef6b7ea96e852b55413cb8ad81deb23ad321dfa51472b33835d7e1a791c4290` |
 | experiment/results/m10_mvp_dry_run/native_partial_export/technical_metrics.jsonl | 0 | `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855` |
-| experiment/results/m11_full_pilot_preflight/preflight.json | 3709 | `8d27250e58ea35649a950f30433cd6803218f087a5d4c2ba3e785ef08ea523e7` |
-| experiment/results/m11_full_pilot_preflight/preflight.md | 1008 | `9c2be12fb1c2f18f581e4d1a7802083c32b0bb928a0e75df7998206eaf63d706` |
-| experiment/results/m12_pilot_report/pilot_report.md | 6238 | `10939837775443cda33d3dd399acbc463faa90a15db544e4b31654fe773269c6` |
-| experiment/results/m12_pilot_report/report_summary.json | 1733 | `d801aa6737426346cafe55ea51be441472acb463fc4b4952d9cf7b183127ffdf` |
+| experiment/results/m11_full_pilot_preflight/preflight.json | 3709 | `a670c3ea317de9e2cdc82f4371f37e57af451aaee867e5a7498c4da588ef9222` |
+| experiment/results/m11_full_pilot_preflight/preflight.md | 1008 | `a88c4ee0128d01cd1d24d0a05785b45ed7c0754ef4f2a2c7784464f43a023c80` |
+| experiment/results/m12_pilot_report/pilot_report.md | 6238 | `c1311c02f49086251a965238eaa53b006c6de94cb21f4a5c601e21c4d681f308` |
+| experiment/results/m12_pilot_report/report_summary.json | 1733 | `4dc190c5b102a2f3d08955cb5f114b157f4a73b56e8b7874ee1f933823077dee` |
 | experiment/results/problem_inventory.jsonl | 144757 | `7e26f0ff04b28399cf43dffe7f9b3b0777f59a6187a164ea53e176b81022edc3` |
 | experiment/results/problem_selection_report.md | 2633 | `687812c572af0f9ccf64d0a770593b44f12d612513c694126ab2f4b77122e6e3` |
 | experiment/schemas/.gitkeep | 7 | `1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd` |
@@ -108,11 +112,11 @@ Head commit: `5bc94f3c637357f57ec29560b7442246ea8c61d1`
 | experiment/scripts/analyze_results.py | 14543 | `1e2399e4493da9faae9cc1517d01e77da4bb36f3d7ae97b46ea0a0c3dae15c46` |
 | experiment/scripts/archive_artifacts.py | 7477 | `eaa65c75cef2bf152bb7d9e71fc664c902eeaebb731650f70e8139e2980afe56` |
 | experiment/scripts/export_results.py | 33858 | `c6f6019545d606ebd537b088e23145a401467d4f156b49ad3ca3c9cf91769b14` |
-| experiment/scripts/freeze_pilot_artifacts.py | 10830 | `b5f22c6e3e6522b96081d6fea28f1e4bfbf8961f1500df7d3b00c3217ecf4cc4` |
+| experiment/scripts/freeze_pilot_artifacts.py | 10962 | `15f7a3c6b910ac60a85c7acc929ee3a67a911dcc776524c5991d4541264a989b` |
 | experiment/scripts/generate_condition_context.py | 13948 | `7e599c263f68bb3615fc8bccf8ca7e095c469804257caad74306eb2ba274dfb6` |
 | experiment/scripts/generate_pilot_report.py | 12613 | `49076b400cceffca08856fadc3fdeae337cbffb519fd6bf974c4a4d3ff4748fc` |
 | experiment/scripts/run_acceptance_smoke.py | 12921 | `64aa0e5b4c5d536f80980b0f29e07d915e043ed44fc8d6566dd0b93849646f08` |
-| experiment/scripts/run_pilot_subset.py | 6006 | `63b3ad6b415cc57702435c80aca2dd3f3aabc1cdf6da544120c4d0d6d77a3abb` |
+| experiment/scripts/run_pilot_subset.py | 6088 | `6c54fcfb8a9686a638b72a835434aa2ec6416689e417115a09400f2ff9cd1452` |
 | experiment/scripts/run_trajectory.py | 15671 | `c699af57799fc3bc47dd7ec386a4dc8363ee50dd380020d7c66f5dc2ca43e864` |
 | experiment/scripts/select_problems.py | 24960 | `fd38aceb8a90c714a88947e63b123fe131a66abd11f5a403ad76272d1a80fcbd` |
 | experiment/scripts/validate_features.py | 3786 | `9598579d5b67bdcf97cde94f1190763c38601745380eb3d4e128b2a4771ffa30` |

@@ -1,8 +1,8 @@
 # SpecCommons SCBench Gherkin Drift Pilot Report
 
-Generated at: `2026-05-03T14:47:49.861115Z`
+Generated at: `2026-05-03T15:00:50.686238Z`
 Report status: `pre_evidence_blocked`
-Freeze hash: `6b523b863cc816ed671ba717f531684915f58f3d05b747aaedc70d23b298964e`
+Freeze hash: `182206ea6e067bb2d7cd5dee3f94ecc66422494a2844fe748b65b09bbef08d1b`
 
 ## Bottom Line
 

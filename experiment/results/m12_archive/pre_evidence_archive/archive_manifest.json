@@ -13,7 +13,7 @@
     ".pyc",
     ".pyo"
   ],
-  "file_count": 118,
+  "file_count": 122,
   "files": [
     {
       "archive_path": "files/docs/experiment/ACCEPTANCE_HARNESS.md",
@@ -90,8 +90,8 @@
     {
       "archive_path": "files/docs/experiment/PROBLEM_SELECTION.md",
       "path": "docs/experiment/PROBLEM_SELECTION.md",
-      "sha256": "43c94ef610bb371e963f69b5f4310e418802e558e18aae75eac5c8db5f0b99e2",
-      "size_bytes": 6404
+      "sha256": "49f4ec74db0525d3163ca001ecf8260acf5737172f78d9fd41ef194b02bc7f6e",
+      "size_bytes": 7046
     },
     {
       "archive_path": "files/docs/experiment/PROMPT_TEMPLATES.md",
@@ -102,8 +102,8 @@
     {
       "archive_path": "files/docs/experiment/README.md",
       "path": "docs/experiment/README.md",
-      "sha256": "e82021b0125b70e49c6ced6b78bb2a3ea9427f0a764010672df509d70bd235b0",
-      "size_bytes": 13741
+      "sha256": "eca9237f6eb908724aa3b088476394e04e47da71d40eec1862e130d18178296b",
+      "size_bytes": 14213
     },
     {
       "archive_path": "files/docs/experiment/REPO_FORK_PLAN.md",
@@ -122,6 +122,12 @@
       "path": "docs/experiment/ROADMAP.md",
       "sha256": "68ba4484de2bbb2330e65b8fa9bc953b1cec1e3271aec713d96ab79cc68b429a",
       "size_bytes": 2365
+    },
+    {
+      "archive_path": "files/docs/experiment/SCREENING_SUBSET.md",
+      "path": "docs/experiment/SCREENING_SUBSET.md",
+      "sha256": "a157cd071b3ed5357e452b19d3767203fffdae8e7a85bed7adb25828583569d7",
+      "size_bytes": 2387
     },
     {
       "archive_path": "files/experiment/FORK_SETUP.md",
@@ -176,6 +182,24 @@
       "path": "experiment/configs/pilot_c2.yaml",
       "sha256": "8a14a2cc1c41c1935297f761925fbc236114daa59b6680058cbb4f159d6d2662",
       "size_bytes": 1803
+    },
+    {
+      "archive_path": "files/experiment/configs/screening_c0.yaml",
+      "path": "experiment/configs/screening_c0.yaml",
+      "sha256": "554b4ff6f409824c6ff650b9cba719f5a651b8d64a8552d12c44468a1335d284",
+      "size_bytes": 1449
+    },
+    {
+      "archive_path": "files/experiment/configs/screening_c1.yaml",
+      "path": "experiment/configs/screening_c1.yaml",
+      "sha256": "2f4b180ab2532817f27c8dae876f846a1fd88c03b2a014dd232667d23dd537bc",
+      "size_bytes": 1764
+    },
+    {
+      "archive_path": "files/experiment/configs/screening_c2.yaml",
+      "path": "experiment/configs/screening_c2.yaml",
+      "sha256": "7acff0b2a07f28d3dd9293d8408df783fbc5b63f81bc3335ba02e2d7f816391f",
+      "size_bytes": 1721
     },
     {
       "archive_path": "files/experiment/features/.gitkeep",
@@ -378,8 +402,8 @@
     {
       "archive_path": "files/experiment/locks/pilot_artifact_freeze.json",
       "path": "experiment/locks/pilot_artifact_freeze.json",
-      "sha256": "436794409356e76e57c70620e09f07299c9476a0d52094921e6ff0a464faaf44",
-      "size_bytes": 20211
+      "sha256": "7798f661e08e5a1d4a2766a72ab2d018a80c66c710438cb1c47d677260feb69a",
+      "size_bytes": 20990
     },
     {
       "archive_path": "files/experiment/prompts/.gitkeep",
@@ -528,25 +552,25 @@
     {
       "archive_path": "files/experiment/results/m11_full_pilot_preflight/preflight.json",
       "path": "experiment/results/m11_full_pilot_preflight/preflight.json",
-      "sha256": "8d27250e58ea35649a950f30433cd6803218f087a5d4c2ba3e785ef08ea523e7",
+      "sha256": "a670c3ea317de9e2cdc82f4371f37e57af451aaee867e5a7498c4da588ef9222",
       "size_bytes": 3709
     },
     {
       "archive_path": "files/experiment/results/m11_full_pilot_preflight/preflight.md",
       "path": "experiment/results/m11_full_pilot_preflight/preflight.md",
-      "sha256": "9c2be12fb1c2f18f581e4d1a7802083c32b0bb928a0e75df7998206eaf63d706",
+      "sha256": "a88c4ee0128d01cd1d24d0a05785b45ed7c0754ef4f2a2c7784464f43a023c80",
       "size_bytes": 1008
     },
     {
       "archive_path": "files/experiment/results/m12_pilot_report/pilot_report.md",
       "path": "experiment/results/m12_pilot_report/pilot_report.md",
-      "sha256": "10939837775443cda33d3dd399acbc463faa90a15db544e4b31654fe773269c6",
+      "sha256": "c1311c02f49086251a965238eaa53b006c6de94cb21f4a5c601e21c4d681f308",
       "size_bytes": 6238
     },
     {
       "archive_path": "files/experiment/results/m12_pilot_report/report_summary.json",
       "path": "experiment/results/m12_pilot_report/report_summary.json",
-      "sha256": "d801aa6737426346cafe55ea51be441472acb463fc4b4952d9cf7b183127ffdf",
+      "sha256": "4dc190c5b102a2f3d08955cb5f114b157f4a73b56e8b7874ee1f933823077dee",
       "size_bytes": 1733
     },
     {
@@ -606,8 +630,8 @@
     {
       "archive_path": "files/experiment/scripts/freeze_pilot_artifacts.py",
       "path": "experiment/scripts/freeze_pilot_artifacts.py",
-      "sha256": "b5f22c6e3e6522b96081d6fea28f1e4bfbf8961f1500df7d3b00c3217ecf4cc4",
-      "size_bytes": 10830
+      "sha256": "15f7a3c6b910ac60a85c7acc929ee3a67a911dcc776524c5991d4541264a989b",
+      "size_bytes": 10962
     },
     {
       "archive_path": "files/experiment/scripts/generate_condition_context.py",
@@ -630,8 +654,8 @@
     {
       "archive_path": "files/experiment/scripts/run_pilot_subset.py",
       "path": "experiment/scripts/run_pilot_subset.py",
-      "sha256": "63b3ad6b415cc57702435c80aca2dd3f3aabc1cdf6da544120c4d0d6d77a3abb",
-      "size_bytes": 6006
+      "sha256": "6c54fcfb8a9686a638b72a835434aa2ec6416689e417115a09400f2ff9cd1452",
+      "size_bytes": 6088
     },
     {
       "archive_path": "files/experiment/scripts/run_trajectory.py",
@@ -724,10 +748,10 @@
       "size_bytes": 1452
     }
   ],
-  "generated_at": "2026-05-03T14:47:54.663821Z",
+  "generated_at": "2026-05-03T15:00:50.992004Z",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
-    "head_commit": "5bc94f3c637357f57ec29560b7442246ea8c61d1"
+    "head_commit": "457d1a249fe57bb1cd50395ce61509dec72eb541"
   },
   "include_patterns": [
     "docs/experiment/**",
@@ -748,5 +772,5 @@
     "experiment/results/m12_pilot_report/**"
   ],
   "schema_version": 1,
-  "total_size_bytes": 674627
+  "total_size_bytes": 684055
 }

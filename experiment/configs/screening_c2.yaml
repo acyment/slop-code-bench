@@ -1,0 +1,51 @@
+schema_version: 1
+matrix_id: screening_c2
+description: Screening subset Gherkin plus executable acceptance run matrix.
+status: design_locked
+condition:
+  id: C2
+  spec_context: gherkin_executable_package
+  gherkin_context_visible: true
+  acceptance_harness_visible: true
+  acceptance_harness_runnable: true
+  hidden_tests_visible_to_agent: false
+  prompt_template: experiment/prompts/gherkin_executable.md
+  completion_policy: pass visible acceptance checks and native hidden SCBench core checks after each checkpoint
+problems:
+  - code_search
+  - file_backup
+  - migrate_configs
+  - log_query
+replicates:
+  - replicate_id: 1
+    seed: 6101
+model:
+  provider: TBD_PROVIDER
+  name: TBD_FIXED_MODEL
+  temperature: 0
+  notes: Set before execution; must match screening C0 and C1.
+agent_harness:
+  id: TBD_AGENT_HARNESS
+  version: TBD_AGENT_VERSION
+  notes: Set before execution; must match screening C0 and C1.
+runner:
+  benchmark_repo: SprocketLab/slop-code-bench
+  benchmark_commit: 03bf1f56752bdb4dc3e607d291870972ddd5f214
+  problem_repo: gabeorlanski/scb-problems
+  problem_commit: 8be2bd10bad43a3c0068bdafd05f8eb065a7dc80
+  native_environment: configs/environments/docker-python3.12-uv.yaml
+  pass_policy: core-cases
+outputs:
+  run_root: experiment/runs/screening_c2
+  normalized_results_jsonl: experiment/results/screening_c2_checkpoint_results.jsonl
+  artifact_manifest: experiment/results/screening_c2_artifacts.json
+lock_policy:
+  mode: manifest_before_after_checkpoint
+  locked_paths:
+    - experiment/features/**
+    - experiment/steps/**
+    - experiment/prompts/**
+    - experiment/scripts/**
+    - experiment/schemas/**
+    - experiment/locks/**
+  violation_policy: mark_protocol_violation_and_exclude_primary

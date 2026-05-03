@@ -101,6 +101,26 @@ Rationale:
 - both can be tested without service lifecycle logic,
 - both should support a lightweight Gherkin acceptance harness.
 
+## Screening Subset
+
+Use:
+
+1. `code_search`
+2. `file_backup`
+3. `migrate_configs`
+4. `log_query`
+
+Rationale:
+
+- includes the MVP CLI/search and stateful file-operation cases,
+- adds structured config migration as a transformation-heavy file-processing case,
+- adds a medium query-language/parser case,
+- keeps all selected problems in the observable CLI/file/query family for the first evidence-producing run,
+- avoids `file_merger` until the heavier `pyarrow` dependency path is justified,
+- avoids `textdrop` until service lifecycle handling is stable.
+
+This gives 12 C0/C1/C2 trajectories and 57 checkpoint executions with one replicate.
+
 ## Required Follow-Up Inspection Task
 
 Before changing the selected set, rerun the automated inventory over the pinned problem repo:

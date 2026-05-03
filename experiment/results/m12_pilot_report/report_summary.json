@@ -10,7 +10,7 @@
   },
   "dry_run_checkpoint_count": 18,
   "evaluable_checkpoint_count": 0,
-  "freeze_hash": "6b523b863cc816ed671ba717f531684915f58f3d05b747aaedc70d23b298964e",
+  "freeze_hash": "182206ea6e067bb2d7cd5dee3f94ecc66422494a2844fe748b65b09bbef08d1b",
   "full_pilot_preflight_status": "blocked",
   "full_pilot_total_checkpoint_executions": 261,
   "full_pilot_total_trajectories": 54,
@@ -41,7 +41,7 @@
       "status": "block"
     }
   ],
-  "generated_at": "2026-05-03T14:47:49.861115Z",
+  "generated_at": "2026-05-03T15:00:50.686238Z",
   "run_count": 4,
   "schema_version": 1,
   "status": "pre_evidence_blocked",

@@ -1,0 +1,45 @@
+schema_version: 1
+matrix_id: screening_c0
+description: Screening subset baseline prose run matrix.
+status: design_locked
+condition:
+  id: C0
+  spec_context: native_prose
+  gherkin_context_visible: false
+  acceptance_harness_visible: false
+  acceptance_harness_runnable: false
+  hidden_tests_visible_to_agent: false
+  prompt_template: experiment/prompts/baseline_prose.md
+  completion_policy: pass native hidden SCBench core checks after each checkpoint
+problems:
+  - code_search
+  - file_backup
+  - migrate_configs
+  - log_query
+replicates:
+  - replicate_id: 1
+    seed: 6101
+model:
+  provider: TBD_PROVIDER
+  name: TBD_FIXED_MODEL
+  temperature: 0
+  notes: Set before execution; keep fixed across screening C0/C1/C2.
+agent_harness:
+  id: TBD_AGENT_HARNESS
+  version: TBD_AGENT_VERSION
+  notes: Set before execution; keep fixed across screening C0/C1/C2.
+runner:
+  benchmark_repo: SprocketLab/slop-code-bench
+  benchmark_commit: 03bf1f56752bdb4dc3e607d291870972ddd5f214
+  problem_repo: gabeorlanski/scb-problems
+  problem_commit: 8be2bd10bad43a3c0068bdafd05f8eb065a7dc80
+  native_environment: configs/environments/docker-python3.12-uv.yaml
+  pass_policy: core-cases
+outputs:
+  run_root: experiment/runs/screening_c0
+  normalized_results_jsonl: experiment/results/screening_c0_checkpoint_results.jsonl
+  artifact_manifest: experiment/results/screening_c0_artifacts.json
+lock_policy:
+  mode: none
+  locked_paths: []
+  violation_policy: not_applicable

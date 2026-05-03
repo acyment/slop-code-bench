@@ -75,6 +75,7 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `HIDDEN_TEST_SEPARATION.md`: file visibility model and C2 lock requirements.
 - `REPO_FORK_PLAN.md`: upstream/fork/branch and integration plan.
 - `PROBLEM_SELECTION.md`: selection criteria and provisional first problem set.
+- `SCREENING_SUBSET.md`: first representative subset before full EXP-101.
 - `CONDITIONS.md`: definitions for C0-C5.
 - `PROMPT_TEMPLATES.md`: templates for implementation-agent prompts.
 - `METRICS.md`: metric definitions and extraction plan.
@@ -128,6 +129,9 @@ Milestone 4 freezes five initial run matrices:
 
 - `experiment/configs/mvp_c0.yaml`
 - `experiment/configs/mvp_c2.yaml`
+- `experiment/configs/screening_c0.yaml`
+- `experiment/configs/screening_c1.yaml`
+- `experiment/configs/screening_c2.yaml`
 - `experiment/configs/pilot_c0.yaml`
 - `experiment/configs/pilot_c1.yaml`
 - `experiment/configs/pilot_c2.yaml`
@@ -137,6 +141,8 @@ Validate them with:
 ```bash
 uv run python experiment/scripts/validate_run_matrix.py
 ```
+
+The recommended representative screening subset is `code_search`, `file_backup`, `migrate_configs`, and `log_query`, across C0/C1/C2 with one replicate. It is intentionally smaller than full EXP-101 and avoids the first-run service lifecycle and heavy dependency confounds.
 
 ## Gherkin Feature Package
 
