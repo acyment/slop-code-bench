@@ -515,7 +515,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100M - Run Meaningful Mini-Screen
 
 - Phase: Full pilot run
-- Status: ready after EXP-100L; execute from a clean freeze/preflight without editing frozen artifacts during data collection
+- Status: completed in `experiment/results/meaningful_mini_screen`; no strict-survival gain observed for C1 or C2, and all evaluated C2 failures were hidden failures after visible acceptance passed
 - Rationale: After the above gates, the next useful evidence is the bounded C0/C1/C2 paired mini-screen.
 - Description: Execute the meaningful mini-screen matrix, export normalized results, analyze paired C0/C1/C2 deltas, and generate a report that separates Gherkin-format effects from executable-feedback effects.
 - Dependencies: EXP-100L
