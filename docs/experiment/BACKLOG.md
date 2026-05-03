@@ -524,6 +524,66 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Implementation notes: Stop and inspect before scaling if C2 has hidden-failure-after-visible-pass spikes or harness feedback is not observed.
 - Risks/unknowns: Cost/runtime and transient agent failures can reduce usable pairs; do not claim proof from this bounded screen.
 
+### EXP-100N - Inspect C2 Visible-Pass Hidden-Fail Cases
+
+- Phase: Full pilot run
+- Status: completed in `experiment/results/meaningful_mini_screen/analysis/blind_spot_inspection.md`
+- Rationale: The meaningful mini-screen produced no C2 survival gain and every evaluated C2 failure passed visible acceptance first; scaling before triage would mainly measure harness blind spots.
+- Description: Inspect representative failed hidden evaluation reports and compare them against original checkpoint prose, Gherkin features, and executable runner coverage. Classify the gap as acceptable hidden-only coverage, Gherkin conversion omission, or executable harness omission.
+- Dependencies: EXP-100M
+- Acceptance criteria: inspection report identifies failure clusters for `code_search` checkpoint 3 and `file_backup` checkpoint 1; report recommends concrete visible acceptance additions without copying hidden tests verbatim.
+- Complexity: M
+- Implementation notes: Treat hidden tests as final judge and maintainer-only diagnostic source; derive new visible examples from original prose and Gherkin intent.
+- Risks/unknowns: Overcorrecting from hidden failures can overfit C2; prefer original-spec-parity examples first.
+
+### EXP-100O - Add Feature-To-Runner Coverage Audit
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: C2 currently executes one representative scenario per covered checkpoint, while feature files may contain multiple scenarios. The experiment needs an explicit coverage ledger before interpreting C2 as an executable-spec workflow.
+- Description: Add a script/report that maps every `.feature` scenario to its executable runner scenario, or marks it as spec-only with a reason. Fail mini-screen preflight if required C2 scenarios lack executable coverage.
+- Dependencies: EXP-100N
+- Acceptance criteria: coverage report lists feature scenario count, executable scenario count, and omitted scenario reasons by problem/checkpoint; mini-screen C2 coverage gate checks the report.
+- Complexity: M
+- Implementation notes: Start with `code_search` and `file_backup`; avoid requiring full coverage for future screening problems until their C2 harnesses are implemented.
+- Risks/unknowns: Some Gherkin scenarios may be intentionally broad and need more than one executable example.
+
+### EXP-100P - Strengthen `code_search` Checkpoint 3 Acceptance
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: C2 passed visible checkpoint 3 acceptance while hidden tests found pattern-matching drift.
+- Description: Add original-spec-parity visible checks for multiple distinct metavariables, optional metavariables, literal `$$`, multiline Python capture boundaries, language-specific pattern filtering, and deterministic ordering across files. Automate the existing nested-expression Gherkin scenario.
+- Dependencies: EXP-100N, EXP-100O
+- Acceptance criteria: reference solutions for checkpoints 1-3 pass; current failed C2 snapshots fail at least one new visible checkpoint 3 scenario; feature-to-runner coverage report is updated.
+- Complexity: L
+- Implementation notes: Use exact `match`, capture `text`, and capture `ranges` assertions for a small number of representative examples.
+- Risks/unknowns: Pattern semantics are broad; keep examples representative rather than exhaustive.
+
+### EXP-100Q - Strengthen `file_backup` Checkpoint 1 Acceptance
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: C2 passed visible checkpoint 1 acceptance while hidden tests showed basic schedule parsing and scheduling gaps.
+- Description: Add original-spec-parity visible checks for block-style YAML lists, daily/weekly/once due windows, disabled/default-enabled jobs, default timezone, inclusive duration boundaries, malformed YAML errors, and representative glob operators.
+- Dependencies: EXP-100N, EXP-100O
+- Acceptance criteria: reference solutions for checkpoints 1-3 pass; current failed C2 snapshots fail at least one new visible checkpoint 1 scenario; feature-to-runner coverage report is updated.
+- Complexity: L
+- Implementation notes: Use examples from the original prose schema first, especially block-list YAML for `exclude` and `days`.
+- Risks/unknowns: Adding too many checks can make C2 much more expensive; keep the first strengthening pass focused on failure clusters seen across all replicates.
+
+### EXP-100R - Rerun Meaningful Mini-Screen After Acceptance Audit
+
+- Phase: Full pilot run
+- Status: pending EXP-100O through EXP-100Q
+- Rationale: The completed mini-screen tested the protocol but not a sufficiently aligned executable acceptance suite.
+- Description: Regenerate freeze/preflight, rerun the same C0/C1/C2 two-problem mini-screen, export/analyze results, and compare against the first mini-screen.
+- Dependencies: EXP-100O, EXP-100P, EXP-100Q
+- Acceptance criteria: C2 visible-pass hidden-fail count decreases, or the remaining cases are documented as intentionally hidden-only; report compares survival and cost deltas against `experiment/results/meaningful_mini_screen`.
+- Complexity: XL
+- Implementation notes: Preserve the same model, seeds, problem set, and checkpoint limit for paired comparability.
+- Risks/unknowns: Stronger visible acceptance may increase C2 cost and repair-loop duration.
+
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
