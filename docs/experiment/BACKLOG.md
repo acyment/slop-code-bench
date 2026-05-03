@@ -269,6 +269,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-070 - Implement Lock Manifest
 
 - Phase: Runner integration
+- Status: completed in `experiment/scripts/verify_locks.py`
 - Rationale: C2 validity depends on protected-file integrity.
 - Description: Implement `verify_locks.py` to hash protected files before and after a checkpoint run.
 - Dependencies: EXP-003
@@ -280,6 +281,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-071 - Implement Trajectory Wrapper
 
 - Phase: Runner integration
+- Status: completed as dry-run integration in `experiment/scripts/run_trajectory.py`
 - Rationale: Need a single command per `(condition, problem, replicate)`.
 - Description: Implement `run_trajectory.py` to prepare workspace, render prompts, call SCBench runner, run visible acceptance for C2, run hidden eval, verify locks, and collect artifacts.
 - Dependencies: EXP-031, EXP-061, EXP-070
@@ -291,6 +293,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-072 - Add Pilot Subset Scripts
 
 - Phase: Runner integration
+- Status: completed for dry-run subsets in `experiment/scripts/run_pilot_subset.py`
 - Rationale: Runs should be easy to reproduce.
 - Description: Add scripts or Make targets for MVP and pilot subsets.
 - Dependencies: EXP-071

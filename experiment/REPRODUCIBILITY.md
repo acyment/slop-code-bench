@@ -6,6 +6,7 @@ Status:
 - EXP-002 complete: forks and experiment branches were created under `acyment`.
 - EXP-003 complete: local experiment directory skeleton exists.
 - EXP-004 complete: this reproducibility document exists.
+- EXP-070 through EXP-072 complete: protected-file lock checks and dry-run trajectory/subset wrappers exist. These dry runs do not execute model agents or hidden scoring.
 
 This file pins the canonical upstream repositories for the SpecCommons SCBench Gherkin drift pilot. It should be copied unchanged into the eventual experiment branch unless a deliberate upstream refresh is performed.
 

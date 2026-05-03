@@ -91,6 +91,10 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `../../experiment/prompts/*.md`: materialized condition prompt templates.
 - `../../experiment/scripts/generate_condition_context.py`: C0/C1/C2 prompt renderer.
 - `../../experiment/scripts/validate_prompt_contexts.py`: prompt stability and condition-boundary validator.
+- `../../experiment/scripts/verify_locks.py`: protected-file manifest creation and verification.
+- `../../experiment/scripts/validate_locks.py`: lock violation smoke check using temporary files.
+- `../../experiment/scripts/run_trajectory.py`: one-trajectory dry-run integration wrapper.
+- `../../experiment/scripts/run_pilot_subset.py`: MVP/pilot subset dry-run wrapper.
 
 ## Proposed First Pilot
 
@@ -174,3 +178,42 @@ uv run python experiment/scripts/validate_prompt_contexts.py \
   --problems-root ../scb-problems \
   --output-dir /tmp/scbench-prompt-contexts
 ```
+
+## Runner Integration Dry Run
+
+Milestone 8 adds the first runner-integration layer. It does not launch an implementation agent and does not run hidden evaluation. It prepares the trajectory artifact tree, renders prompts for every checkpoint, hashes protected files before/after each checkpoint, and emits `run.json` plus `checkpoints.jsonl` records.
+
+Validate lock enforcement with:
+
+```bash
+uv run python experiment/scripts/validate_locks.py
+```
+
+Render a single C2 trajectory dry run with:
+
+```bash
+uv run python experiment/scripts/run_trajectory.py \
+  --config experiment/configs/mvp_c2.yaml \
+  --problem code_search \
+  --replicate-id 1 \
+  --problems-root ../scb-problems \
+  --mode dry-run \
+  --run-root /tmp/scbench-m8-runs \
+  --run-id milestone8-smoke
+```
+
+Render an MVP subset dry run with:
+
+```bash
+uv run python experiment/scripts/run_pilot_subset.py \
+  --subset mvp \
+  --mode dry-run \
+  --problem code_search \
+  --replicate-id 1 \
+  --problems-root ../scb-problems \
+  --run-root /tmp/scbench-m8-mvp-subset \
+  --run-id-prefix milestone8 \
+  --summary-jsonl /tmp/scbench-m8-mvp-subset/summary.jsonl
+```
+
+Execution mode remains a later task: the wrapper currently records planned native SCBench and visible acceptance commands without running model agents or hidden scoring.
