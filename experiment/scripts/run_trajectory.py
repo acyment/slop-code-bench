@@ -153,30 +153,52 @@ def write_yaml(path: Path, payload: dict[str, Any]) -> None:
 
 def stage_acceptance_asset(
     *,
-    repo_root: Path,
     problem_dir: Path,
-    problem_id: str,
-    checkpoint_count: int,
 ) -> None:
     asset_root = problem_dir / "experiment_acceptance"
     asset_root.mkdir(parents=True, exist_ok=True)
-    shutil.copy2(
-        repo_root / "experiment" / "steps" / "acceptance" / "standalone_runner.py",
-        asset_root / "runner.py",
+    (asset_root / "runner.py").write_text(
+        "\n".join(
+            [
+                "#!/usr/bin/env python3",
+                '"""Checkpoint-scoped SpecCommons acceptance runner entrypoint."""',
+                "",
+                "from __future__ import annotations",
+                "",
+                "import runpy",
+                "import sys",
+                "from pathlib import Path",
+                "",
+                'CURRENT_RUNNER = Path(__file__).with_name("runner_current.py")',
+                "if not CURRENT_RUNNER.is_file():",
+                "    raise SystemExit(",
+                '        "checkpoint-scoped acceptance runner has not been prepared"',
+                "    )",
+                "sys.argv[0] = str(CURRENT_RUNNER)",
+                'runpy.run_path(str(CURRENT_RUNNER), run_name="__main__")',
+                "",
+            ]
+        ),
+        encoding="utf-8",
     )
-
-    features_src = repo_root / "experiment" / "features" / problem_id
-    features_dst = asset_root / "features" / problem_id
-    features_dst.mkdir(parents=True, exist_ok=True)
-    for index in range(1, checkpoint_count + 1):
-        feature_path = features_src / f"checkpoint_{index:03d}.feature"
-        if feature_path.is_file():
-            shutil.copy2(feature_path, features_dst / feature_path.name)
+    (asset_root / "README.md").write_text(
+        "\n".join(
+            [
+                "# SpecCommons C2 Acceptance Harness",
+                "",
+                "This workspace asset intentionally contains a checkpoint-scoped runner entrypoint only.",
+                "Checkpoint feature text is rendered into the prompt as current/prior context.",
+                "The native experiment runner writes `.scbench_acceptance/runner_current.py` before each checkpoint.",
+                "Future checkpoint `.feature` files and future scenario code are not staged here to avoid leakage.",
+                "",
+            ]
+        ),
+        encoding="utf-8",
+    )
 
 
 def prepare_native_problem_fixture(
     *,
-    repo_root: Path,
     source_problems_root: Path,
     artifact_root: Path,
     matrix_config: dict[str, Any],
@@ -201,10 +223,7 @@ def prepare_native_problem_fixture(
 
     if matrix_config["condition"]["id"] == "C2":
         stage_acceptance_asset(
-            repo_root=repo_root,
             problem_dir=problem_dir,
-            problem_id=problem_id,
-            checkpoint_count=len(checkpoint_ids),
         )
         static_assets = dict(config_payload.get("static_assets") or {})
         static_assets["speccommons_acceptance"] = {
@@ -328,6 +347,13 @@ def run_native_scbench(
         and acceptance_feedback_policy.get("enforcement") == "harness_mediated"
     ):
         env["SPECCOMMONS_ACCEPTANCE_GATE"] = "1"
+        env["SPECCOMMONS_ACCEPTANCE_SOURCE"] = (
+            repo_root_from_script()
+            / "experiment"
+            / "steps"
+            / "acceptance"
+            / "standalone_runner.py"
+        ).as_posix()
         env["SPECCOMMONS_ACCEPTANCE_GATE_MAX_REPAIRS"] = str(
             int(acceptance_feedback_policy.get("max_repair_attempts", 1))
         )
@@ -741,7 +767,6 @@ def run_trajectory(
             checkpoint_dir=root,
         )
         native_problem_root = prepare_native_problem_fixture(
-            repo_root=repo_root,
             source_problems_root=problems_root,
             artifact_root=root,
             matrix_config=matrix_config,

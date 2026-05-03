@@ -4,10 +4,10 @@
       "details": {
         "added_files": [],
         "changed_files": [],
-        "checked_at": "2026-05-03T17:27:14.391531Z",
-        "file_count_after": 105,
-        "file_count_before": 105,
-        "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
+        "checked_at": "2026-05-03T17:50:05.890058Z",
+        "file_count_after": 106,
+        "file_count_before": 106,
+        "freeze_hash": "07fe6bfc946cf0a5428247e5158d1c859c931b21d9ba87bbec8b2e481fc5db14",
         "freeze_status": "pre_execution_artifact_freeze",
         "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
         "missing_patterns_after": [],
@@ -21,7 +21,7 @@
         "schema_version": 1,
         "status": "unchanged"
       },
-      "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
+      "freeze_hash": "07fe6bfc946cf0a5428247e5158d1c859c931b21d9ba87bbec8b2e481fc5db14",
       "id": "pilot_artifacts.freeze_manifest",
       "message": "Freeze manifest matches current files.",
       "status": "pass"
@@ -29,6 +29,12 @@
     {
       "id": "mini_screen_c0.model_agent_selected",
       "matrix_id": "mini_screen_c0",
+      "message": "Model and agent are selected.",
+      "status": "pass"
+    },
+    {
+      "id": "mini_screen_c1.model_agent_selected",
+      "matrix_id": "mini_screen_c1",
       "message": "Model and agent are selected.",
       "status": "pass"
     },
@@ -80,7 +86,7 @@
     "ready": true
   },
   "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
-  "generated_at": "2026-05-03T17:27:14.404595Z",
+  "generated_at": "2026-05-03T17:50:05.910311Z",
   "matrix_summary": {
     "matrices": [
       {
@@ -88,28 +94,40 @@
           "code_search": 3,
           "file_backup": 3
         },
-        "checkpoint_executions": 6,
+        "checkpoint_executions": 18,
         "condition_id": "C0",
         "matrix_id": "mini_screen_c0",
         "problem_count": 2,
-        "replicate_count": 1,
-        "trajectory_count": 2
+        "replicate_count": 3,
+        "trajectory_count": 6
       },
       {
         "checkpoint_counts": {
           "code_search": 3,
           "file_backup": 3
         },
-        "checkpoint_executions": 6,
+        "checkpoint_executions": 18,
+        "condition_id": "C1",
+        "matrix_id": "mini_screen_c1",
+        "problem_count": 2,
+        "replicate_count": 3,
+        "trajectory_count": 6
+      },
+      {
+        "checkpoint_counts": {
+          "code_search": 3,
+          "file_backup": 3
+        },
+        "checkpoint_executions": 18,
         "condition_id": "C2",
         "matrix_id": "mini_screen_c2",
         "problem_count": 2,
-        "replicate_count": 1,
-        "trajectory_count": 2
+        "replicate_count": 3,
+        "trajectory_count": 6
       }
     ],
-    "total_checkpoint_executions": 12,
-    "total_trajectories": 4
+    "total_checkpoint_executions": 54,
+    "total_trajectories": 18
   },
   "profile": "mini_screen",
   "schema_version": 1,

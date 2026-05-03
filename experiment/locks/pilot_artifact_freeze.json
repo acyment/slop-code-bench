@@ -1,6 +1,6 @@
 {
   "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
-  "created_at": "2026-05-03T17:27:07.111435Z",
+  "created_at": "2026-05-03T17:49:54.740176Z",
   "excluded_paths": [],
   "files": {
     "docs/experiment/ACCEPTANCE_HARNESS.md": {
@@ -8,8 +8,8 @@
       "size_bytes": 2815
     },
     "docs/experiment/BACKLOG.md": {
-      "sha256": "c390871a36fdc9c85d6f23e95a173f9fadc63d46aa9c03c1d1891288044858b6",
-      "size_bytes": 32958
+      "sha256": "0648b6d5b1415b190f3fad411ec2d326e491ecddd2ac0fd96c8d3562f9f0a724",
+      "size_bytes": 41064
     },
     "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
       "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
@@ -96,12 +96,16 @@
       "size_bytes": 8690
     },
     "experiment/configs/mini_screen_c0.yaml": {
-      "sha256": "1a10db445521523f8844d99b6e9f4fb04b0f0d8a1a83cc730823e07f5b34512f",
-      "size_bytes": 1487
+      "sha256": "00862a8f055b9ce9952f8d75104845bf2e8ad8de31e2a3ea7d1c05576da40a05",
+      "size_bytes": 1575
+    },
+    "experiment/configs/mini_screen_c1.yaml": {
+      "sha256": "d7e7ecab3a8d472142c18634649f25b42a5ff08058d97506cc5f8b1efd74d852",
+      "size_bytes": 1902
     },
     "experiment/configs/mini_screen_c2.yaml": {
-      "sha256": "92611c4edb25b01795790b47a0a2a13c2ba8b0c38d2e7c5df4a1ad187cc158b0",
-      "size_bytes": 2195
+      "sha256": "68d36478a5edcd9350d95d2e440b09c4c942cf9aa81b39aa413e1fbc736d77e2",
+      "size_bytes": 2283
     },
     "experiment/configs/mvp_c0.yaml": {
       "sha256": "16f3bdc62f16b16c9a38d2d56c7e0ff6637bb57ac085d784dddf7a8e33fa0c4f",
@@ -332,8 +336,8 @@
       "size_bytes": 35044
     },
     "experiment/scripts/freeze_pilot_artifacts.py": {
-      "sha256": "67f8fd828193d7a0174098d93c2f4484801a0d892d79d75162649a210c9af376",
-      "size_bytes": 11307
+      "sha256": "9650060b083844cd593bbbc3c3d958bd1ddaec3fe58627ccf16adfcc29c2897a",
+      "size_bytes": 11353
     },
     "experiment/scripts/generate_condition_context.py": {
       "sha256": "e1906655860f028965e08033c6f424487181a9f8e8ecfcb073bf54f38e9b23b6",
@@ -356,12 +360,12 @@
       "size_bytes": 12921
     },
     "experiment/scripts/run_pilot_subset.py": {
-      "sha256": "46932e7b1bd5f509d0474c646af1dfea6520bd18b3fcc2865f111b6bebaa52a5",
-      "size_bytes": 6961
+      "sha256": "7bf106be7906387e3b6caa4cd0674ab71b513f6ff3b8edb9610091387f972288",
+      "size_bytes": 6984
     },
     "experiment/scripts/run_trajectory.py": {
-      "sha256": "5554746df114c34b81398a72591cd4ea780d619211e1154914561284b8ce7e23",
-      "size_bytes": 36642
+      "sha256": "0241fde402cb473ccfd10c5baa2144949fa480fea922291918467cc955c1a8f4",
+      "size_bytes": 37654
     },
     "experiment/scripts/select_problems.py": {
       "sha256": "fd38aceb8a90c714a88947e63b123fe131a66abd11f5a403ad76272d1a80fcbd",
@@ -372,8 +376,8 @@
       "size_bytes": 3786
     },
     "experiment/scripts/validate_full_pilot_preflight.py": {
-      "sha256": "a2f32b8dc8a2c8174fff74529b58adf3d8bd6fc6bd51669bb6e39168b246ede1",
-      "size_bytes": 23983
+      "sha256": "535375d1d566f27c50b70f9863030c34ab53480a18ebb62c2560c024cbf0ce33",
+      "size_bytes": 24020
     },
     "experiment/scripts/validate_locks.py": {
       "sha256": "9b10710c22d1715df0409262e98aa51e4c0b93c81c6d7fef2f5a23d32561739c",
@@ -420,18 +424,18 @@
       "size_bytes": 1452
     },
     "experiment/steps/acceptance/standalone_runner.py": {
-      "sha256": "70badf07e787ba127395fbc2f5ca8976f126ef0d84701ddd136f0a857d7da947",
-      "size_bytes": 30249
+      "sha256": "43cf87cd7a0add6df8ea72eb75f3431eb18d902d73cc40c6f0d2b4c29b781237",
+      "size_bytes": 36758
     }
   },
-  "freeze_created_at": "2026-05-03T17:27:07.151745Z",
-  "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
+  "freeze_created_at": "2026-05-03T17:49:54.782947Z",
+  "freeze_hash": "07fe6bfc946cf0a5428247e5158d1c859c931b21d9ba87bbec8b2e481fc5db14",
   "freeze_schema_version": 1,
   "freeze_status": "pre_execution_artifact_freeze",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
     "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
-    "head_commit_at_manifest_generation": "f3870d2c1c08efe4f5f87af51c3c93a3ee2b8f49"
+    "head_commit_at_manifest_generation": "3822a03c49b8ee9ea5f83f7953481d2aac939304"
   },
   "locked_paths": [
     "docs/experiment/**",
@@ -445,10 +449,11 @@
     "experiment/scripts/**",
     "experiment/schemas/**"
   ],
-  "manifest_hash": "3349dad7b9fabb0ba625d6cfd45c346edc21a9f70eaf2e4066652a092a0ddff0",
+  "manifest_hash": "7c482a562c6296dcaebc95084b580809cd5a54cf2073e9400ce524551da7cb54",
   "matrix_summary": {
     "conditions": [
       "C0",
+      "C1",
       "C2",
       "C0",
       "C1",
@@ -461,7 +466,7 @@
           "code_search": 3,
           "file_backup": 3
         },
-        "checkpoint_executions": 6,
+        "checkpoint_executions": 18,
         "condition_id": "C0",
         "matrix_id": "mini_screen_c0",
         "model_name": "gpt-5.3-codex-spark",
@@ -471,11 +476,13 @@
           "code_search",
           "file_backup"
         ],
-        "replicate_count": 1,
+        "replicate_count": 3,
         "replicate_ids": [
-          1
+          1,
+          2,
+          3
         ],
-        "trajectory_count": 2
+        "trajectory_count": 6
       },
       {
         "agent_harness": "codex",
@@ -483,7 +490,31 @@
           "code_search": 3,
           "file_backup": 3
         },
-        "checkpoint_executions": 6,
+        "checkpoint_executions": 18,
+        "condition_id": "C1",
+        "matrix_id": "mini_screen_c1",
+        "model_name": "gpt-5.3-codex-spark",
+        "path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/configs/mini_screen_c1.yaml",
+        "problem_count": 2,
+        "problems": [
+          "code_search",
+          "file_backup"
+        ],
+        "replicate_count": 3,
+        "replicate_ids": [
+          1,
+          2,
+          3
+        ],
+        "trajectory_count": 6
+      },
+      {
+        "agent_harness": "codex",
+        "checkpoint_counts": {
+          "code_search": 3,
+          "file_backup": 3
+        },
+        "checkpoint_executions": 18,
         "condition_id": "C2",
         "matrix_id": "mini_screen_c2",
         "model_name": "gpt-5.3-codex-spark",
@@ -493,11 +524,13 @@
           "code_search",
           "file_backup"
         ],
-        "replicate_count": 1,
+        "replicate_count": 3,
         "replicate_ids": [
-          1
+          1,
+          2,
+          3
         ],
-        "trajectory_count": 2
+        "trajectory_count": 6
       },
       {
         "agent_harness": "TBD_AGENT_HARNESS",
@@ -604,8 +637,8 @@
       "migrate_configs",
       "textdrop"
     ],
-    "total_checkpoint_executions": 273,
-    "total_trajectories": 58
+    "total_checkpoint_executions": 315,
+    "total_trajectories": 72
   },
   "missing_patterns": [],
   "primary_run_gate": {

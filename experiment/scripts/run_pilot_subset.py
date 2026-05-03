@@ -11,7 +11,7 @@ from typing import Any
 import run_trajectory
 
 SUBSET_CONFIGS = {
-    "mini_screen": ["mini_screen_c0.yaml", "mini_screen_c2.yaml"],
+    "mini_screen": ["mini_screen_c0.yaml", "mini_screen_c1.yaml", "mini_screen_c2.yaml"],
     "mvp": ["mvp_c0.yaml", "mvp_c2.yaml"],
     "screening": ["screening_c0.yaml", "screening_c1.yaml", "screening_c2.yaml"],
     "pilot": ["pilot_c0.yaml", "pilot_c1.yaml", "pilot_c2.yaml"],

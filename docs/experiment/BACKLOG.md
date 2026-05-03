@@ -440,10 +440,94 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Implementation notes: Implemented through the native checkpoint loop using `SPECCOMMONS_ACCEPTANCE_GATE=1`. The runner executes `.scbench_acceptance/runner.py` after the draft, records `acceptance_gate/summary.json`, feeds visible failures back for one repair attempt, and still preserves scorer-side visible acceptance reruns as measurement. Future checkpoint scenario staging still needs inspection before scale-up.
 - Risks/unknowns: Native SCBench may not expose enough transcript detail to prove command timing; a repair loop can change comparability with the original benchmark if not carefully documented.
 
+### EXP-100G - Prevent Future Checkpoint Feature Leakage
+
+- Phase: Full pilot run
+- Status: completed; C2 fixture dry-run stages only a non-leaking runner entrypoint/README, and native C2 checkpoints generate `.scbench_acceptance/runner_current.py` scoped to current/prior scenarios before the implementation agent starts each checkpoint
+- Rationale: C2 must expose current and prior behavior only. Future checkpoint scenarios in the implementation workspace would contaminate the intervention and make trajectories incomparable.
+- Description: Change C2 asset staging so `.scbench_acceptance` contains the locked runner/harness code but not future `.feature` files. The prompt renderer remains responsible for showing only current and prior Gherkin context. Add a dry-run verification that staged C2 workspaces do not contain future feature files.
+- Dependencies: EXP-100F
+- Acceptance criteria: C2 native fixture staging contains no future checkpoint `.feature` files; C2 acceptance still runs through current/prior scenarios; mini-screen preflight remains ready after freeze regeneration.
+- Complexity: M
+- Implementation notes: The staged `runner.py` delegates to a checkpoint-scoped `runner_current.py`. The full canonical runner stays in the experiment repo and is used by the native runner process to generate current/prior-only scoped copies. Treat post-hoc scenario `feature_path` fields as source references, not workspace paths.
+- Risks/unknowns: Some future reporting may assume `.feature` files are present in `.scbench_acceptance`; update reports if that assumption appears.
+
+### EXP-100H - Run C2 Gate Smoke
+
+- Phase: Full pilot run
+- Status: completed in `experiment/runs/c2_gate_smoke` and `experiment/results/c2_gate_smoke/exported`
+- Rationale: The new C2 repair loop must be verified before spending on a meaningful matrix.
+- Description: Run a cheap filtered native C2 trajectory, preferably `code_search` checkpoint 1 only, and confirm that `acceptance_gate/summary.json` exists, `c2_feedback_status` is `observed`, visible acceptance is rerun on the saved snapshot, and hidden scoring still executes.
+- Dependencies: EXP-100F, EXP-100G
+- Acceptance criteria: smoke run produces normalized checkpoint rows with C2 feedback fields populated; acceptance gate artifacts are linked from `artifact_paths`; no future `.feature` files are staged in the agent workspace.
+- Complexity: M
+- Implementation notes: This can use the Codex subscription because it is one checkpoint and should be low cost. Do not interpret it as reduced-drift evidence.
+- Risks/unknowns: Agent or Docker failure may require rerun; keep artifacts under a smoke-specific run root.
+
+### EXP-100I - Tighten `file_backup` Visible Acceptance
+
+- Phase: Full pilot run
+- Status: completed; strengthened checkpoint 1 acceptance passes reference solutions at checkpoints 1, 2, and 3
+- Rationale: The prior mini-screen showed `file_backup` passing visible acceptance while failing hidden tests at checkpoint 1. That indicates the visible harness was too weak or misaligned to act as useful executable feedback.
+- Description: Strengthen `file_backup` checkpoint 1 visible acceptance to check full observable event sequences for path relativity, exclusion ordering, deterministic job sorting, selected/excluded counts, and stderr cleanliness. Preserve maintainability and avoid copying hidden-only cases into the visible suite.
+- Dependencies: EXP-100B
+- Acceptance criteria: reference solution passes strengthened visible acceptance for `file_backup` checkpoints 1-3; generated scenarios remain observable CLI behavior; feature notes distinguish original-spec parity from enriched examples where applicable.
+- Complexity: M
+- Implementation notes: Use examples already present in checkpoint prose where possible, especially relative source paths and multiple-job sorting.
+- Risks/unknowns: Making visible acceptance too close to hidden tests can overfit; keep it as representative observable behavior, not a clone of hidden coverage.
+
+### EXP-100J - Add C1 To Mini-Screen Matrix
+
+- Phase: Full pilot run
+- Status: completed in `experiment/configs/mini_screen_c1.yaml` and mini-screen subset/preflight wiring
+- Rationale: `C0` vs `C2` does not isolate executable feedback from Gherkin/spec-format effects. A meaningful C2 interpretation needs `C1` as the structured-spec-only counterfactual.
+- Description: Add `mini_screen_c1.yaml`, include it in mini-screen subset/preflight, and keep problem IDs, checkpoint prefix, replicates, model, and agent harness matched across `C0`, `C1`, and `C2`.
+- Dependencies: EXP-100C
+- Acceptance criteria: mini-screen preflight includes `C0/C1/C2`; config validation passes; `C1` exposes Gherkin context but no runnable acceptance command.
+- Complexity: S
+- Implementation notes: Use the same seeds/replicate IDs as C0/C2.
+- Risks/unknowns: More trajectories increase cost; run smoke before full mini-screen.
+
+### EXP-100K - Define First Meaningful Mini-Screen Matrix
+
+- Phase: Full pilot run
+- Status: completed; mini-screen preflight reports 18 trajectories and 54 checkpoint executions
+- Rationale: The next run should be large enough to show tendency while still bounded enough to inspect manually.
+- Description: Configure the first meaningful matrix as `code_search` and `file_backup`, checkpoints 1-3, conditions `C0/C1/C2`, 3 replicates, one fixed model/agent harness. Record exact run command and planned output roots.
+- Dependencies: EXP-100G, EXP-100I, EXP-100J
+- Acceptance criteria: mini-screen preflight reports ready; matrix summary shows 18 trajectories and 54 checkpoint executions; screening/full pilot remains blocked until wider C2 coverage is complete.
+- Complexity: S
+- Implementation notes: This replaces the old one-replicate C0/C2 mini-screen as the first meaningful tendency check. Label results as bounded and still not causal proof.
+- Risks/unknowns: `file_backup` may still fail early; keep paired survival/regression analysis rather than aggregate-only pass rates.
+
+### EXP-100L - Freeze And Preflight Meaningful Mini-Screen
+
+- Phase: Full pilot run
+- Status: completed; latest freeze/preflight should be regenerated after any backlog/status edit and before EXP-100M execution
+- Rationale: No meaningful run should start from drifting experiment artifacts.
+- Description: Regenerate the artifact freeze, validate run matrices, validate prompt contexts, validate feature files, run targeted unit tests, and rerun mini-screen plus screening preflight.
+- Dependencies: EXP-100G, EXP-100H, EXP-100I, EXP-100J, EXP-100K
+- Acceptance criteria: `experiment/results/mini_screen_preflight/preflight.json` has `status: ready`; `experiment/results/screening_preflight/preflight.json` blocks only on wider C2 coverage; tests used for the protocol changes pass.
+- Complexity: M
+- Implementation notes: If freeze changes after smoke artifacts, regenerate and rerun preflight before the meaningful run.
+- Risks/unknowns: Frozen artifacts must be regenerated whenever feature/harness/prompt/schema scripts change.
+
+### EXP-100M - Run Meaningful Mini-Screen
+
+- Phase: Full pilot run
+- Status: ready after EXP-100L; execute from a clean freeze/preflight without editing frozen artifacts during data collection
+- Rationale: After the above gates, the next useful evidence is the bounded C0/C1/C2 paired mini-screen.
+- Description: Execute the meaningful mini-screen matrix, export normalized results, analyze paired C0/C1/C2 deltas, and generate a report that separates Gherkin-format effects from executable-feedback effects.
+- Dependencies: EXP-100L
+- Acceptance criteria: all 18 trajectories complete/fail/invalid with artifacts; normalized results include C2 feedback fields; report includes `C0 vs C1`, `C1 vs C2`, and `C0 vs C2` paired survival/regression tables.
+- Complexity: XL
+- Implementation notes: Stop and inspect before scaling if C2 has hidden-failure-after-visible-pass spikes or harness feedback is not observed.
+- Risks/unknowns: Cost/runtime and transient agent failures can reduce usable pairs; do not claim proof from this bounded screen.
+
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
-- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 6 of 19 selected checkpoint slots and C2 executed-feedback enforcement is not implemented
+- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 6 of 19 selected checkpoint slots, while executed-feedback enforcement is now implemented for future C2 runs
 - Rationale: Collect paired C0/C1/C2 trajectories.
 - Description: Run selected problems across C0/C1/C2 and 3 replicates if budget allows.
 - Dependencies: EXP-100A, EXP-100B, EXP-100C, EXP-100D, EXP-100E, EXP-100F

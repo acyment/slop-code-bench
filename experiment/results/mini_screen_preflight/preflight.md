@@ -2,12 +2,12 @@
 
 Profile: `mini_screen`
 Status: `ready`
-Generated at: `2026-05-03T17:27:14.404595Z`
+Generated at: `2026-05-03T17:50:05.910311Z`
 
 ## Matrix
 
-- Total trajectories: `4`
-- Total checkpoint executions: `12`
+- Total trajectories: `18`
+- Total checkpoint executions: `54`
 
 ## Gate Checks
 
@@ -15,6 +15,7 @@ Generated at: `2026-05-03T17:27:14.404595Z`
 | --- | --- | --- |
 | pilot_artifacts.freeze_manifest | pass | Freeze manifest matches current files. |
 | mini_screen_c0.model_agent_selected | pass | Model and agent are selected. |
+| mini_screen_c1.model_agent_selected | pass | Model and agent are selected. |
 | mini_screen_c2.model_agent_selected | pass | Model and agent are selected. |
 | trajectory.execution_bridge | pass | run_trajectory.py appears to support a non-dry-run execution mode. |
 | c2.acceptance_snapshot_bridge | pass | C2 acceptance command points at a workspace-local standalone runner. |

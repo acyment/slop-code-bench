@@ -1,0 +1,11 @@
+{
+  "artifact_count": 2,
+  "checkpoint_count": 1,
+  "generated_at": "2026-05-03T17:48:04.095203Z",
+  "input_runs": [
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/c2_gate_smoke/code_search/replicate_01/c2-gate-smoke-mini_screen_c2-code_search-r01"
+  ],
+  "run_count": 1,
+  "schema_version": 1,
+  "technical_metric_count": 1
+}

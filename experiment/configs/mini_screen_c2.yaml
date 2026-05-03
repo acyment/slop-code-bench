@@ -1,6 +1,6 @@
 schema_version: 1
 matrix_id: mini_screen_c2
-description: Reduced-drift mini-screen Gherkin plus executable acceptance run matrix for checkpoints 1-3.
+description: Meaningful reduced-drift mini-screen Gherkin plus executable acceptance run matrix for checkpoints 1-3.
 status: ready_to_run
 checkpoint_limit: 3
 condition:
@@ -26,11 +26,15 @@ problems:
 replicates:
   - replicate_id: 1
     seed: 7101
+  - replicate_id: 2
+    seed: 7102
+  - replicate_id: 3
+    seed: 7103
 model:
   provider: codex_auth
   name: gpt-5.3-codex-spark
   temperature: 0
-  notes: Fixed across mini-screen C0/C2 for the first paired reduced-drift probe.
+  notes: Fixed across mini-screen C0/C1/C2 for the first meaningful reduced-drift probe.
 agent_harness:
   id: codex
   version: 0.128.0

@@ -4,10 +4,10 @@
       "details": {
         "added_files": [],
         "changed_files": [],
-        "checked_at": "2026-05-03T17:27:14.400643Z",
-        "file_count_after": 105,
-        "file_count_before": 105,
-        "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
+        "checked_at": "2026-05-03T17:50:05.907684Z",
+        "file_count_after": 106,
+        "file_count_before": 106,
+        "freeze_hash": "07fe6bfc946cf0a5428247e5158d1c859c931b21d9ba87bbec8b2e481fc5db14",
         "freeze_status": "pre_execution_artifact_freeze",
         "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
         "missing_patterns_after": [],
@@ -21,7 +21,7 @@
         "schema_version": 1,
         "status": "unchanged"
       },
-      "freeze_hash": "e1c7ddbf47fe98b636ccd4a3d1ee9793941bcbd810e52112828ed033ef1c5067",
+      "freeze_hash": "07fe6bfc946cf0a5428247e5158d1c859c931b21d9ba87bbec8b2e481fc5db14",
       "id": "pilot_artifacts.freeze_manifest",
       "message": "Freeze manifest matches current files.",
       "status": "pass"
@@ -268,7 +268,7 @@
     "ready": false
   },
   "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
-  "generated_at": "2026-05-03T17:27:14.421560Z",
+  "generated_at": "2026-05-03T17:50:05.928356Z",
   "matrix_summary": {
     "matrices": [
       {

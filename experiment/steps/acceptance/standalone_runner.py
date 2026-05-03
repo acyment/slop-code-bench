@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import ast
 import json
 import subprocess
 import sys
@@ -37,6 +38,78 @@ def checkpoint_index(checkpoint_id: str) -> int:
         return int(checkpoint_id.rsplit("_", 1)[1])
     except (IndexError, ValueError) as exc:
         raise HarnessError(f"unsupported checkpoint id: {checkpoint_id}") from exc
+
+
+def _literal_ast(value: Any) -> ast.expr:
+    if isinstance(value, str | int | float | bool) or value is None:
+        return ast.Constant(value=value)
+    if isinstance(value, list):
+        return ast.List(
+            elts=[_literal_ast(item) for item in value],
+            ctx=ast.Load(),
+        )
+    raise HarnessError(f"cannot serialize scoped runner literal: {value!r}")
+
+
+def _scenario_specs_ast(specs: list[dict[str, Any]]) -> ast.List:
+    spec_nodes: list[ast.Dict] = []
+    for spec in specs:
+        keys: list[ast.expr | None] = []
+        values: list[ast.expr] = []
+        for key, value in spec.items():
+            keys.append(ast.Constant(value=key))
+            if key == "scenario_func":
+                values.append(ast.Name(id=value.__name__, ctx=ast.Load()))
+            else:
+                values.append(_literal_ast(value))
+        spec_nodes.append(ast.Dict(keys=keys, values=values))
+    return ast.List(elts=spec_nodes, ctx=ast.Load())
+
+
+def write_scoped_runner(
+    *,
+    source_path: Path,
+    output_path: Path,
+    problem_id: str,
+    checkpoint_id: str,
+    through_checkpoint: bool,
+) -> None:
+    allowed_specs = selected_scenarios(
+        problem_id=problem_id,
+        checkpoint_id=checkpoint_id,
+        through_checkpoint=through_checkpoint,
+    )
+    allowed_func_names = {
+        spec["scenario_func"].__name__
+        for spec in allowed_specs
+    }
+    source = source_path.read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    class ScopeTransformer(ast.NodeTransformer):
+        def visit_FunctionDef(self, node: ast.FunctionDef) -> ast.AST | None:  # noqa: N802
+            if node.name.startswith("scenario_") and node.name not in allowed_func_names:
+                return None
+            return self.generic_visit(node)
+
+        def visit_AnnAssign(self, node: ast.AnnAssign) -> ast.AST:  # noqa: N802
+            if isinstance(node.target, ast.Name) and node.target.id == "SCENARIO_SPECS":
+                node.value = _scenario_specs_ast(allowed_specs)
+                return node
+            return self.generic_visit(node)
+
+    scoped = ScopeTransformer().visit(tree)
+    ast.fix_missing_locations(scoped)
+    output = (
+        "#!/usr/bin/env python3\n"
+        "# Generated checkpoint-scoped visible acceptance runner.\n"
+        "# Future checkpoint scenarios are intentionally omitted.\n"
+        f"# Scope: problem={problem_id} checkpoint={checkpoint_id} through={through_checkpoint}\n"
+        + ast.unparse(scoped)
+        + "\n"
+    )
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(output, encoding="utf-8")
 
 
 def write_text(path: Path, text: str) -> None:
@@ -117,6 +190,25 @@ def assert_json_lines_equal(text: str, expected: list[dict[str, Any]]) -> None:
         )
 
 
+def assert_json_lines_match_subsets(
+    text: str,
+    expected_subsets: list[dict[str, Any]],
+) -> None:
+    actual = parse_json_lines(text)
+    if len(actual) != len(expected_subsets):
+        raise ScenarioFailureError(
+            f"JSONL line count mismatch: got {len(actual)}, expected {len(expected_subsets)}"
+        )
+    for index, (row, subset) in enumerate(zip(actual, expected_subsets, strict=True)):
+        if not isinstance(row, dict):
+            raise ScenarioFailureError(f"JSONL line {index} is not an object")
+        for key, expected_value in subset.items():
+            if row.get(key) != expected_value:
+                raise ScenarioFailureError(
+                    "JSONL output did not match expected observable events"
+                )
+
+
 def assert_any_json_line(text: str, expected_subset: dict[str, Any]) -> None:
     for row in parse_json_lines(text):
         if not isinstance(row, dict):
@@ -147,12 +239,14 @@ def assert_json_line_count(text: str, expected_count: int) -> list[dict[str, Any
 
 
 def assert_output_sorted_by_file_position(rows: list[dict[str, Any]]) -> None:
-    sort_key = lambda row: (
-        row.get("file"),
-        row.get("start", {}).get("line"),
-        row.get("start", {}).get("col"),
-        row.get("rule_id"),
-    )
+    def sort_key(row: dict[str, Any]) -> tuple[Any, Any, Any, Any]:
+        return (
+            row.get("file"),
+            row.get("start", {}).get("line"),
+            row.get("start", {}).get("col"),
+            row.get("rule_id"),
+        )
+
     if rows != sorted(rows, key=sort_key):
         raise ScenarioFailureError("JSONL matches must be sorted by file and position")
 
@@ -211,7 +305,7 @@ def scenario_code_search_cp1(
 
     assert_exit_status(result, 0)
     assert_stderr_empty(result)
-    assert_json_lines_equal(
+    assert_json_lines_match_subsets(
         result["stdout"],
         [
             {
@@ -432,8 +526,14 @@ def scenario_file_backup_cp1(
         for rel_path in [
             "A/B/C/D.py",
             "A/B/E.bin",
+            "A/F/G.bin",
+            "A/F/H.py",
             "A/I.py",
+            "A/J.bin",
+            "A/K.html",
+            "A/L.md",
             "M.py",
+            "N.py",
             "O.md",
         ]:
             write_text(files_root / rel_path, "")
@@ -478,15 +578,97 @@ jobs:
         )
 
     assert_exit_status(result, 0)
-    events = parse_json_lines(result["stdout"])
-    if not events or not isinstance(events[0], dict):
-        raise ScenarioFailureError("expected at least one JSONL event")
-    if events[0].get("event") != "SCHEDULE_PARSED":
-        raise ScenarioFailureError("first event must be SCHEDULE_PARSED")
-    assert_any_json_line(result["stdout"], {"event": "JOB_ELIGIBLE", "job_id": "job-root"})
-    assert_any_json_line(result["stdout"], {"event": "JOB_ELIGIBLE", "job_id": "job-subdir"})
-    assert_any_json_line(result["stdout"], {"event": "JOB_COMPLETED", "job_id": "job-root"})
-    assert_any_json_line(result["stdout"], {"event": "JOB_COMPLETED", "job_id": "job-subdir"})
+    assert_stderr_empty(result)
+    assert_json_lines_match_subsets(
+        result["stdout"],
+        [
+            {"event": "SCHEDULE_PARSED", "timezone": "UTC", "jobs_total": 2},
+            {
+                "event": "JOB_ELIGIBLE",
+                "job_id": "job-root",
+                "kind": "daily",
+                "now_local": "2025-09-10T03:30:00Z",
+            },
+            {"event": "JOB_STARTED", "job_id": "job-root", "exclude_count": 3},
+            {"event": "FILE_SELECTED", "job_id": "job-root", "path": "A/B/C/D.py"},
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "A/B/E.bin",
+                "pattern": "**/*.bin",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "A/F/G.bin",
+                "pattern": "**/*.bin",
+            },
+            {"event": "FILE_SELECTED", "job_id": "job-root", "path": "A/F/H.py"},
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "A/I.py",
+                "pattern": "A/*",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "A/J.bin",
+                "pattern": "A/*",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "A/K.html",
+                "pattern": "A/*",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "A/L.md",
+                "pattern": "A/*",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "M.py",
+                "pattern": "*.py",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-root",
+                "path": "N.py",
+                "pattern": "*.py",
+            },
+            {"event": "FILE_SELECTED", "job_id": "job-root", "path": "O.md"},
+            {
+                "event": "JOB_COMPLETED",
+                "job_id": "job-root",
+                "selected": 3,
+                "excluded": 8,
+            },
+            {
+                "event": "JOB_ELIGIBLE",
+                "job_id": "job-subdir",
+                "kind": "daily",
+                "now_local": "2025-09-10T03:30:00Z",
+            },
+            {"event": "JOB_STARTED", "job_id": "job-subdir", "exclude_count": 2},
+            {"event": "FILE_SELECTED", "job_id": "job-subdir", "path": "C/D.py"},
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "job-subdir",
+                "path": "E.bin",
+                "pattern": "**/*.bin",
+            },
+            {
+                "event": "JOB_COMPLETED",
+                "job_id": "job-subdir",
+                "selected": 1,
+                "excluded": 1,
+            },
+        ],
+    )
     return result["stdout_path"], result["stderr_path"]
 
 
@@ -876,11 +1058,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--output-dir", type=Path, default=Path(".scbench_acceptance/results"))
     parser.add_argument("--run-id", default="visible-acceptance")
     parser.add_argument("--list-json", action="store_true")
+    parser.add_argument("--scope-output", type=Path)
     return parser.parse_args()
 
 
 def main() -> int:
     args = parse_args()
+    if args.scope_output:
+        if not args.problem_id or not args.checkpoint_id:
+            raise HarnessError("--problem-id and --checkpoint-id are required")
+        write_scoped_runner(
+            source_path=Path(__file__).resolve(),
+            output_path=args.scope_output,
+            problem_id=args.problem_id,
+            checkpoint_id=args.checkpoint_id,
+            through_checkpoint=args.through_checkpoint,
+        )
+        return 0
+
     if args.list_json:
         payload = [
             {

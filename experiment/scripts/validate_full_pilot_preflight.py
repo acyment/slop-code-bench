@@ -25,6 +25,7 @@ SCREENING_CONFIGS = [
 ]
 MINI_SCREEN_CONFIGS = [
     "experiment/configs/mini_screen_c0.yaml",
+    "experiment/configs/mini_screen_c1.yaml",
     "experiment/configs/mini_screen_c2.yaml",
 ]
 CONFIG_PROFILES = {
@@ -352,11 +353,11 @@ def check_reduced_drift_evidence_gate(
 
     if required_conditions.issubset(by_condition):
         baseline = by_condition["C0"]
-        baseline_problems = set(str(problem) for problem in baseline["problems"])
+        baseline_problems = {str(problem) for problem in baseline["problems"]}
         baseline_replicates = replicate_ids(baseline)
         for condition_id in comparable_conditions:
             config = by_condition[condition_id]
-            problems = set(str(problem) for problem in config["problems"])
+            problems = {str(problem) for problem in config["problems"]}
             if problems != baseline_problems:
                 blockers.append(
                     {
@@ -385,7 +386,7 @@ def check_reduced_drift_evidence_gate(
                     problem_id=problem_id,
                 )
                 for condition_id in comparable_conditions
-                if problem_id in set(str(problem) for problem in by_condition[condition_id]["problems"])
+                if problem_id in {str(problem) for problem in by_condition[condition_id]["problems"]}
             }
             if counts_by_condition and len(set(counts_by_condition.values())) > 1:
                 blockers.append(

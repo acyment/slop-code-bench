@@ -29,6 +29,7 @@ DEFAULT_FROZEN_PATHS = [
 ]
 DEFAULT_MATRIX_PATHS = [
     "experiment/configs/mini_screen_c0.yaml",
+    "experiment/configs/mini_screen_c1.yaml",
     "experiment/configs/mini_screen_c2.yaml",
     "experiment/configs/pilot_c0.yaml",
     "experiment/configs/pilot_c1.yaml",

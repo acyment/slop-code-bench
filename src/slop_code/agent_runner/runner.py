@@ -6,6 +6,8 @@ import json
 import os
 import queue
 import shlex
+import subprocess
+import sys
 import threading
 import time
 import traceback
@@ -43,6 +45,7 @@ logger = get_logger(__name__)
 ACCEPTANCE_GATE_ENV = "SPECCOMMONS_ACCEPTANCE_GATE"
 ACCEPTANCE_GATE_MAX_REPAIRS_ENV = "SPECCOMMONS_ACCEPTANCE_GATE_MAX_REPAIRS"
 ACCEPTANCE_GATE_TIMEOUT_ENV = "SPECCOMMONS_ACCEPTANCE_GATE_TIMEOUT_SECONDS"
+ACCEPTANCE_SOURCE_ENV = "SPECCOMMONS_ACCEPTANCE_SOURCE"
 ACCEPTANCE_GATE_DIR = "acceptance_gate"
 TRUTHY_ENV_VALUES = {"1", "true", "yes", "on"}
 
@@ -114,7 +117,71 @@ def _scenario_summary(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 
 def _acceptance_gate_available(session: Session) -> bool:
-    return (session.working_dir / ".scbench_acceptance" / "runner.py").is_file()
+    acceptance_dir = session.working_dir / ".scbench_acceptance"
+    return (
+        (acceptance_dir / "runner.py").is_file()
+        and (acceptance_dir / "runner_current.py").is_file()
+    )
+
+
+def _acceptance_source_path() -> Path | None:
+    raw = os.environ.get(ACCEPTANCE_SOURCE_ENV)
+    if raw:
+        path = Path(raw)
+        if path.is_file():
+            return path
+        logger.warning("Acceptance source runner not found", path=raw)
+    return None
+
+
+def _scope_acceptance_runner_for_checkpoint(
+    *,
+    session: Session,
+    problem_id: str,
+    checkpoint_id: str,
+) -> None:
+    acceptance_dir = session.working_dir / ".scbench_acceptance"
+    entrypoint = acceptance_dir / "runner.py"
+    if not entrypoint.is_file():
+        return
+    source_path = _acceptance_source_path()
+    if source_path is None:
+        logger.warning(
+            "Cannot scope acceptance runner without source path",
+            problem_id=problem_id,
+            checkpoint_id=checkpoint_id,
+        )
+        return
+    scoped_path = acceptance_dir / "runner_current.py"
+    temporary_path = acceptance_dir / "runner_current.py.tmp"
+    command = [
+        sys.executable,
+        str(source_path),
+        "--problem-id",
+        problem_id,
+        "--checkpoint-id",
+        checkpoint_id,
+        "--through-checkpoint",
+        "--scope-output",
+        str(temporary_path),
+    ]
+    completed = subprocess.run(  # noqa: S603
+        command,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if completed.returncode != 0:
+        logger.warning(
+            "Failed to prepare checkpoint-scoped acceptance runner",
+            problem_id=problem_id,
+            checkpoint_id=checkpoint_id,
+            returncode=completed.returncode,
+            stdout=completed.stdout[-1000:],
+            stderr=completed.stderr[-1000:],
+        )
+        return
+    temporary_path.replace(scoped_path)
 
 
 def _acceptance_gate_command(
@@ -887,6 +954,11 @@ class AgentRunner:
         checkpoint_save_dir: Path,
         is_first_checkpoint: bool,  # noqa: FBT001
     ) -> AgentCheckpointSummary:
+        _scope_acceptance_runner_for_checkpoint(
+            session=self.session,
+            problem_id=self.run_spec.problem.name,
+            checkpoint_id=checkpoint.name,
+        )
         self._setup_for_checkpoint(checkpoint)
         self.metrics_tracker.state = AgentStateEnum.RUNNING
         compress = self.run_spec.compress_artifacts
