@@ -445,6 +445,12 @@ def export_dry_run(
     for row in checkpoint_rows:
         require_fields(row, CHECKPOINT_FIELDS, (run_dir / "checkpoints.jsonl").as_posix())
 
+    native_technical_rows = read_jsonl(run_dir / "normalized" / "technical_metrics.jsonl")
+    native_technical_by_checkpoint = {
+        str(row.get("checkpoint_id")): row
+        for row in native_technical_rows
+        if isinstance(row, dict)
+    }
     technical_rows: list[dict[str, Any]] = []
     artifact_rows = [
         {
@@ -458,8 +464,17 @@ def export_dry_run(
     ]
     for checkpoint_row in checkpoint_rows:
         technical = dict(checkpoint_row.get("technical_metrics") or {})
-        technical_rows.append(
-            {
+        native_technical = native_technical_by_checkpoint.get(
+            str(checkpoint_row["checkpoint_id"])
+        )
+        if native_technical is not None:
+            technical_row = dict(native_technical)
+            technical_row["acceptance_runtime_ms"] = technical.get(
+                "acceptance_runtime_ms",
+                technical_row.get("acceptance_runtime_ms"),
+            )
+        else:
+            technical_row = {
                 "schema_version": 1,
                 "run_id": run_row["run_id"],
                 "problem_id": run_row["problem_id"],
@@ -483,7 +498,7 @@ def export_dry_run(
                 "acceptance_runtime_ms": technical.get("acceptance_runtime_ms"),
                 "hidden_eval_runtime_ms": technical.get("hidden_eval_runtime_ms"),
             }
-        )
+        technical_rows.append(technical_row)
         artifact_rows.append(
             {
                 "schema_version": 1,
@@ -806,15 +821,19 @@ def is_dry_run_dir(path: Path) -> bool:
 
 
 def discover_input_runs(roots: list[Path]) -> list[Path]:
-    discovered: dict[Path, None] = {}
+    wrapper_runs: dict[Path, None] = {}
+    native_runs: dict[Path, None] = {}
     for root in roots:
-        if is_dry_run_dir(root) or (root / "config.yaml").is_file():
-            discovered[root.resolve()] = None
+        if is_dry_run_dir(root):
+            wrapper_runs[root.resolve()] = None
+            continue
+        if (root / "config.yaml").is_file():
+            native_runs[root.resolve()] = None
             continue
         for run_json in root.rglob("run.json"):
             run_dir = run_json.parent
             if is_dry_run_dir(run_dir):
-                discovered[run_dir.resolve()] = None
+                wrapper_runs[run_dir.resolve()] = None
         for config_path in root.rglob("config.yaml"):
             candidate = config_path.parent
             if (
@@ -822,8 +841,13 @@ def discover_input_runs(roots: list[Path]) -> list[Path]:
                 or (candidate / "run_agent.log").is_file()
                 or (candidate / "problem_catalog.json").is_file()
             ):
-                discovered[candidate.resolve()] = None
-    return sorted(discovered)
+                native_runs[candidate.resolve()] = None
+
+    wrapper_roots = list(wrapper_runs)
+    for native_run in list(native_runs):
+        if any(native_run.is_relative_to(wrapper_root) for wrapper_root in wrapper_roots):
+            native_runs.pop(native_run, None)
+    return sorted({**wrapper_runs, **native_runs})
 
 
 def export_runs(

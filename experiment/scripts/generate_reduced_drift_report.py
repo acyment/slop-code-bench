@@ -91,6 +91,14 @@ def bool_label(value: Any) -> str:
     return "n/a"
 
 
+def yes_no_label(value: Any) -> str:
+    if value is True:
+        return "yes"
+    if value is False:
+        return "no"
+    return "n/a"
+
+
 def summary_by_condition_problem_replicate(
     analysis: dict[str, Any]
 ) -> dict[tuple[str, str, int], dict[str, Any]]:
@@ -192,7 +200,7 @@ def checkpoint_pair_rows(checkpoint_rows: list[dict[str, Any]]) -> list[dict[str
                 "c2_visible": bool_label(c2.get("visible_acceptance_passed")),
                 "c0_regressions": c0.get("prior_regression_count"),
                 "c2_regressions": c2.get("prior_regression_count"),
-                "c2_hidden_after_visible": bool_label(
+                "c2_hidden_after_visible": yes_no_label(
                     c2.get("hidden_failure_after_visible_pass")
                 ),
             }
@@ -229,6 +237,28 @@ def cost_summary(checkpoint_rows: list[dict[str, Any]]) -> dict[str, Any]:
     return totals
 
 
+def technical_slope_rows(analysis: dict[str, Any]) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for row in analysis.get("technical_slopes", []):
+        if not isinstance(row, dict):
+            continue
+        rows.append(
+            {
+                "condition": row.get("condition_id"),
+                "problem": row.get("problem_id"),
+                "replicate": row.get("replicate_id"),
+                "loc_slope": row.get("loc_slope"),
+                "sloc_slope": row.get("sloc_slope"),
+                "cc_max_slope": row.get("cc_max_slope"),
+                "clone_lines_slope": row.get("clone_lines_slope"),
+                "cloned_pct_slope": row.get("cloned_pct_slope"),
+                "acceptance_runtime_ms_slope": row.get("acceptance_runtime_ms_slope"),
+                "loc_points": row.get("loc_points"),
+            }
+        )
+    return rows
+
+
 def report_status(
     *, analysis: dict[str, Any], preflight: dict[str, Any], pair_rows: list[dict[str, Any]]
 ) -> str:
@@ -254,6 +284,7 @@ def build_report(
     run_rows = read_jsonl(results_dir / "runs.jsonl")
     pair_rows = paired_trajectory_rows(analysis)
     checkpoint_pairs = checkpoint_pair_rows(checkpoint_rows)
+    technical_rows = technical_slope_rows(analysis)
     costs = cost_summary(checkpoint_rows)
     status = report_status(
         analysis=analysis,
@@ -274,6 +305,7 @@ def build_report(
         "evaluable_checkpoint_count": analysis.get("evaluable_checkpoint_count"),
         "paired_trajectory_rows": pair_rows,
         "checkpoint_pair_rows": checkpoint_pairs,
+        "technical_slope_rows": technical_rows,
         "cost_summary": costs,
         "limitations": [
             "One replicate and two problems are underpowered and directional only.",
@@ -289,6 +321,7 @@ def build_report(
             summary=summary,
             pair_rows=pair_rows,
             checkpoint_pairs=checkpoint_pairs,
+            technical_rows=technical_rows,
         ),
     )
     return summary
@@ -299,6 +332,7 @@ def report_markdown(
     summary: dict[str, Any],
     pair_rows: list[dict[str, Any]],
     checkpoint_pairs: list[dict[str, Any]],
+    technical_rows: list[dict[str, Any]],
 ) -> str:
     lines = [
         "# Reduced-Drift Mini-Screen Report",
@@ -352,6 +386,24 @@ def report_markdown(
                 "c0_regressions",
                 "c2_regressions",
                 "c2_hidden_after_visible",
+            ],
+        ),
+        "",
+        "## Technical Drift Slopes",
+        "",
+        markdown_table(
+            technical_rows,
+            [
+                "condition",
+                "problem",
+                "replicate",
+                "loc_slope",
+                "sloc_slope",
+                "cc_max_slope",
+                "clone_lines_slope",
+                "cloned_pct_slope",
+                "acceptance_runtime_ms_slope",
+                "loc_points",
             ],
         ),
         "",

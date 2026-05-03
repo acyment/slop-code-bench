@@ -1,0 +1,14 @@
+{
+  "artifact_count": 12,
+  "checkpoint_count": 8,
+  "generated_at": "2026-05-03T16:44:40.427679Z",
+  "input_runs": [
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/reduced_drift_probe/code_search/replicate_01/reduced-drift-probe-mini_screen_c0-code_search-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/reduced_drift_probe/code_search/replicate_01/reduced-drift-probe-mini_screen_c2-code_search-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/reduced_drift_probe/file_backup/replicate_01/reduced-drift-probe-mini_screen_c0-file_backup-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/reduced_drift_probe/file_backup/replicate_01/reduced-drift-probe-mini_screen_c2-file_backup-r01"
+  ],
+  "run_count": 4,
+  "schema_version": 1,
+  "technical_metric_count": 8
+}

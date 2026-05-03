@@ -1,0 +1,155 @@
+{
+  "analysis_dir": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/reduced_drift_probe/analysis",
+  "causal_claim_supported": false,
+  "checkpoint_count": 8,
+  "checkpoint_pair_rows": [
+    {
+      "c0_hidden": "pass",
+      "c0_regressions": 0,
+      "c2_hidden": "pass",
+      "c2_hidden_after_visible": "no",
+      "c2_regressions": 0,
+      "c2_visible": "pass",
+      "checkpoint": "checkpoint_1",
+      "problem": "code_search",
+      "replicate": 1
+    },
+    {
+      "c0_hidden": "pass",
+      "c0_regressions": 0,
+      "c2_hidden": "pass",
+      "c2_hidden_after_visible": "no",
+      "c2_regressions": 0,
+      "c2_visible": "pass",
+      "checkpoint": "checkpoint_2",
+      "problem": "code_search",
+      "replicate": 1
+    },
+    {
+      "c0_hidden": "fail",
+      "c0_regressions": 0,
+      "c2_hidden": "fail",
+      "c2_hidden_after_visible": "yes",
+      "c2_regressions": 0,
+      "c2_visible": "pass",
+      "checkpoint": "checkpoint_3",
+      "problem": "code_search",
+      "replicate": 1
+    },
+    {
+      "c0_hidden": "fail",
+      "c0_regressions": 0,
+      "c2_hidden": "fail",
+      "c2_hidden_after_visible": "yes",
+      "c2_regressions": 0,
+      "c2_visible": "pass",
+      "checkpoint": "checkpoint_1",
+      "problem": "file_backup",
+      "replicate": 1
+    }
+  ],
+  "claim_status": "directional_only",
+  "cost_summary": {
+    "agent_steps": 150,
+    "api_cost_usd": 0.2900795,
+    "checkpoint_rows_with_cost": 8,
+    "input_tokens_net": 2820654,
+    "output_tokens_net": 88810,
+    "reasoning_tokens_net": 42569
+  },
+  "evaluable_checkpoint_count": 8,
+  "generated_at": "2026-05-03T16:47:41.295188Z",
+  "limitations": [
+    "One replicate and two problems are underpowered and directional only.",
+    "Visible acceptance tests are an intervention; hidden SCBench tests remain the correctness judge.",
+    "Technical drift slopes over three checkpoints are noisy and should be treated as secondary.",
+    "Before scaling, inspect C2 asset staging so future checkpoint scenarios are not exposed early."
+  ],
+  "paired_trajectory_rows": [
+    {
+      "c0_hidden_pass_rate": 0.6666666666666666,
+      "c0_regression_rate": 0.0,
+      "c0_survival": 2,
+      "c2_hidden_after_visible": 1,
+      "c2_hidden_pass_rate": 0.6666666666666666,
+      "c2_regression_rate": 0.0,
+      "c2_survival": 2,
+      "paired": true,
+      "problem": "code_search",
+      "regression_delta_c2_minus_c0": 0.0,
+      "replicate": 1,
+      "status": "paired",
+      "survival_delta_c2_minus_c0": 0
+    },
+    {
+      "c0_hidden_pass_rate": 0.0,
+      "c0_regression_rate": 0.0,
+      "c0_survival": 0,
+      "c2_hidden_after_visible": 1,
+      "c2_hidden_pass_rate": 0.0,
+      "c2_regression_rate": 0.0,
+      "c2_survival": 0,
+      "paired": true,
+      "problem": "file_backup",
+      "regression_delta_c2_minus_c0": 0.0,
+      "replicate": 1,
+      "status": "paired",
+      "survival_delta_c2_minus_c0": 0
+    }
+  ],
+  "preflight_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/mini_screen_preflight/preflight.json",
+  "results_dir": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/reduced_drift_probe",
+  "run_count": 4,
+  "schema_version": 1,
+  "status": "directional_probe_complete",
+  "technical_slope_rows": [
+    {
+      "acceptance_runtime_ms_slope": null,
+      "cc_max_slope": 6.5,
+      "clone_lines_slope": 15.0,
+      "cloned_pct_slope": 0.030425963488843813,
+      "condition": "C0",
+      "loc_points": 3,
+      "loc_slope": 209.0,
+      "problem": "code_search",
+      "replicate": 1,
+      "sloc_slope": 176.5
+    },
+    {
+      "acceptance_runtime_ms_slope": 67.2479789936915,
+      "cc_max_slope": 1.5,
+      "clone_lines_slope": 10.0,
+      "cloned_pct_slope": 0.021367521367521368,
+      "condition": "C2",
+      "loc_points": 3,
+      "loc_slope": 173.5,
+      "problem": "code_search",
+      "replicate": 1,
+      "sloc_slope": 141.5
+    },
+    {
+      "acceptance_runtime_ms_slope": null,
+      "cc_max_slope": null,
+      "clone_lines_slope": null,
+      "cloned_pct_slope": null,
+      "condition": "C0",
+      "loc_points": 1,
+      "loc_slope": null,
+      "problem": "file_backup",
+      "replicate": 1,
+      "sloc_slope": null
+    },
+    {
+      "acceptance_runtime_ms_slope": null,
+      "cc_max_slope": null,
+      "clone_lines_slope": null,
+      "cloned_pct_slope": null,
+      "condition": "C2",
+      "loc_points": 1,
+      "loc_slope": null,
+      "problem": "file_backup",
+      "replicate": 1,
+      "sloc_slope": null
+    }
+  ]
+}

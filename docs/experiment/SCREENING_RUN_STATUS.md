@@ -4,9 +4,9 @@ Generated: 2026-05-03
 
 ## Current Status
 
-The native execution path is now implemented far enough to run SCBench through a condition-specific fixture without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1.
+The native execution path is now implemented far enough to run SCBench through a condition-specific fixture without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1, and a paired reduced-drift mini-screen has now run for C0 vs C2 on `code_search` and `file_backup` through checkpoint 3.
 
-This is not primary experiment evidence. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial.
+This is still directional evidence only. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial.
 
 ## Seven-Step Run Checklist
 
@@ -17,8 +17,8 @@ This is not primary experiment evidence. The representative screening matrix rem
 | 3. Add screening preflight | done | `validate_full_pilot_preflight.py --profile screening` checks model/agent selection, execution bridge, freeze state, and C2 coverage. |
 | 4. Choose fixed runtime settings | done | Screening configs use `codex_auth/gpt-5.3-codex-spark`, Codex CLI `0.128.0`, `thinking: low`, `num_workers: 1`. |
 | 5. Run one paid smoke checkpoint | done | `smoke-c2-code-search-cp1-v2` completed and passed. |
-| 6. Run screening matrix | blocked | C2 coverage has locked scenarios for 2 of 19 selected checkpoint slots; 17 slots are missing. |
-| 7. Export/analyze/report | done for smoke | Normalized smoke result and analysis are under `experiment/results/paid_smoke_c2_code_search_cp1_v2/`. |
+| 6. Run screening matrix | blocked | C2 coverage has locked scenarios for 6 of 19 selected checkpoint slots; 13 slots are missing. |
+| 7. Export/analyze/report | done for smoke and mini-screen | Normalized smoke result and analysis are under `experiment/results/paid_smoke_c2_code_search_cp1_v2/`; mini-screen results are under `experiment/results/reduced_drift_probe/`. |
 
 ## Paid Smoke Result
 
@@ -62,18 +62,44 @@ The smoke result validates that the pipeline can:
 
 It does not show a tendency between C0, C1, and C2. There is only one C2 checkpoint and no paired baseline run in this smoke.
 
+## Reduced-Drift Mini-Screen Result
+
+Run prefix: `reduced-drift-probe`
+
+Shape:
+
+- Conditions: C0 vs C2
+- Problems: `code_search`, `file_backup`
+- Checkpoint prefix: 1-3
+- Replicates: 1
+- Evaluable checkpoint rows: 8
+- Agent-reported cost: `$0.2900795`
+
+Directional outcome:
+
+- `code_search`: C0 and C2 both survived through checkpoint 2 and failed hidden tests at checkpoint 3. C2 visible acceptance passed at checkpoints 1-3, producing one hidden-failure-after-visible-pass case at checkpoint 3.
+- `file_backup`: C0 and C2 both failed hidden tests at checkpoint 1 and did not progress to checkpoints 2-3. C2 visible acceptance passed checkpoint 1, producing one hidden-failure-after-visible-pass case.
+- There is no observed survival or regression-rate advantage for C2 in this one-replicate mini-screen.
+
+Primary artifacts:
+
+- Runs: `experiment/runs/reduced_drift_probe/`
+- Normalized export: `experiment/results/reduced_drift_probe/`
+- Analysis summary: `experiment/results/reduced_drift_probe/analysis/summary.json`
+- Directional report: `experiment/results/reduced_drift_probe/report/reduced_drift_report.md`
+
 ## Current Blocker
 
 The screening preflight blocks the full screening matrix because C2 visible acceptance coverage is partial:
 
 - selected C2 checkpoint slots: 19
-- covered checkpoint slots: 2
-- missing checkpoint slots: 17
+- covered checkpoint slots: 6
+- missing checkpoint slots: 13
 
 The covered slots are:
 
-- `code_search` checkpoint 1
-- `file_backup` checkpoint 1
+- `code_search` checkpoints 1-3
+- `file_backup` checkpoints 1-3
 
 The missing C2 slots include later checkpoints for `code_search` and `file_backup`, and all selected checkpoints for `migrate_configs` and `log_query`.
 

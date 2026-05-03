@@ -812,6 +812,8 @@ def run_trajectory(
             repo_root=repo_root,
             experiment_commit=experiment_commit,
         )
+        native_run_record["checkpoint_count_expected"] = len(selected_checkpoints)
+        native_run_record["checkpoint_count_completed"] = len(native_checkpoint_records)
         if condition_id == "C2":
             merge_visible_acceptance_results(
                 repo_root=repo_root,

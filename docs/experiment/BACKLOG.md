@@ -371,7 +371,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100A - Define Reduced-Drift Evidence Gate
 
 - Phase: Full pilot run
-- Status: planned
+- Status: completed in `experiment/scripts/validate_full_pilot_preflight.py` and passing for `--profile mini_screen`
 - Rationale: A successful pipeline smoke is not evidence of reduced drift without matched counterfactual trajectories and enough checkpoint depth.
 - Description: Add an explicit preflight gate that marks a configured run as evidence-producing only when it includes matched C0 and C2 trajectories, or matched C0/C1/C2 trajectories, for the same problems, checkpoint prefix, replicate IDs, model, and agent harness; includes at least 3 checkpoints per selected problem; and has no C2 acceptance coverage gaps for included checkpoints.
 - Dependencies: EXP-100
@@ -383,7 +383,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100B - Complete C2 Acceptance Coverage For Mini-Screen
 
 - Phase: Full pilot run
-- Status: planned
+- Status: completed for `code_search` and `file_backup` checkpoints 1-3 in `experiment/steps/acceptance/standalone_runner.py`
 - Rationale: C2 cannot be compared against C0 unless every included checkpoint has locked, maintainer-authored visible acceptance scenarios and steps.
 - Description: Author and lock C2 feature and step coverage for a reduced-drift mini-screen, initially `code_search` and `file_backup` through checkpoint 3 unless problem inspection recommends replacing one. Keep the implementation agent forbidden from modifying `.feature`, step, harness, scoring, prompt-template, schema, and lock files.
 - Dependencies: EXP-051, EXP-052, EXP-100A
@@ -395,7 +395,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100C - Add Paired Mini-Screen Run Matrix
 
 - Phase: Full pilot run
-- Status: planned
+- Status: completed in `experiment/configs/mini_screen_c0.yaml` and `experiment/configs/mini_screen_c2.yaml`
 - Rationale: Reduced-drift tendency requires paired trajectories, not isolated condition results.
 - Description: Add a mini-screen config for `code_search` and `file_backup`, checkpoints 1-3, C0 vs C2 at minimum, optionally C0/C1/C2 if cost allows, one replicate, one model, one agent harness. The config must use identical problem/checkpoint prefixes and replicate IDs across conditions.
 - Dependencies: EXP-031, EXP-100A, EXP-100B
@@ -407,7 +407,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100D - Run Paired Reduced-Drift Probe
 
 - Phase: Full pilot run
-- Status: planned
+- Status: completed in `experiment/runs/reduced_drift_probe/` with normalized exports in `experiment/results/reduced_drift_probe/`
 - Rationale: The first interpretable signal should compare C0 and C2 on the same problem trajectories and checkpoint depth.
 - Description: Execute the mini-screen matrix after EXP-100A through EXP-100C pass. Collect native SCBench hidden-test outcomes, visible acceptance outcomes for C2, lock verification, artifacts, prompts, cost, token, latency, turn, command, and test-run counts.
 - Dependencies: EXP-100C, EXP-071, EXP-080
@@ -419,7 +419,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100E - Report Directional Reduced-Drift Signal
 
 - Phase: Full pilot run
-- Status: planned
+- Status: completed in `experiment/results/reduced_drift_probe/report/reduced_drift_report.md`
 - Rationale: The first useful report should answer whether there is a directional tendency worth scaling, while avoiding proof claims.
 - Description: Generate a reduced-drift mini-screen report with paired strict survival, regression rate, hidden failure after visible pass, checkpoint pass/fail matrix, technical drift slopes where available, and cost/runtime metrics. Label the report as directional and underpowered.
 - Dependencies: EXP-100D, EXP-081, EXP-110
@@ -431,7 +431,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
-- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 2 of 19 selected checkpoint slots
+- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 6 of 19 selected checkpoint slots
 - Rationale: Collect paired C0/C1/C2 trajectories.
 - Description: Run selected problems across C0/C1/C2 and 3 replicates if budget allows.
 - Dependencies: EXP-100A, EXP-100B, EXP-100C, EXP-100D, EXP-100E
