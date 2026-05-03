@@ -63,6 +63,29 @@ Feature: Schedule-driven backup event simulation
       | weekly | 03:30 | Wed | 2025-09-10T03:30:00Z | 0 | due |
       | once | 2025-09-10T03:30:00 | | 2025-09-10T03:30:00Z | 0 | due |
 
+  @core @positive @cli @jsonl @file_io
+  Scenario: Recurring jobs run once for each trigger inside the simulation window
+    Given a mounted file tree rooted at "files" contains:
+      | path | content |
+      | data.txt | data |
+    And a schedule file named "schedule.yaml" contains:
+      """
+      version: 1
+      timezone: UTC
+      jobs:
+        - id: daily-repeat
+          source: mount://
+          destination: backup://
+          when:
+            kind: daily
+            at: "03:30"
+      """
+    When I run the scheduler at "2025-09-08T03:30:00Z" for "48" hours
+    Then stdout reports the job as due at "2025-09-08T03:30:00Z"
+    And stdout reports the job as due at "2025-09-09T03:30:00Z"
+    And stdout reports the job as due at "2025-09-10T03:30:00Z"
+    And stdout contains three JOB_COMPLETED events for "daily-repeat"
+
   @edge @negative @cli
   Scenario: Disabled jobs emit no job events
     Given a schedule file named "schedule.yaml" contains:
@@ -73,9 +96,52 @@ Feature: Schedule-driven backup event simulation
         - id: disabled
           enabled: false
           source: mount://
+          destination: backup://
           when: {kind: daily, at: "03:30"}
       """
     When I run the scheduler at "2025-09-10T03:30:00Z"
     Then stdout contains one SCHEDULE_PARSED event
     And stdout does not contain JOB_ELIGIBLE, JOB_STARTED, or JOB_COMPLETED events
 
+  @edge @positive @cli @jsonl @file_io
+  Scenario: Block-style lists, default fields, and representative glob operators are honored
+    Given a mounted file tree rooted at "files" contains:
+      | path | content |
+      | data1.txt | one |
+      | data10.txt | ten |
+      | keep.md | keep |
+      | report1.log | one |
+      | report3.log | three |
+      | tmp/cache.bin | cache |
+    And a schedule file named "schedule.yaml" contains:
+      """
+      version: 1
+      jobs:
+        - id: defaults-and-globs
+          source: mount://
+          destination: backup://
+          exclude:
+            - tmp/**
+            - data?.txt
+            - report[12].log
+          when:
+            kind: daily
+            at: "03:30"
+      """
+    When I run the scheduler at "2025-09-10T03:30:00Z" for "0" hours
+    Then stdout starts with a SCHEDULE_PARSED event for timezone "UTC"
+    And stdout reports the default-enabled job as due
+    And stdout excludes "data1.txt" with pattern "data?.txt"
+    And stdout excludes "report1.log" with pattern "report[12].log"
+    And stdout excludes "tmp/cache.bin" with pattern "tmp/**"
+    And stdout selects "data10.txt", "keep.md", and "report3.log"
+
+  @edge @negative @cli
+  Scenario: Malformed schedule YAML exits with an error
+    Given a schedule file named "schedule.yaml" contains:
+      """
+      jobs: [
+      """
+    When I run the scheduler at "2025-09-10T03:30:00Z"
+    Then the exit status is non-zero
+    And stdout is empty

@@ -228,6 +228,16 @@ def assert_no_json_line(text: str, forbidden_subset: dict[str, Any]) -> None:
             )
 
 
+def assert_no_json_events(text: str, forbidden_events: set[str]) -> None:
+    for row in parse_json_lines(text):
+        if not isinstance(row, dict):
+            continue
+        if row.get("event") in forbidden_events:
+            raise ScenarioFailureError(
+                f"unexpected JSONL event: {row.get('event')}"
+            )
+
+
 def assert_json_line_count(text: str, expected_count: int) -> list[dict[str, Any]]:
     rows = parse_json_lines(text)
     dict_rows = [row for row in rows if isinstance(row, dict)]
@@ -236,6 +246,30 @@ def assert_json_line_count(text: str, expected_count: int) -> list[dict[str, Any
             f"expected {expected_count} JSONL rows, got {len(dict_rows)}"
         )
     return dict_rows
+
+
+def rows_for_rule(rows: list[Any], rule_id: str) -> list[dict[str, Any]]:
+    return [
+        row
+        for row in rows
+        if isinstance(row, dict) and row.get("rule_id") == rule_id
+    ]
+
+
+def assert_capture_text(row: dict[str, Any], name: str, expected: str) -> None:
+    captures = row.get("captures")
+    if not isinstance(captures, dict):
+        raise ScenarioFailureError(f"match must include captures for {name}")
+    capture = captures.get(name)
+    if not isinstance(capture, dict):
+        raise ScenarioFailureError(f"match must include capture {name}")
+    if capture.get("text") != expected:
+        raise ScenarioFailureError(
+            f"capture {name} text mismatch: expected {expected!r}, got {capture.get('text')!r}"
+        )
+    ranges = capture.get("ranges")
+    if not isinstance(ranges, list) or not ranges:
+        raise ScenarioFailureError(f"capture {name} must include at least one range")
 
 
 def assert_output_sorted_by_file_position(rows: list[dict[str, Any]]) -> None:
@@ -514,6 +548,233 @@ console.log("user", id);
     return result["stdout_path"], result["stderr_path"]
 
 
+def scenario_code_search_cp3_nested_expression(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "code_search.py")
+    artifact_dir = artifact_root / "code_search" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="code-search-acceptance-") as tmp:
+        scratch = Path(tmp)
+        write_text(
+            scratch / "rules.json",
+            json.dumps(
+                [
+                    {
+                        "id": "func-call",
+                        "kind": "pattern",
+                        "pattern": "$X($Y)",
+                        "languages": ["python"],
+                    }
+                ]
+            ),
+        )
+        write_text(scratch / "repo" / "nested.py", "f(g(h(z)))\n")
+        result = run_command(
+            [
+                sys.executable,
+                str(script_path),
+                str(scratch / "repo"),
+                "--rules",
+                str(scratch / "rules.json"),
+            ],
+            cwd=workspace,
+            artifact_dir=artifact_dir,
+            name="code_search_cp003_nested_expression",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = assert_json_line_count(result["stdout"], 1)
+    row = rows[0]
+    expected_subset = {
+        "rule_id": "func-call",
+        "file": "nested.py",
+        "language": "python",
+        "start": {"line": 1, "col": 1},
+        "end": {"line": 1, "col": 11},
+        "match": "f(g(h(z)))",
+    }
+    for key, expected_value in expected_subset.items():
+        if row.get(key) != expected_value:
+            raise ScenarioFailureError("nested-expression match did not match expected output")
+    assert_capture_text(row, "$X", "f")
+    assert_capture_text(row, "$Y", "g(h(z))")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_code_search_cp3_pattern_edge_semantics(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "code_search.py")
+    artifact_dir = artifact_root / "code_search" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="code-search-acceptance-") as tmp:
+        scratch = Path(tmp)
+        write_text(
+            scratch / "rules.json",
+            json.dumps(
+                [
+                    {
+                        "id": "optional-item",
+                        "kind": "pattern",
+                        "pattern": "[$X?]",
+                        "languages": ["python"],
+                    },
+                    {
+                        "id": "dollar-var",
+                        "kind": "pattern",
+                        "pattern": "$$price = $VAL",
+                        "languages": ["python"],
+                    },
+                    {
+                        "id": "js-func",
+                        "kind": "pattern",
+                        "pattern": "function $NAME($ARG) {}",
+                        "languages": ["javascript"],
+                    },
+                    {
+                        "id": "var-decl",
+                        "kind": "pattern",
+                        "pattern": "let $VAR = $VAL;",
+                        "languages": ["javascript"],
+                    },
+                ]
+            ),
+        )
+        write_text(
+            scratch / "repo" / "items.py",
+            "[]\n[value]\n$price = 100\n",
+        )
+        write_text(
+            scratch / "repo" / "a.js",
+            "let a = 1;\nlet b = 2;\nfunction greet(name) {}\n",
+        )
+        write_text(scratch / "repo" / "z.js", "let z = 3;\n")
+        write_text(
+            scratch / "repo" / "not_javascript.py",
+            "function wrong(arg) {}\n",
+        )
+        result = run_command(
+            [
+                sys.executable,
+                str(script_path),
+                str(scratch / "repo"),
+                "--rules",
+                str(scratch / "rules.json"),
+            ],
+            cwd=workspace,
+            artifact_dir=artifact_dir,
+            name="code_search_cp003_pattern_edge_semantics",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = assert_json_line_count(result["stdout"], 7)
+    assert_output_sorted_by_file_position(rows)
+
+    optional_rows = rows_for_rule(rows, "optional-item")
+    if [row.get("match") for row in optional_rows] != ["[]", "[value]"]:
+        raise ScenarioFailureError("optional metavariable matches are missing")
+    if "$X" in optional_rows[0].get("captures", {}):
+        raise ScenarioFailureError("absent optional metavariable must not be captured")
+    assert_capture_text(optional_rows[1], "$X", "value")
+
+    dollar_rows = rows_for_rule(rows, "dollar-var")
+    if len(dollar_rows) != 1 or dollar_rows[0].get("match") != "$price = 100":
+        raise ScenarioFailureError("literal dollar pattern did not match expected source")
+    assert_capture_text(dollar_rows[0], "$VAL", "100")
+
+    js_func_rows = rows_for_rule(rows, "js-func")
+    if len(js_func_rows) != 1:
+        raise ScenarioFailureError("expected one JavaScript function match")
+    js_func = js_func_rows[0]
+    if js_func.get("file") != "a.js" or js_func.get("match") != "function greet(name) {}":
+        raise ScenarioFailureError("JavaScript function pattern matched the wrong file or text")
+    captures = js_func.get("captures")
+    if not isinstance(captures, dict) or list(captures) != ["$ARG", "$NAME"]:
+        raise ScenarioFailureError("captures must be serialized in lexicographic order")
+    assert_capture_text(js_func, "$NAME", "greet")
+    assert_capture_text(js_func, "$ARG", "name")
+    assert_no_json_line(result["stdout"], {"rule_id": "js-func", "file": "not_javascript.py"})
+
+    var_rows = rows_for_rule(rows, "var-decl")
+    observed_var_matches = [
+        (row.get("file"), row.get("match"))
+        for row in var_rows
+    ]
+    if observed_var_matches != [
+        ("a.js", "let a = 1;"),
+        ("a.js", "let b = 2;"),
+        ("z.js", "let z = 3;"),
+    ]:
+        raise ScenarioFailureError("JavaScript variable matches are not deterministically ordered")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_code_search_cp3_multiline_python_captures(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "code_search.py")
+    artifact_dir = artifact_root / "code_search" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="code-search-acceptance-") as tmp:
+        scratch = Path(tmp)
+        write_text(
+            scratch / "rules.json",
+            json.dumps(
+                [
+                    {
+                        "id": "if-return",
+                        "kind": "pattern",
+                        "pattern": "if $COND:\n        return $VALUE",
+                        "languages": ["python"],
+                    }
+                ]
+            ),
+        )
+        write_text(
+            scratch / "repo" / "app.py",
+            (
+                "def choose(flag):\n"
+                "    if flag:\n"
+                "        return result\n"
+                "    return None\n"
+            ),
+        )
+        result = run_command(
+            [
+                sys.executable,
+                str(script_path),
+                str(scratch / "repo"),
+                "--rules",
+                str(scratch / "rules.json"),
+            ],
+            cwd=workspace,
+            artifact_dir=artifact_dir,
+            name="code_search_cp003_multiline_python_captures",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = assert_json_line_count(result["stdout"], 1)
+    row = rows[0]
+    expected_subset = {
+        "rule_id": "if-return",
+        "file": "app.py",
+        "language": "python",
+        "start": {"line": 2, "col": 5},
+        "end": {"line": 3, "col": 22},
+        "match": "if flag:\n        return result",
+    }
+    for key, expected_value in expected_subset.items():
+        if row.get(key) != expected_value:
+            raise ScenarioFailureError("multiline Python pattern did not match expected output")
+    assert_capture_text(row, "$COND", "flag")
+    assert_capture_text(row, "$VALUE", "result")
+    return result["stdout_path"], result["stderr_path"]
+
+
 def scenario_file_backup_cp1(
     workspace: Path, artifact_root: Path
 ) -> tuple[str | None, str | None]:
@@ -681,17 +942,19 @@ def run_backup_scheduler(
     name: str,
     schedule: Path,
     mount: Path,
+    now: str = "2025-09-10T03:30:00Z",
+    duration: str = "1",
     backup: Path | None = None,
 ) -> dict[str, Any]:
     command = [
         sys.executable,
         str(script_path),
         "--now",
-        "2025-09-10T03:30:00Z",
+        now,
         "--schedule",
         str(schedule),
         "--duration",
-        "1",
+        duration,
         "--mount",
         str(mount),
     ]
@@ -703,6 +966,370 @@ def run_backup_scheduler(
         artifact_dir=artifact_dir,
         name=name,
     )
+
+
+def assert_due_backup_run(
+    result: dict[str, Any],
+    *,
+    job_id: str,
+    kind: str,
+) -> None:
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = parse_json_lines(result["stdout"])
+    if not rows or not isinstance(rows[0], dict) or rows[0].get("event") != "SCHEDULE_PARSED":
+        raise ScenarioFailureError("backup output must start with SCHEDULE_PARSED")
+    assert_any_json_line(
+        result["stdout"],
+        {"event": "JOB_ELIGIBLE", "job_id": job_id, "kind": kind},
+    )
+    assert_any_json_line(
+        result["stdout"],
+        {"event": "JOB_STARTED", "job_id": job_id},
+    )
+    assert_any_json_line(
+        result["stdout"],
+        {"event": "FILE_SELECTED", "job_id": job_id, "path": "data.txt"},
+    )
+    assert_any_json_line(
+        result["stdout"],
+        {"event": "JOB_COMPLETED", "job_id": job_id, "selected": 1, "excluded": 0},
+    )
+
+
+def scenario_file_backup_cp1_due_windows(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "backup_scheduler.py")
+    artifact_dir = artifact_root / "file_backup" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="file-backup-acceptance-") as tmp:
+        scratch = Path(tmp)
+        files_root = scratch / "files"
+        write_text(files_root / "data.txt", "data")
+        cases = [
+            {
+                "name": "daily_exact_default_fields",
+                "job_id": "daily-exact",
+                "kind": "daily",
+                "when": 'kind: daily\n      at: "03:30"',
+                "now": "2025-09-10T03:30:00Z",
+                "duration": "0",
+            },
+            {
+                "name": "daily_inclusive_next_day",
+                "job_id": "daily-window",
+                "kind": "daily",
+                "when": 'kind: daily\n      at: "03:30"',
+                "now": "2025-09-10T03:31:00Z",
+                "duration": "24",
+            },
+            {
+                "name": "weekly_block_days",
+                "job_id": "weekly-wed",
+                "kind": "weekly",
+                "when": 'kind: weekly\n      at: "03:30"\n      days:\n        - Wed',
+                "now": "2025-09-10T03:30:00Z",
+                "duration": "0",
+            },
+            {
+                "name": "once_exact",
+                "job_id": "once-exact",
+                "kind": "once",
+                "when": 'kind: once\n      at: "2025-09-10T03:30:00"',
+                "now": "2025-09-10T03:30:00Z",
+                "duration": "0",
+            },
+        ]
+        last_result: dict[str, Any] | None = None
+        for case in cases:
+            schedule_path = scratch / f"{case['name']}.yaml"
+            write_text(
+                schedule_path,
+                f"""
+version: 1
+jobs:
+  - id: {case["job_id"]}
+    source: mount://
+    destination: backup://
+    when:
+      {case["when"]}
+""".strip(),
+            )
+            last_result = run_backup_scheduler(
+                workspace=workspace,
+                script_path=script_path,
+                scratch=scratch,
+                artifact_dir=artifact_dir,
+                name=f"file_backup_cp001_{case['name']}",
+                schedule=schedule_path,
+                mount=files_root,
+                now=str(case["now"]),
+                duration=str(case["duration"]),
+            )
+            assert_due_backup_run(
+                last_result,
+                job_id=str(case["job_id"]),
+                kind=str(case["kind"]),
+            )
+
+    if last_result is None:
+        raise HarnessError("no due-window cases executed")
+    return last_result["stdout_path"], last_result["stderr_path"]
+
+
+def scenario_file_backup_cp1_recurring_triggers(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "backup_scheduler.py")
+    artifact_dir = artifact_root / "file_backup" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="file-backup-acceptance-") as tmp:
+        scratch = Path(tmp)
+        files_root = scratch / "files"
+        write_text(files_root / "data.txt", "data")
+        schedule_path = scratch / "schedule.yaml"
+        write_text(
+            schedule_path,
+            """
+version: 1
+timezone: UTC
+jobs:
+  - id: daily-repeat
+    source: mount://
+    destination: backup://
+    when:
+      kind: daily
+      at: "03:30"
+""".strip(),
+        )
+        result = run_backup_scheduler(
+            workspace=workspace,
+            script_path=script_path,
+            scratch=scratch,
+            artifact_dir=artifact_dir,
+            name="file_backup_cp001_recurring_triggers",
+            schedule=schedule_path,
+            mount=files_root,
+            now="2025-09-08T03:30:00Z",
+            duration="48",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    rows = parse_json_lines(result["stdout"])
+    due_times = [
+        row.get("now_local")
+        for row in rows
+        if isinstance(row, dict)
+        and row.get("event") == "JOB_ELIGIBLE"
+        and row.get("job_id") == "daily-repeat"
+    ]
+    if due_times != [
+        "2025-09-08T03:30:00Z",
+        "2025-09-09T03:30:00Z",
+        "2025-09-10T03:30:00Z",
+    ]:
+        raise ScenarioFailureError("daily recurring job must run once per trigger in window")
+    completions = [
+        row
+        for row in rows
+        if isinstance(row, dict)
+        and row.get("event") == "JOB_COMPLETED"
+        and row.get("job_id") == "daily-repeat"
+    ]
+    if len(completions) != 3:
+        raise ScenarioFailureError("daily recurring job must complete once per trigger")
+    for row in completions:
+        if row.get("selected") != 1 or row.get("excluded") != 0:
+            raise ScenarioFailureError("recurring run completion counts are incorrect")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_file_backup_cp1_disabled_jobs(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "backup_scheduler.py")
+    artifact_dir = artifact_root / "file_backup" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="file-backup-acceptance-") as tmp:
+        scratch = Path(tmp)
+        files_root = scratch / "files"
+        write_text(files_root / "data.txt", "data")
+        schedule_path = scratch / "schedule.yaml"
+        write_text(
+            schedule_path,
+            """
+version: 1
+timezone: UTC
+jobs:
+  - id: disabled
+    enabled: false
+    source: mount://
+    destination: backup://
+    when:
+      kind: daily
+      at: "03:30"
+""".strip(),
+        )
+        result = run_backup_scheduler(
+            workspace=workspace,
+            script_path=script_path,
+            scratch=scratch,
+            artifact_dir=artifact_dir,
+            name="file_backup_cp001_disabled_jobs",
+            schedule=schedule_path,
+            mount=files_root,
+            now="2025-09-10T03:30:00Z",
+            duration="1",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    assert_json_lines_match_subsets(
+        result["stdout"],
+        [{"event": "SCHEDULE_PARSED", "timezone": "UTC", "jobs_total": 1}],
+    )
+    assert_no_json_events(
+        result["stdout"],
+        {"JOB_ELIGIBLE", "JOB_STARTED", "FILE_SELECTED", "FILE_EXCLUDED", "JOB_COMPLETED"},
+    )
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_file_backup_cp1_block_lists_defaults_globs(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "backup_scheduler.py")
+    artifact_dir = artifact_root / "file_backup" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="file-backup-acceptance-") as tmp:
+        scratch = Path(tmp)
+        files_root = scratch / "files"
+        for rel_path, content in [
+            ("data1.txt", "one"),
+            ("data10.txt", "ten"),
+            ("keep.md", "keep"),
+            ("report1.log", "one"),
+            ("report3.log", "three"),
+            ("tmp/cache.bin", "cache"),
+        ]:
+            write_text(files_root / rel_path, content)
+        schedule_path = scratch / "schedule.yaml"
+        write_text(
+            schedule_path,
+            """
+version: 1
+jobs:
+  - id: defaults-and-globs
+    source: mount://
+    destination: backup://
+    exclude:
+      - tmp/**
+      - data?.txt
+      - report[12].log
+    when:
+      kind: daily
+      at: "03:30"
+""".strip(),
+        )
+        result = run_backup_scheduler(
+            workspace=workspace,
+            script_path=script_path,
+            scratch=scratch,
+            artifact_dir=artifact_dir,
+            name="file_backup_cp001_block_lists_defaults_globs",
+            schedule=schedule_path,
+            mount=files_root,
+            now="2025-09-10T03:30:00Z",
+            duration="0",
+        )
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    assert_json_lines_match_subsets(
+        result["stdout"],
+        [
+            {"event": "SCHEDULE_PARSED", "timezone": "UTC", "jobs_total": 1},
+            {
+                "event": "JOB_ELIGIBLE",
+                "job_id": "defaults-and-globs",
+                "kind": "daily",
+            },
+            {"event": "JOB_STARTED", "job_id": "defaults-and-globs", "exclude_count": 3},
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "defaults-and-globs",
+                "path": "data1.txt",
+                "pattern": "data?.txt",
+            },
+            {
+                "event": "FILE_SELECTED",
+                "job_id": "defaults-and-globs",
+                "path": "data10.txt",
+            },
+            {
+                "event": "FILE_SELECTED",
+                "job_id": "defaults-and-globs",
+                "path": "keep.md",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "defaults-and-globs",
+                "path": "report1.log",
+                "pattern": "report[12].log",
+            },
+            {
+                "event": "FILE_SELECTED",
+                "job_id": "defaults-and-globs",
+                "path": "report3.log",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "defaults-and-globs",
+                "path": "tmp/cache.bin",
+                "pattern": "tmp/**",
+            },
+            {
+                "event": "JOB_COMPLETED",
+                "job_id": "defaults-and-globs",
+                "selected": 3,
+                "excluded": 3,
+            },
+        ],
+    )
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_file_backup_cp1_malformed_yaml(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "backup_scheduler.py")
+    artifact_dir = artifact_root / "file_backup" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="file-backup-acceptance-") as tmp:
+        scratch = Path(tmp)
+        files_root = scratch / "files"
+        files_root.mkdir(parents=True)
+        schedule_path = scratch / "schedule.yaml"
+        write_text(schedule_path, "jobs: [\n")
+        result = run_backup_scheduler(
+            workspace=workspace,
+            script_path=script_path,
+            scratch=scratch,
+            artifact_dir=artifact_dir,
+            name="file_backup_cp001_malformed_yaml",
+            schedule=schedule_path,
+            mount=files_root,
+            now="2025-09-10T03:30:00Z",
+            duration="1",
+        )
+
+    if result["exit_code"] == 0:
+        raise ScenarioFailureError("malformed YAML must return a non-zero status")
+    if result["stdout"].strip():
+        raise ScenarioFailureError("malformed YAML must not emit JSONL stdout")
+    return result["stdout_path"], result["stderr_path"]
 
 
 def scenario_file_backup_cp2(
@@ -959,12 +1586,76 @@ SCENARIO_SPECS: list[dict[str, Any]] = [
         "scenario_func": scenario_code_search_cp3,
     },
     {
+        "problem_id": "code_search",
+        "checkpoint_index": 3,
+        "scenario_id": "code_search.cp003.nested-expression-capture",
+        "scenario_name": "Workspace product captures nested expression metavariables",
+        "tags": ["problem:code_search", "checkpoint:3", "core", "positive", "cli"],
+        "scenario_func": scenario_code_search_cp3_nested_expression,
+    },
+    {
+        "problem_id": "code_search",
+        "checkpoint_index": 3,
+        "scenario_id": "code_search.cp003.pattern-edge-semantics",
+        "scenario_name": "Workspace product honors optional, literal-dollar, and multi-capture pattern semantics",
+        "tags": ["problem:code_search", "checkpoint:3", "core", "positive", "cli"],
+        "scenario_func": scenario_code_search_cp3_pattern_edge_semantics,
+    },
+    {
+        "problem_id": "code_search",
+        "checkpoint_index": 3,
+        "scenario_id": "code_search.cp003.multiline-python-captures",
+        "scenario_name": "Workspace product preserves multiline Python capture boundaries",
+        "tags": ["problem:code_search", "checkpoint:3", "core", "positive", "cli"],
+        "scenario_func": scenario_code_search_cp3_multiline_python_captures,
+    },
+    {
         "problem_id": "file_backup",
         "checkpoint_index": 1,
         "scenario_id": "file_backup.cp001.workspace-cli-events",
         "scenario_name": "Workspace product emits due-job JSONL event history",
         "tags": ["problem:file_backup", "checkpoint:1", "core", "positive", "cli"],
         "scenario_func": scenario_file_backup_cp1,
+    },
+    {
+        "problem_id": "file_backup",
+        "checkpoint_index": 1,
+        "scenario_id": "file_backup.cp001.due-window-semantics",
+        "scenario_name": "Workspace product evaluates daily, weekly, and once due windows",
+        "tags": ["problem:file_backup", "checkpoint:1", "core", "positive", "cli"],
+        "scenario_func": scenario_file_backup_cp1_due_windows,
+    },
+    {
+        "problem_id": "file_backup",
+        "checkpoint_index": 1,
+        "scenario_id": "file_backup.cp001.recurring-triggers",
+        "scenario_name": "Workspace product runs recurring jobs for every trigger in the window",
+        "tags": ["problem:file_backup", "checkpoint:1", "core", "positive", "cli"],
+        "scenario_func": scenario_file_backup_cp1_recurring_triggers,
+    },
+    {
+        "problem_id": "file_backup",
+        "checkpoint_index": 1,
+        "scenario_id": "file_backup.cp001.disabled-jobs",
+        "scenario_name": "Workspace product suppresses events for disabled jobs",
+        "tags": ["problem:file_backup", "checkpoint:1", "edge", "negative", "cli"],
+        "scenario_func": scenario_file_backup_cp1_disabled_jobs,
+    },
+    {
+        "problem_id": "file_backup",
+        "checkpoint_index": 1,
+        "scenario_id": "file_backup.cp001.block-lists-defaults-globs",
+        "scenario_name": "Workspace product handles block lists, defaults, and representative globs",
+        "tags": ["problem:file_backup", "checkpoint:1", "edge", "positive", "cli"],
+        "scenario_func": scenario_file_backup_cp1_block_lists_defaults_globs,
+    },
+    {
+        "problem_id": "file_backup",
+        "checkpoint_index": 1,
+        "scenario_id": "file_backup.cp001.malformed-yaml",
+        "scenario_name": "Workspace product rejects malformed YAML schedules",
+        "tags": ["problem:file_backup", "checkpoint:1", "edge", "negative", "cli"],
+        "scenario_func": scenario_file_backup_cp1_malformed_yaml,
     },
     {
         "problem_id": "file_backup",

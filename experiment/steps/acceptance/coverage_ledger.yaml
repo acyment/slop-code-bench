@@ -49,9 +49,24 @@ entries:
   - problem_id: code_search
     checkpoint_index: 3
     feature_scenario: Nested expressions bind as a single metavariable value
-    coverage: required
-    runner_scenario_ids: []
-    reason: Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching.
+    coverage: executable
+    runner_scenario_ids:
+      - code_search.cp003.nested-expression-capture
+    reason: The checkpoint 3 runner now executes the nested-expression Gherkin scenario with exact match text and capture assertions.
+  - problem_id: code_search
+    checkpoint_index: 3
+    feature_scenario: Optional metavariables, literal dollars, and multiple captures follow pattern semantics
+    coverage: executable
+    runner_scenario_ids:
+      - code_search.cp003.pattern-edge-semantics
+    reason: The checkpoint 3 runner exercises optional metavariables, literal $$ matching, multiple captures, language filtering, capture key ordering, and deterministic file/position ordering.
+  - problem_id: code_search
+    checkpoint_index: 3
+    feature_scenario: Multiline Python patterns preserve capture boundaries
+    coverage: executable
+    runner_scenario_ids:
+      - code_search.cp003.multiline-python-captures
+    reason: The checkpoint 3 runner verifies multiline Python pattern match text and exact capture text/ranges across the if/return lines.
   - problem_id: code_search
     checkpoint_index: 3
     feature_scenario: Exact and regex rules from previous checkpoints still produce match lines
@@ -70,15 +85,38 @@ entries:
   - problem_id: file_backup
     checkpoint_index: 1
     feature_scenario: Determine whether jobs are due inside the inclusive simulation window
-    coverage: required
-    runner_scenario_ids: []
-    reason: Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries.
+    coverage: executable
+    runner_scenario_ids:
+      - file_backup.cp001.due-window-semantics
+    reason: The checkpoint 1 runner now executes daily, weekly, and once due-window examples, including duration-zero and inclusive-window cases.
+  - problem_id: file_backup
+    checkpoint_index: 1
+    feature_scenario: Recurring jobs run once for each trigger inside the simulation window
+    coverage: executable
+    runner_scenario_ids:
+      - file_backup.cp001.recurring-triggers
+    reason: The checkpoint 1 runner verifies that a daily job emits one eligible/start/file/completion sequence for every trigger in a multi-day inclusive window.
   - problem_id: file_backup
     checkpoint_index: 1
     feature_scenario: Disabled jobs emit no job events
-    coverage: required
-    runner_scenario_ids: []
-    reason: Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage.
+    coverage: executable
+    runner_scenario_ids:
+      - file_backup.cp001.disabled-jobs
+    reason: The checkpoint 1 runner now verifies that disabled jobs emit only SCHEDULE_PARSED and no job/file events.
+  - problem_id: file_backup
+    checkpoint_index: 1
+    feature_scenario: Block-style lists, default fields, and representative glob operators are honored
+    coverage: executable
+    runner_scenario_ids:
+      - file_backup.cp001.block-lists-defaults-globs
+    reason: The checkpoint 1 runner exercises block-style YAML lists, omitted timezone and enabled defaults, and representative tmp/**, data?.txt, and report[12].log globs.
+  - problem_id: file_backup
+    checkpoint_index: 1
+    feature_scenario: Malformed schedule YAML exits with an error
+    coverage: executable
+    runner_scenario_ids:
+      - file_backup.cp001.malformed-yaml
+    reason: The checkpoint 1 runner verifies malformed YAML returns a non-zero status without JSONL stdout.
   - problem_id: file_backup
     checkpoint_index: 2
     feature_scenario: Full and verify strategies process selected files individually

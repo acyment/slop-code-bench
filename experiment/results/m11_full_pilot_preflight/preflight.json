@@ -4,10 +4,10 @@
       "details": {
         "added_files": [],
         "changed_files": [],
-        "checked_at": "2026-05-03T19:59:40.578187Z",
+        "checked_at": "2026-05-03T20:18:48.532303Z",
         "file_count_after": 108,
         "file_count_before": 108,
-        "freeze_hash": "b9e4da7c407e5cc8d59a6c380c81a39708129fd0fd3cce7116e574af5ed81d75",
+        "freeze_hash": "9ed3dcc5ce290ccc13e7ce5deac80b8e08546e3980d5f3f87078996761b34405",
         "freeze_status": "pre_execution_artifact_freeze",
         "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
         "missing_patterns_after": [],
@@ -21,7 +21,7 @@
         "schema_version": 1,
         "status": "unchanged"
       },
-      "freeze_hash": "b9e4da7c407e5cc8d59a6c380c81a39708129fd0fd3cce7116e574af5ed81d75",
+      "freeze_hash": "9ed3dcc5ce290ccc13e7ce5deac80b8e08546e3980d5f3f87078996761b34405",
       "id": "pilot_artifacts.freeze_manifest",
       "message": "Freeze manifest matches current files.",
       "status": "pass"
@@ -184,15 +184,8 @@
       "status": "block"
     },
     {
-      "blocker_count": 93,
+      "blocker_count": 90,
       "blockers": [
-        {
-          "checkpoint_index": 3,
-          "coverage": "required",
-          "feature_scenario": "Nested expressions bind as a single metavariable value",
-          "problem_id": "code_search",
-          "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-        },
         {
           "checkpoint_index": 4,
           "coverage": "missing_ledger",
@@ -241,20 +234,6 @@
           "feature_scenario": "Existing Python JavaScript and C++ behavior remains supported",
           "problem_id": "code_search",
           "reason": "Feature scenario is not mapped in the acceptance coverage ledger."
-        },
-        {
-          "checkpoint_index": 1,
-          "coverage": "required",
-          "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-          "problem_id": "file_backup",
-          "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-        },
-        {
-          "checkpoint_index": 1,
-          "coverage": "required",
-          "feature_scenario": "Disabled jobs emit no job events",
-          "problem_id": "file_backup",
-          "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
         },
         {
           "checkpoint_index": 4,
@@ -839,15 +818,8 @@
         }
       ],
       "details": {
-        "blocker_count": 93,
+        "blocker_count": 90,
         "blockers": [
-          {
-            "checkpoint_index": 3,
-            "coverage": "required",
-            "feature_scenario": "Nested expressions bind as a single metavariable value",
-            "problem_id": "code_search",
-            "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-          },
           {
             "checkpoint_index": 4,
             "coverage": "missing_ledger",
@@ -896,20 +868,6 @@
             "feature_scenario": "Existing Python JavaScript and C++ behavior remains supported",
             "problem_id": "code_search",
             "reason": "Feature scenario is not mapped in the acceptance coverage ledger."
-          },
-          {
-            "checkpoint_index": 1,
-            "coverage": "required",
-            "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-            "problem_id": "file_backup",
-            "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-          },
-          {
-            "checkpoint_index": 1,
-            "coverage": "required",
-            "feature_scenario": "Disabled jobs emit no job events",
-            "problem_id": "file_backup",
-            "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
           },
           {
             "checkpoint_index": 4,
@@ -1513,12 +1471,12 @@
             "spec_only_scenario_count": 1
           },
           {
-            "blocker_count": 1,
+            "blocker_count": 0,
             "checkpoint_index": 3,
-            "executable_scenario_count": 2,
-            "feature_scenario_count": 3,
+            "executable_scenario_count": 5,
+            "feature_scenario_count": 5,
             "problem_id": "code_search",
-            "required_missing_count": 1,
+            "required_missing_count": 0,
             "spec_only_scenario_count": 0
           },
           {
@@ -1540,12 +1498,12 @@
             "spec_only_scenario_count": 0
           },
           {
-            "blocker_count": 2,
+            "blocker_count": 0,
             "checkpoint_index": 1,
-            "executable_scenario_count": 1,
-            "feature_scenario_count": 3,
+            "executable_scenario_count": 6,
+            "feature_scenario_count": 6,
             "problem_id": "file_backup",
-            "required_missing_count": 2,
+            "required_missing_count": 0,
             "spec_only_scenario_count": 0
           },
           {
@@ -1757,13 +1715,12 @@
           }
         ],
         "coverage_counts": {
-          "executable": 10,
+          "executable": 18,
           "missing_ledger": 90,
-          "required": 3,
           "spec_only": 5
         },
-        "executable_scenario_count": 10,
-        "feature_scenario_count": 108,
+        "executable_scenario_count": 18,
+        "feature_scenario_count": 113,
         "invalid_coverage_count": 0,
         "missing_ledger_count": 90,
         "omitted_scenarios": [
@@ -1790,27 +1747,6 @@
           },
           {
             "checkpoint_index": 3,
-            "coverage": "required",
-            "feature_scenario": "Nested expressions bind as a single metavariable value",
-            "problem_id": "code_search",
-            "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-          },
-          {
-            "checkpoint_index": 1,
-            "coverage": "required",
-            "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-            "problem_id": "file_backup",
-            "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-          },
-          {
-            "checkpoint_index": 1,
-            "coverage": "required",
-            "feature_scenario": "Disabled jobs emit no job events",
-            "problem_id": "file_backup",
-            "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
-          },
-          {
-            "checkpoint_index": 3,
             "coverage": "spec_only",
             "feature_scenario": "First run writes full backups into destination job directories",
             "problem_id": "file_backup",
@@ -1824,16 +1760,16 @@
             "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1."
           }
         ],
-        "required_missing_count": 3,
+        "required_missing_count": 0,
         "spec_only_scenario_count": 5
       },
-      "executable_scenario_count": 10,
-      "feature_scenario_count": 108,
+      "executable_scenario_count": 18,
+      "feature_scenario_count": 113,
       "id": "c2.feature_runner_coverage",
       "invalid_coverage_count": 0,
-      "message": "C2 feature-to-runner coverage has blockers: 93 required/missing scenario(s) need locked executable coverage.",
+      "message": "C2 feature-to-runner coverage has blockers: 90 required/missing scenario(s) need locked executable coverage.",
       "missing_ledger_count": 90,
-      "required_missing_count": 3,
+      "required_missing_count": 0,
       "spec_only_scenario_count": 5,
       "status": "block"
     },
@@ -1937,15 +1873,8 @@
           "type": "incomplete_c2_acceptance_coverage"
         },
         {
-          "blocker_count": 93,
+          "blocker_count": 90,
           "blockers": [
-            {
-              "checkpoint_index": 3,
-              "coverage": "required",
-              "feature_scenario": "Nested expressions bind as a single metavariable value",
-              "problem_id": "code_search",
-              "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-            },
             {
               "checkpoint_index": 4,
               "coverage": "missing_ledger",
@@ -1994,20 +1923,6 @@
               "feature_scenario": "Existing Python JavaScript and C++ behavior remains supported",
               "problem_id": "code_search",
               "reason": "Feature scenario is not mapped in the acceptance coverage ledger."
-            },
-            {
-              "checkpoint_index": 1,
-              "coverage": "required",
-              "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-              "problem_id": "file_backup",
-              "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-            },
-            {
-              "checkpoint_index": 1,
-              "coverage": "required",
-              "feature_scenario": "Disabled jobs emit no job events",
-              "problem_id": "file_backup",
-              "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
             },
             {
               "checkpoint_index": 4,
@@ -2593,7 +2508,7 @@
           ],
           "invalid_coverage_count": 0,
           "missing_ledger_count": 90,
-          "required_missing_count": 3,
+          "required_missing_count": 0,
           "type": "incomplete_c2_feature_runner_coverage"
         }
       ],
@@ -2708,15 +2623,8 @@
         "type": "incomplete_c2_acceptance_coverage"
       },
       {
-        "blocker_count": 93,
+        "blocker_count": 90,
         "blockers": [
-          {
-            "checkpoint_index": 3,
-            "coverage": "required",
-            "feature_scenario": "Nested expressions bind as a single metavariable value",
-            "problem_id": "code_search",
-            "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-          },
           {
             "checkpoint_index": 4,
             "coverage": "missing_ledger",
@@ -2765,20 +2673,6 @@
             "feature_scenario": "Existing Python JavaScript and C++ behavior remains supported",
             "problem_id": "code_search",
             "reason": "Feature scenario is not mapped in the acceptance coverage ledger."
-          },
-          {
-            "checkpoint_index": 1,
-            "coverage": "required",
-            "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-            "problem_id": "file_backup",
-            "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-          },
-          {
-            "checkpoint_index": 1,
-            "coverage": "required",
-            "feature_scenario": "Disabled jobs emit no job events",
-            "problem_id": "file_backup",
-            "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
           },
           {
             "checkpoint_index": 4,
@@ -3364,7 +3258,7 @@
         ],
         "invalid_coverage_count": 0,
         "missing_ledger_count": 90,
-        "required_missing_count": 3,
+        "required_missing_count": 0,
         "type": "incomplete_c2_feature_runner_coverage"
       }
     ],
@@ -3372,7 +3266,7 @@
     "ready": false
   },
   "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
-  "generated_at": "2026-05-03T19:59:40.636349Z",
+  "generated_at": "2026-05-03T20:18:48.596045Z",
   "matrix_summary": {
     "matrices": [
       {

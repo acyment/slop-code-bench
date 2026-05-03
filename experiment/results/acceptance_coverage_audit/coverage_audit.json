@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-03T19:59:32.092851Z",
+  "generated_at": "2026-05-03T20:18:01.934306Z",
   "ledger_path": "experiment/steps/acceptance/coverage_ledger.yaml",
   "rows": [
     {
@@ -158,23 +158,97 @@
       ]
     },
     {
-      "blocker": true,
+      "blocker": false,
       "checkpoint_index": 3,
-      "coverage": "required",
+      "coverage": "executable",
       "feature_line": 38,
       "feature_path": "experiment/features/code_search/checkpoint_003.feature",
       "feature_scenario": "Nested expressions bind as a single metavariable value",
       "missing_runner_scenario_ids": [],
       "problem_id": "code_search",
-      "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching.",
-      "runner_scenario_ids": [],
-      "runner_scenarios": []
+      "reason": "The checkpoint 3 runner now executes the nested-expression Gherkin scenario with exact match text and capture assertions.",
+      "runner_scenario_ids": [
+        "code_search.cp003.nested-expression-capture"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp003.nested-expression-capture",
+          "scenario_name": "Workspace product captures nested expression metavariables",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:3",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
     },
     {
       "blocker": false,
       "checkpoint_index": 3,
       "coverage": "executable",
       "feature_line": 57,
+      "feature_path": "experiment/features/code_search/checkpoint_003.feature",
+      "feature_scenario": "Optional metavariables, literal dollars, and multiple captures follow pattern semantics",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "The checkpoint 3 runner exercises optional metavariables, literal $$ matching, multiple captures, language filtering, capture key ordering, and deterministic file/position ordering.",
+      "runner_scenario_ids": [
+        "code_search.cp003.pattern-edge-semantics"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp003.pattern-edge-semantics",
+          "scenario_name": "Workspace product honors optional, literal-dollar, and multi-capture pattern semantics",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:3",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 101,
+      "feature_path": "experiment/features/code_search/checkpoint_003.feature",
+      "feature_scenario": "Multiline Python patterns preserve capture boundaries",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "The checkpoint 3 runner verifies multiline Python pattern match text and exact capture text/ranges across the if/return lines.",
+      "runner_scenario_ids": [
+        "code_search.cp003.multiline-python-captures"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp003.multiline-python-captures",
+          "scenario_name": "Workspace product preserves multiline Python capture boundaries",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:3",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 123,
       "feature_path": "experiment/features/code_search/checkpoint_003.feature",
       "feature_scenario": "Exact and regex rules from previous checkpoints still produce match lines",
       "missing_runner_scenario_ids": [],
@@ -243,30 +317,149 @@
       ]
     },
     {
-      "blocker": true,
+      "blocker": false,
       "checkpoint_index": 1,
-      "coverage": "required",
+      "coverage": "executable",
       "feature_line": 52,
       "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
       "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
       "missing_runner_scenario_ids": [],
       "problem_id": "file_backup",
-      "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries.",
-      "runner_scenario_ids": [],
-      "runner_scenarios": []
+      "reason": "The checkpoint 1 runner now executes daily, weekly, and once due-window examples, including duration-zero and inclusive-window cases.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.due-window-semantics"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.due-window-semantics",
+          "scenario_name": "Workspace product evaluates daily, weekly, and once due windows",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
     },
     {
-      "blocker": true,
+      "blocker": false,
       "checkpoint_index": 1,
-      "coverage": "required",
+      "coverage": "executable",
       "feature_line": 67,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "Recurring jobs run once for each trigger inside the simulation window",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 1 runner verifies that a daily job emits one eligible/start/file/completion sequence for every trigger in a multi-day inclusive window.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.recurring-triggers"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.recurring-triggers",
+          "scenario_name": "Workspace product runs recurring jobs for every trigger in the window",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "executable",
+      "feature_line": 90,
       "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
       "feature_scenario": "Disabled jobs emit no job events",
       "missing_runner_scenario_ids": [],
       "problem_id": "file_backup",
-      "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage.",
-      "runner_scenario_ids": [],
-      "runner_scenarios": []
+      "reason": "The checkpoint 1 runner now verifies that disabled jobs emit only SCHEDULE_PARSED and no job/file events.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.disabled-jobs"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.disabled-jobs",
+          "scenario_name": "Workspace product suppresses events for disabled jobs",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "edge",
+            "negative",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "executable",
+      "feature_line": 107,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "Block-style lists, default fields, and representative glob operators are honored",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 1 runner exercises block-style YAML lists, omitted timezone and enabled defaults, and representative tmp/**, data?.txt, and report[12].log globs.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.block-lists-defaults-globs"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.block-lists-defaults-globs",
+          "scenario_name": "Workspace product handles block lists, defaults, and representative globs",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "edge",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "executable",
+      "feature_line": 140,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "Malformed schedule YAML exits with an error",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 1 runner verifies malformed YAML returns a non-zero status without JSONL stdout.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.malformed-yaml"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.malformed-yaml",
+          "scenario_name": "Workspace product rejects malformed YAML schedules",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "edge",
+            "negative",
+            "cli"
+          ]
+        }
+      ]
     },
     {
       "blocker": false,
@@ -442,32 +635,10 @@
       "problem_id": "file_backup"
     }
   ],
-  "status": "block",
+  "status": "pass",
   "summary": {
-    "blocker_count": 3,
-    "blockers": [
-      {
-        "checkpoint_index": 3,
-        "coverage": "required",
-        "feature_scenario": "Nested expressions bind as a single metavariable value",
-        "problem_id": "code_search",
-        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-      },
-      {
-        "checkpoint_index": 1,
-        "coverage": "required",
-        "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-        "problem_id": "file_backup",
-        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-      },
-      {
-        "checkpoint_index": 1,
-        "coverage": "required",
-        "feature_scenario": "Disabled jobs emit no job events",
-        "problem_id": "file_backup",
-        "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
-      }
-    ],
+    "blocker_count": 0,
+    "blockers": [],
     "by_problem_checkpoint": [
       {
         "blocker_count": 0,
@@ -488,21 +659,21 @@
         "spec_only_scenario_count": 1
       },
       {
-        "blocker_count": 1,
+        "blocker_count": 0,
         "checkpoint_index": 3,
-        "executable_scenario_count": 2,
-        "feature_scenario_count": 3,
+        "executable_scenario_count": 5,
+        "feature_scenario_count": 5,
         "problem_id": "code_search",
-        "required_missing_count": 1,
+        "required_missing_count": 0,
         "spec_only_scenario_count": 0
       },
       {
-        "blocker_count": 2,
+        "blocker_count": 0,
         "checkpoint_index": 1,
-        "executable_scenario_count": 1,
-        "feature_scenario_count": 3,
+        "executable_scenario_count": 6,
+        "feature_scenario_count": 6,
         "problem_id": "file_backup",
-        "required_missing_count": 2,
+        "required_missing_count": 0,
         "spec_only_scenario_count": 0
       },
       {
@@ -525,12 +696,11 @@
       }
     ],
     "coverage_counts": {
-      "executable": 10,
-      "required": 3,
+      "executable": 18,
       "spec_only": 5
     },
-    "executable_scenario_count": 10,
-    "feature_scenario_count": 18,
+    "executable_scenario_count": 18,
+    "feature_scenario_count": 23,
     "invalid_coverage_count": 0,
     "missing_ledger_count": 0,
     "omitted_scenarios": [
@@ -557,27 +727,6 @@
       },
       {
         "checkpoint_index": 3,
-        "coverage": "required",
-        "feature_scenario": "Nested expressions bind as a single metavariable value",
-        "problem_id": "code_search",
-        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
-      },
-      {
-        "checkpoint_index": 1,
-        "coverage": "required",
-        "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
-        "problem_id": "file_backup",
-        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
-      },
-      {
-        "checkpoint_index": 1,
-        "coverage": "required",
-        "feature_scenario": "Disabled jobs emit no job events",
-        "problem_id": "file_backup",
-        "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
-      },
-      {
-        "checkpoint_index": 3,
         "coverage": "spec_only",
         "feature_scenario": "First run writes full backups into destination job directories",
         "problem_id": "file_backup",
@@ -591,7 +740,7 @@
         "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1."
       }
     ],
-    "required_missing_count": 3,
+    "required_missing_count": 0,
     "spec_only_scenario_count": 5
   }
 }
