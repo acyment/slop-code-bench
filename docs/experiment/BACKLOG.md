@@ -385,10 +385,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-110 - Generate Pilot Report
 
 - Phase: Analysis/reporting
+- Status: completed as pre-evidence report scaffold in `experiment/results/m12_pilot_report/`
 - Rationale: Results need transparent interpretation and limitations.
 - Description: Produce report with inspected setup, run matrix, pass/fail matrix, survival, regressions, hidden-after-visible failures, quality slopes, and cost metrics.
 - Dependencies: EXP-101, EXP-081
-- Acceptance criteria: report clearly states no causal proof; includes data and scripts.
+- Acceptance criteria: report clearly states no causal proof; includes data and scripts. Current output is explicitly marked `not_tested` because EXP-101 remains blocked.
 - Complexity: L
 - Implementation notes: Include per-problem paired plots and tables.
 - Risks/unknowns: small samples may be noisy.
@@ -396,6 +397,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-111 - Archive Artifacts
 
 - Phase: Analysis/reporting
+- Status: completed as pre-evidence archive scaffold in `experiment/results/m12_archive/`
 - Rationale: Runs need to be reproducible and reviewable.
 - Description: Export artifacts, configs, prompts, hashes, logs, and normalized data to an archive directory.
 - Dependencies: EXP-110

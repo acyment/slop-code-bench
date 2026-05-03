@@ -9,6 +9,7 @@ Status:
 - EXP-070 through EXP-072 complete: protected-file lock checks and dry-run trajectory/subset wrappers exist. These dry runs do not execute model agents or hidden scoring.
 - EXP-100 complete as a pre-execution artifact freeze: `experiment/locks/pilot_artifact_freeze.json`.
 - EXP-101 blocked by full-pilot preflight until the execution bridge, fixed model/agent config, and C2 snapshot acceptance integration are complete.
+- EXP-110 through EXP-111 complete as pre-evidence reporting/archive scaffolds. The current report is not a result analysis of a completed pilot.
 
 This file pins the canonical upstream repositories for the SpecCommons SCBench Gherkin drift pilot. It should be copied unchanged into the eventual experiment branch unless a deliberate upstream refresh is performed.
 
@@ -94,6 +95,22 @@ uv run python experiment/scripts/validate_full_pilot_preflight.py \
 ```
 
 Primary data collection is not valid until that gate returns `ready`.
+
+## Current Report And Archive
+
+Current pre-evidence report:
+
+```text
+experiment/results/m12_pilot_report/pilot_report.md
+```
+
+Current pre-evidence archive:
+
+```text
+experiment/results/m12_archive/pre_evidence_archive/
+```
+
+These artifacts are useful for reviewing the setup state. They do not contain evidence from implementation-agent trajectories.
 
 ## Planned Fork Layout
 

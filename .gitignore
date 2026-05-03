@@ -213,6 +213,7 @@ logs/*
 results/*
 experiment/runs/*
 !experiment/runs/.gitkeep
+experiment/results/m12_archive/pre_evidence_archive/files/
 
 dashboard/*.db
 dashboard/.states

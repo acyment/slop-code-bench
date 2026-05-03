@@ -1,0 +1,49 @@
+{
+  "analysis_source_results_dir": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/m10_mvp_dry_run/export",
+  "causal_claim_supported": false,
+  "checkpoint_count": 18,
+  "claim_status": "not_tested",
+  "cost_metrics": {
+    "cost_data_available": false,
+    "reason": "No implementation-agent execution has run in the current artifacts.",
+    "run_count": 4
+  },
+  "dry_run_checkpoint_count": 18,
+  "evaluable_checkpoint_count": 0,
+  "freeze_hash": "6b523b863cc816ed671ba717f531684915f58f3d05b747aaedc70d23b298964e",
+  "full_pilot_preflight_status": "blocked",
+  "full_pilot_total_checkpoint_executions": 261,
+  "full_pilot_total_trajectories": 54,
+  "gate_blockers": [
+    {
+      "id": "pilot_c0.model_agent_selected",
+      "message": "Model/provider and agent harness/version still contain TBD placeholders.",
+      "status": "block"
+    },
+    {
+      "id": "pilot_c1.model_agent_selected",
+      "message": "Model/provider and agent harness/version still contain TBD placeholders.",
+      "status": "block"
+    },
+    {
+      "id": "pilot_c2.model_agent_selected",
+      "message": "Model/provider and agent harness/version still contain TBD placeholders.",
+      "status": "block"
+    },
+    {
+      "id": "trajectory.execution_bridge",
+      "message": "run_trajectory.py is still dry-run only.",
+      "status": "block"
+    },
+    {
+      "id": "c2.acceptance_snapshot_bridge",
+      "message": "C2 acceptance command still points at the smoke/reference runner, not agent checkpoint snapshots.",
+      "status": "block"
+    }
+  ],
+  "generated_at": "2026-05-03T14:47:49.861115Z",
+  "run_count": 4,
+  "schema_version": 1,
+  "status": "pre_evidence_blocked",
+  "visible_acceptance_checkpoint_count": 0
+}

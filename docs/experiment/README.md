@@ -99,8 +99,11 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `../../experiment/scripts/analyze_results.py`: trajectory and technical-drift summary generator.
 - `../../experiment/scripts/freeze_pilot_artifacts.py`: pre-execution artifact freeze manifest generator and verifier.
 - `../../experiment/scripts/validate_full_pilot_preflight.py`: full-pilot readiness gate.
+- `../../experiment/scripts/generate_pilot_report.py`: limitation-aware report generator.
+- `../../experiment/scripts/archive_artifacts.py`: reproducibility archive builder.
 - `MVP_DRY_RUN_REPORT.md`: Milestone 10 preflight run report.
 - `FULL_PILOT_RUN_GATE.md`: Milestone 11 freeze and full-pilot execution gate.
+- `PILOT_REPORTING.md`: Milestone 12 reporting and archive commands.
 
 ## Proposed First Pilot
 
@@ -260,3 +263,17 @@ uv run python experiment/scripts/validate_full_pilot_preflight.py \
 ```
 
 The gate currently blocks primary data collection because model/agent values are still placeholders, the trajectory wrapper is dry-run only, and C2 acceptance is not yet wired to agent checkpoint snapshots.
+
+## Reporting And Archive
+
+Milestone 12 adds the report and archive pipeline. The current report is intentionally pre-evidence: it summarizes the M10 dry-run and M11 blocked preflight, and it marks the research claim as `not_tested`.
+
+Generate the current report and archive with:
+
+```bash
+uv run python experiment/scripts/generate_pilot_report.py \
+  --output-dir experiment/results/m12_pilot_report
+
+uv run python experiment/scripts/archive_artifacts.py \
+  --output-dir experiment/results/m12_archive/pre_evidence_archive
+```
