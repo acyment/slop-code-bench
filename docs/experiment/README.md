@@ -70,6 +70,7 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 
 - `BACKLOG.md`: task-level implementation backlog.
 - `BENCHMARK_ARCHITECTURE.md`: native runner/problem/evaluation/metrics data flow.
+- `ACCEPTANCE_HARNESS.md`: Milestone 6 runner decision, helper scope, and smoke command.
 - `EXPERIMENT_DESIGN.md`: pilot design, MVP cut, decision log.
 - `HIDDEN_TEST_SEPARATION.md`: file visibility model and C2 lock requirements.
 - `REPO_FORK_PLAN.md`: upstream/fork/branch and integration plan.
@@ -85,6 +86,8 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `../../experiment/schemas/run_matrix.schema.json`: schema for run matrix configs.
 - `../../experiment/features/README.md`: Gherkin conversion style guide.
 - `../../experiment/features/CONVERSION_LEDGER.md`: source and information-level ledger for converted feature files.
+- `../../experiment/steps/acceptance/`: locked CLI/API/result helpers for visible acceptance execution.
+- `../../experiment/schemas/scenario_result.schema.json`: schema for visible scenario result JSONL rows.
 
 ## Proposed First Pilot
 
@@ -130,4 +133,18 @@ Validate feature structure and required tags with:
 
 ```bash
 uv run python experiment/scripts/validate_features.py
+```
+
+## Acceptance Harness Prototype
+
+Milestone 6 selects a custom parser-to-pytest adapter path and adds the locked helper layer. The current smoke runner validates the helper layer against reference solutions for `code_search`, `file_backup`, and `textdrop`.
+
+Run smoke checks with:
+
+```bash
+uv run python experiment/scripts/run_acceptance_smoke.py \
+  --problems-root ../scb-problems \
+  --output-dir /tmp/scbench-acceptance-smoke
+uv run python experiment/scripts/validate_scenario_results.py \
+  /tmp/scbench-acceptance-smoke/scenarios.jsonl
 ```

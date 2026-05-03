@@ -193,6 +193,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-050 - Select Gherkin Runner
 
 - Phase: Acceptance harness prototype
+- Status: completed in `docs/experiment/ACCEPTANCE_HARNESS.md`
 - Rationale: Runner choice affects speed, lockability, and output schema.
 - Description: Compare `pytest-bdd`, `behave`, and a custom parser-to-pytest adapter for CLI/API tasks.
 - Dependencies: EXP-041
@@ -204,6 +205,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-051 - Implement CLI Acceptance Helpers
 
 - Phase: Acceptance harness prototype
+- Status: completed in `experiment/steps/acceptance/cli.py`
 - Rationale: MVP problems are CLI-oriented.
 - Description: Add helpers for command execution, stdin, stdout/stderr assertions, JSONL parsing, temp files, and exit-code checks.
 - Dependencies: EXP-050
@@ -215,6 +217,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-052 - Implement API Acceptance Helpers
 
 - Phase: Acceptance harness prototype
+- Status: completed in `experiment/steps/acceptance/api.py`
 - Rationale: Full pilot may include `textdrop` or another HTTP/API problem.
 - Description: Add helpers for server startup, port allocation, HTTP requests, teardown, and runtime capture.
 - Dependencies: EXP-050
@@ -226,6 +229,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-053 - Add Machine-Readable Acceptance Output
 
 - Phase: Acceptance harness prototype
+- Status: completed in `experiment/steps/acceptance/results.py` and `experiment/schemas/scenario_result.schema.json`
 - Rationale: Scenario results need to merge with hidden SCBench scoring.
 - Description: Emit JSONL scenario records with status, tags, duration, failure type, stdout/stderr paths.
 - Dependencies: EXP-051

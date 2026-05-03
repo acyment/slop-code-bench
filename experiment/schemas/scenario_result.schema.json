@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://speccommons.local/scbench/scenario_result.schema.json",
+  "title": "SpecCommons SCBench Scenario Result",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "run_id",
+    "problem_id",
+    "checkpoint_id",
+    "scenario_id",
+    "feature_path",
+    "scenario_name",
+    "tags",
+    "status",
+    "failure_type",
+    "duration_ms",
+    "stdout_path",
+    "stderr_path"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 1
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "problem_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_]+$"
+    },
+    "checkpoint_id": {
+      "type": "string",
+      "pattern": "^checkpoint_[0-9]+$"
+    },
+    "scenario_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9_.-]+$"
+    },
+    "feature_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scenario_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": ["passed", "failed", "error", "skipped"]
+    },
+    "failure_type": {
+      "type": ["string", "null"],
+      "enum": [
+        "scenario_failure",
+        "step_error",
+        "product_error",
+        "harness_error",
+        null
+      ]
+    },
+    "duration_ms": {
+      "type": "number",
+      "minimum": 0
+    },
+    "stdout_path": {
+      "type": ["string", "null"]
+    },
+    "stderr_path": {
+      "type": ["string", "null"]
+    }
+  }
+}
+

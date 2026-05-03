@@ -13,6 +13,10 @@ experiment/results/cost_events.jsonl
 experiment/results/artifacts.jsonl
 ```
 
+The scenario row shape is also encoded in
+`experiment/schemas/scenario_result.schema.json` and can be validated with
+`experiment/scripts/validate_scenario_results.py`.
+
 ## Run Record
 
 One row per full trajectory.
