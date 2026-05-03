@@ -4,9 +4,9 @@ Generated: 2026-05-03
 
 ## Current Status
 
-The native execution path is now implemented far enough to run SCBench through a condition-specific fixture without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1, and a paired reduced-drift mini-screen has now run for C0 vs C2 on `code_search` and `file_backup` through checkpoint 3.
+The native execution path is now implemented far enough to run SCBench through condition-specific fixtures without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1, a first reduced-drift probe ran for C0 vs C2, and the later meaningful mini-screen has now run and rerun across C0/C1/C2 for `code_search` and `file_backup`.
 
-This is still directional/pipeline-only evidence. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial. C2 acceptance feedback enforcement has now been implemented as a harness-mediated repair loop for future native runs, but the existing reduced-drift probe was run before that gate existed.
+This is still directional evidence. The latest EXP-100R rerun validates that C2 executable acceptance is being executed as a harness-mediated intervention, but it did not show a C2 survival advantage or reduce hidden-failure-after-visible-pass cases. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial beyond the mini-screen slots, and the remaining mini-screen blind spots need inspection before scaling.
 
 ## Seven-Step Run Checklist
 
@@ -17,8 +17,8 @@ This is still directional/pipeline-only evidence. The representative screening m
 | 3. Add screening preflight | done | `validate_full_pilot_preflight.py --profile screening` checks model/agent selection, execution bridge, freeze state, C2 coverage, and C2 executed-feedback enforcement. |
 | 4. Choose fixed runtime settings | done | Screening configs use `codex_auth/gpt-5.3-codex-spark`, Codex CLI `0.128.0`, `thinking: low`, `num_workers: 1`. |
 | 5. Run one paid smoke checkpoint | done | `smoke-c2-code-search-cp1-v2` completed and passed. |
-| 6. Run screening matrix | blocked | C2 coverage has locked scenarios for 6 of 19 selected checkpoint slots; 13 slots are missing. C2 executed-feedback enforcement is also missing. |
-| 7. Export/analyze/report | done for smoke and mini-screen | Normalized smoke result and analysis are under `experiment/results/paid_smoke_c2_code_search_cp1_v2/`; mini-screen results are under `experiment/results/reduced_drift_probe/`. |
+| 6. Run screening matrix | blocked | C2 coverage has locked scenarios for the mini-screen slots, but the broader screening/pilot profiles are still missing selected checkpoint coverage. EXP-100R also left six C2 hidden failures after visible acceptance passes. |
+| 7. Export/analyze/report | done for smoke, reduced-drift probe, meaningful mini-screen, and EXP-100R rerun | Normalized smoke result and analysis are under `experiment/results/paid_smoke_c2_code_search_cp1_v2/`; the EXP-100R rerun is under `experiment/results/meaningful_mini_screen_rerun/`. |
 
 ## Paid Smoke Result
 
@@ -89,6 +89,38 @@ Primary artifacts:
 - Analysis summary: `experiment/results/reduced_drift_probe/analysis/summary.json`
 - Directional report: `experiment/results/reduced_drift_probe/report/reduced_drift_report.md`
 
+## Meaningful Mini-Screen And EXP-100R Rerun
+
+Latest run prefix: `meaningful-rerun`
+
+Shape:
+
+- Conditions: C0, C1, C2
+- Problems: `code_search`, `file_backup`
+- Checkpoint prefix: 1-3
+- Replicates: 3
+- Trajectories: 18
+- Evaluable checkpoint rows: 35
+- C2 visible-acceptance checkpoint rows: 12
+- C2 rows with harness feedback observed: 12
+- Protocol violations: 0
+- Agent-reported cost: `$1.3592863`
+
+Directional outcome:
+
+- `code_search`: C0 and C2 both survived through checkpoint 2 and failed hidden tests at checkpoint 3 in all three replicates. C1 worsened in one replicate, failing checkpoint 2 once.
+- `file_backup`: C0, C1, and C2 all failed hidden tests at checkpoint 1 in all three replicates.
+- C2 visible acceptance passed all 12 C2 checkpoint rows, but six of those rows failed hidden tests afterward.
+- Hidden-failure-after-visible-pass count stayed unchanged from the prior meaningful mini-screen: 6 before, 6 after acceptance strengthening.
+- The EXP-100R result validates the executed-feedback protocol, but does not provide positive evidence that C2 reduced functional/spec drift in this mini-screen.
+
+Primary artifacts:
+
+- Runs: `experiment/runs/meaningful_mini_screen_rerun/`
+- Normalized export: `experiment/results/meaningful_mini_screen_rerun/exported/`
+- Analysis summary: `experiment/results/meaningful_mini_screen_rerun/analysis/summary.json`
+- Comparison report: `experiment/results/meaningful_mini_screen_rerun/analysis/exp100r_comparison.md`
+
 ## Current Blocker
 
 The screening preflight blocks the full screening matrix because C2 visible acceptance coverage is partial:
@@ -104,7 +136,7 @@ The covered slots are:
 
 The missing C2 slots include later checkpoints for `code_search` and `file_backup`, and all selected checkpoints for `migrate_configs` and `log_query`.
 
-The C2 feedback blocker has been addressed for future runs:
+The C2 feedback blocker has been addressed for current and future C2 native runs:
 
 - current enforcement mode: `harness_mediated`
 - native C2 runs set `SPECCOMMONS_ACCEPTANCE_GATE=1`
@@ -112,7 +144,9 @@ The C2 feedback blocker has been addressed for future runs:
 
 ## Recommended Next Step
 
-Next complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
+Next complete EXP-100S: inspect the remaining EXP-100R C2 hidden-failure-after-visible-pass cases before scaling. If the remaining failures are original-spec visible-harness omissions, strengthen the relevant C2 acceptance checks again. If they are intentionally hidden-only or indicate problem unsuitability, update problem selection before running a broader matrix.
+
+After EXP-100S, complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
 
 ```bash
 uv run python experiment/scripts/freeze_pilot_artifacts.py snapshot --problems-root ../scb-problems

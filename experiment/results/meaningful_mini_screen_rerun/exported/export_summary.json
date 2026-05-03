@@ -1,0 +1,28 @@
+{
+  "artifact_count": 53,
+  "checkpoint_count": 35,
+  "generated_at": "2026-05-03T21:03:28.938210Z",
+  "input_runs": [
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_01/meaningful-rerun-mini_screen_c0-code_search-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_01/meaningful-rerun-mini_screen_c1-code_search-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_01/meaningful-rerun-mini_screen_c2-code_search-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_02/meaningful-rerun-mini_screen_c0-code_search-r02",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_02/meaningful-rerun-mini_screen_c1-code_search-r02",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_02/meaningful-rerun-mini_screen_c2-code_search-r02",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_03/meaningful-rerun-mini_screen_c0-code_search-r03",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_03/meaningful-rerun-mini_screen_c1-code_search-r03",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/code_search/replicate_03/meaningful-rerun-mini_screen_c2-code_search-r03",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_01/meaningful-rerun-mini_screen_c0-file_backup-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_01/meaningful-rerun-mini_screen_c1-file_backup-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_01/meaningful-rerun-mini_screen_c2-file_backup-r01",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_02/meaningful-rerun-mini_screen_c0-file_backup-r02",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_02/meaningful-rerun-mini_screen_c1-file_backup-r02",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_02/meaningful-rerun-mini_screen_c2-file_backup-r02",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_03/meaningful-rerun-mini_screen_c0-file_backup-r03",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_03/meaningful-rerun-mini_screen_c1-file_backup-r03",
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/runs/meaningful_mini_screen_rerun/file_backup/replicate_03/meaningful-rerun-mini_screen_c2-file_backup-r03"
+  ],
+  "run_count": 18,
+  "schema_version": 1,
+  "technical_metric_count": 35
+}

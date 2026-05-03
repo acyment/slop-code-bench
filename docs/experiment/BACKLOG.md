@@ -575,14 +575,26 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100R - Rerun Meaningful Mini-Screen After Acceptance Audit
 
 - Phase: Full pilot run
-- Status: ready for rerun; `mini_screen` preflight is ready after regenerated freeze and coverage audit
+- Status: completed in `experiment/results/meaningful_mini_screen_rerun/`; result was protocol-valid but did not show a C2 survival gain
 - Rationale: The completed mini-screen tested the protocol but not a sufficiently aligned executable acceptance suite.
 - Description: Regenerate freeze/preflight, rerun the same C0/C1/C2 two-problem mini-screen, export/analyze results, and compare against the first mini-screen.
 - Dependencies: EXP-100O, EXP-100P, EXP-100Q
 - Acceptance criteria: C2 visible-pass hidden-fail count decreases, or the remaining cases are documented as intentionally hidden-only; report compares survival and cost deltas against `experiment/results/meaningful_mini_screen`.
 - Complexity: XL
-- Implementation notes: Preserve the same model, seeds, problem set, and checkpoint limit for paired comparability. The `screening` and `pilot` profiles remain blocked by wider C2 coverage gaps; rerun only the `mini_screen` profile for this task.
-- Risks/unknowns: Stronger visible acceptance may increase C2 cost and repair-loop duration.
+- Implementation notes: Rerun completed 18 trajectories and 35 checkpoint rows. C2 feedback was observed for all 12 C2 visible-acceptance checkpoint rows and there were no protocol violations. C2 hidden-failure-after-visible-pass count stayed at 6, unchanged from the prior mini-screen; C2 matched C0 on `code_search` survival and all conditions failed `file_backup` at checkpoint 1. Comparison report: `experiment/results/meaningful_mini_screen_rerun/analysis/exp100r_comparison.md`.
+- Risks/unknowns: Stronger visible acceptance increased C2 cost and repair-loop duration without reducing hidden failures in this mini-screen.
+
+### EXP-100S - Inspect Remaining Rerun C2 Blind Spots
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: EXP-100R still has six C2 hidden failures after visible acceptance passes, so scaling now would mainly measure remaining harness blind spots or problem unsuitability.
+- Description: Inspect the rerun C2 hidden-failure-after-visible cases for `code_search` checkpoint 3 and `file_backup` checkpoint 1. Compare hidden failure reports against original checkpoint prose, Gherkin feature intent, executable scenarios, and old/new acceptance strengthening changes.
+- Dependencies: EXP-100R
+- Acceptance criteria: report classifies each remaining failure cluster as original-spec visible-harness omission, intentionally hidden-only coverage, agent implementation failure unrelated to C2, or problem-selection issue; report recommends whether to strengthen acceptance again, replace/down-rank a problem, or proceed to a broader screen; backlog is updated with the selected follow-up.
+- Complexity: M
+- Implementation notes: Use hidden failures only as maintainer diagnostics. Do not copy hidden tests into visible acceptance; derive any new visible checks from original checkpoint prose and existing Gherkin intent.
+- Risks/unknowns: Overfitting to hidden tests would invalidate the intervention; if `file_backup` is intrinsically too hard at checkpoint 1 for this model, it may need to be replaced for drift measurement.
 
 ### EXP-101 - Run Full Pilot Matrix
 
