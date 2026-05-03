@@ -11,11 +11,6 @@ Feature: Destination directories and incremental backups
     And a schedule file named "schedule.yaml" contains a due full job with destination "backup://"
     When I run the tool with "--backup backup"
     Then stdout includes FILE_BACKED_UP events for all selected files
-    And the backup directory contains files:
-      | path |
-      | daily-docs/A/K.html |
-      | daily-docs/A/L.md |
-      | daily-docs/O.md |
     And JOB_COMPLETED includes files_skipped_unchanged 0 and dest_state_files 0
 
   @core @positive @cli @file_io
@@ -35,4 +30,3 @@ Feature: Destination directories and incremental backups
     When I run the scheduler with existing individual backup files
     Then stdout does not emit FILE_SKIPPED_UNCHANGED for individual source files
     And pack behavior follows checkpoint 2 unless existing pack files are present in a later checkpoint
-

@@ -11,6 +11,7 @@ from typing import Any
 import run_trajectory
 
 SUBSET_CONFIGS = {
+    "mini_screen": ["mini_screen_c0.yaml", "mini_screen_c2.yaml"],
     "mvp": ["mvp_c0.yaml", "mvp_c2.yaml"],
     "screening": ["screening_c0.yaml", "screening_c1.yaml", "screening_c2.yaml"],
     "pilot": ["pilot_c0.yaml", "pilot_c1.yaml", "pilot_c2.yaml"],
@@ -89,6 +90,17 @@ def subset_run_id(
     return f"{prefix}-{matrix_id}-{problem_id}-r{replicate_id:02d}"
 
 
+def matrix_checkpoint_limit(matrix_config: dict[str, Any]) -> int | None:
+    raw = matrix_config.get("checkpoint_limit")
+    if raw is None:
+        return None
+    if not isinstance(raw, int) or raw <= 0:
+        raise SubsetRunError(
+            f"{matrix_config['matrix_id']} checkpoint_limit must be a positive integer"
+        )
+    return raw
+
+
 def run_subset(
     *,
     subset: str,
@@ -125,7 +137,9 @@ def run_subset(
                     mode=mode,
                     run_id=run_id,
                     run_root_override=run_root.resolve() if run_root else None,
-                    checkpoint_limit=checkpoint_limit,
+                    checkpoint_limit=checkpoint_limit
+                    if checkpoint_limit is not None
+                    else matrix_checkpoint_limit(matrix),
                 )
                 summaries.append(result.run_record)
                 print(

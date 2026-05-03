@@ -20,12 +20,7 @@ DEFAULT_FROZEN_PATHS = [
     "experiment/README.md",
     "experiment/REPRODUCIBILITY.md",
     "experiment/FORK_SETUP.md",
-    "experiment/configs/screening_c0.yaml",
-    "experiment/configs/screening_c1.yaml",
-    "experiment/configs/screening_c2.yaml",
-    "experiment/configs/pilot_c0.yaml",
-    "experiment/configs/pilot_c1.yaml",
-    "experiment/configs/pilot_c2.yaml",
+    "experiment/configs/*.yaml",
     "experiment/features/**",
     "experiment/prompts/**",
     "experiment/steps/**",
@@ -33,6 +28,8 @@ DEFAULT_FROZEN_PATHS = [
     "experiment/schemas/**",
 ]
 DEFAULT_MATRIX_PATHS = [
+    "experiment/configs/mini_screen_c0.yaml",
+    "experiment/configs/mini_screen_c2.yaml",
     "experiment/configs/pilot_c0.yaml",
     "experiment/configs/pilot_c1.yaml",
     "experiment/configs/pilot_c2.yaml",
@@ -118,6 +115,16 @@ def summarize_matrix(
     checkpoint_counts = {
         problem: checkpoint_count(problems_root, problem) for problem in problems
     }
+    checkpoint_limit = matrix.get("checkpoint_limit")
+    if checkpoint_limit is not None:
+        if not isinstance(checkpoint_limit, int) or checkpoint_limit <= 0:
+            raise FreezeError(
+                f"{matrix_path} checkpoint_limit must be a positive integer"
+            )
+        checkpoint_counts = {
+            problem: min(count, checkpoint_limit) if count is not None else None
+            for problem, count in checkpoint_counts.items()
+        }
     checkpoint_total_per_replicate = sum(
         value for value in checkpoint_counts.values() if value is not None
     )

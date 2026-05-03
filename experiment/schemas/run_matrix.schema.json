@@ -32,6 +32,11 @@
       "type": "string",
       "enum": ["design_locked", "ready_to_run", "paused"]
     },
+    "checkpoint_limit": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Optional prefix length for reduced pilot profiles. When omitted, all problem checkpoints are included."
+    },
     "condition": {
       "type": "object",
       "required": [

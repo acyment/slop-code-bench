@@ -23,7 +23,12 @@ SCREENING_CONFIGS = [
     "experiment/configs/screening_c1.yaml",
     "experiment/configs/screening_c2.yaml",
 ]
+MINI_SCREEN_CONFIGS = [
+    "experiment/configs/mini_screen_c0.yaml",
+    "experiment/configs/mini_screen_c2.yaml",
+]
 CONFIG_PROFILES = {
+    "mini_screen": MINI_SCREEN_CONFIGS,
     "pilot": PILOT_CONFIGS,
     "screening": SCREENING_CONFIGS,
 }
@@ -152,6 +157,27 @@ def acceptance_coverage_index(repo_root: Path) -> set[tuple[str, int]]:
     }
 
 
+def configured_checkpoint_limit(config: dict[str, Any]) -> int | None:
+    raw = config.get("checkpoint_limit")
+    if raw is None:
+        return None
+    if not isinstance(raw, int) or raw <= 0:
+        raise PreflightError(
+            f"{config.get('matrix_id', '<unknown>')} checkpoint_limit must be a positive integer"
+        )
+    return raw
+
+
+def selected_checkpoint_count(
+    *, problems_root: Path, config: dict[str, Any], problem_id: str
+) -> int:
+    total = checkpoint_count(problems_root, problem_id)
+    limit = configured_checkpoint_limit(config)
+    if limit is None:
+        return total
+    return min(total, limit)
+
+
 def check_acceptance_coverage(
     *, repo_root: Path, problems_root: Path, config_rels: list[str]
 ) -> dict[str, Any]:
@@ -163,7 +189,11 @@ def check_acceptance_coverage(
         if config["condition"]["id"] != "C2":
             continue
         for problem_id in config["problems"]:
-            total = checkpoint_count(problems_root, str(problem_id))
+            total = selected_checkpoint_count(
+                problems_root=problems_root,
+                config=config,
+                problem_id=str(problem_id),
+            )
             for index in range(1, total + 1):
                 checked += 1
                 if (str(problem_id), index) not in coverage:
@@ -185,6 +215,166 @@ def check_acceptance_coverage(
         ),
         "checked_checkpoint_slots": checked,
         "missing_checkpoint_slots": missing,
+    }
+
+
+def model_key(config: dict[str, Any]) -> tuple[str, str]:
+    model = config.get("model", {})
+    return (str(model.get("provider")), str(model.get("name")))
+
+
+def agent_key(config: dict[str, Any]) -> tuple[str, str]:
+    agent = config.get("agent_harness", {})
+    return (str(agent.get("id")), str(agent.get("version")))
+
+
+def replicate_ids(config: dict[str, Any]) -> list[int]:
+    return sorted(int(replicate["replicate_id"]) for replicate in config["replicates"])
+
+
+def check_reduced_drift_evidence_gate(
+    *, repo_root: Path, problems_root: Path, config_rels: list[str]
+) -> dict[str, Any]:
+    configs = [load_yaml(repo_root / config_rel) for config_rel in config_rels]
+    by_condition = {
+        str(config["condition"]["id"]): config
+        for config in configs
+    }
+    blockers: list[dict[str, Any]] = []
+
+    required_conditions = {"C0", "C2"}
+    missing_conditions = sorted(required_conditions - set(by_condition))
+    if missing_conditions:
+        blockers.append(
+            {
+                "type": "missing_counterfactual_conditions",
+                "missing_conditions": missing_conditions,
+            }
+        )
+
+    comparable_conditions = [
+        condition_id
+        for condition_id in ["C0", "C1", "C2"]
+        if condition_id in by_condition
+    ]
+    if "C0" in by_condition:
+        baseline = by_condition["C0"]
+        for condition_id in comparable_conditions:
+            config = by_condition[condition_id]
+            if model_key(config) != model_key(baseline):
+                blockers.append(
+                    {
+                        "type": "model_mismatch",
+                        "condition_id": condition_id,
+                        "baseline_model": list(model_key(baseline)),
+                        "condition_model": list(model_key(config)),
+                    }
+                )
+            if agent_key(config) != agent_key(baseline):
+                blockers.append(
+                    {
+                        "type": "agent_harness_mismatch",
+                        "condition_id": condition_id,
+                        "baseline_agent": list(agent_key(baseline)),
+                        "condition_agent": list(agent_key(config)),
+                    }
+                )
+
+    if required_conditions.issubset(by_condition):
+        baseline = by_condition["C0"]
+        baseline_problems = set(str(problem) for problem in baseline["problems"])
+        baseline_replicates = replicate_ids(baseline)
+        for condition_id in comparable_conditions:
+            config = by_condition[condition_id]
+            problems = set(str(problem) for problem in config["problems"])
+            if problems != baseline_problems:
+                blockers.append(
+                    {
+                        "type": "problem_set_mismatch",
+                        "condition_id": condition_id,
+                        "baseline_problems": sorted(baseline_problems),
+                        "condition_problems": sorted(problems),
+                    }
+                )
+            condition_replicates = replicate_ids(config)
+            if condition_replicates != baseline_replicates:
+                blockers.append(
+                    {
+                        "type": "replicate_mismatch",
+                        "condition_id": condition_id,
+                        "baseline_replicates": baseline_replicates,
+                        "condition_replicates": condition_replicates,
+                    }
+                )
+
+        for problem_id in sorted(baseline_problems):
+            counts_by_condition = {
+                condition_id: selected_checkpoint_count(
+                    problems_root=problems_root,
+                    config=by_condition[condition_id],
+                    problem_id=problem_id,
+                )
+                for condition_id in comparable_conditions
+                if problem_id in set(str(problem) for problem in by_condition[condition_id]["problems"])
+            }
+            if counts_by_condition and len(set(counts_by_condition.values())) > 1:
+                blockers.append(
+                    {
+                        "type": "checkpoint_prefix_mismatch",
+                        "problem_id": problem_id,
+                        "checkpoint_counts": counts_by_condition,
+                    }
+                )
+            minimum_count = min(counts_by_condition.values()) if counts_by_condition else 0
+            if minimum_count < 3:
+                blockers.append(
+                    {
+                        "type": "insufficient_checkpoint_depth",
+                        "problem_id": problem_id,
+                        "minimum_checkpoint_count": minimum_count,
+                        "required_minimum": 3,
+                    }
+                )
+
+    coverage = acceptance_coverage_index(repo_root)
+    c2_config = by_condition.get("C2")
+    if c2_config is not None:
+        missing_coverage: list[dict[str, Any]] = []
+        for problem_id in [str(problem) for problem in c2_config["problems"]]:
+            total = selected_checkpoint_count(
+                problems_root=problems_root,
+                config=c2_config,
+                problem_id=problem_id,
+            )
+            for index in range(1, total + 1):
+                if (problem_id, index) not in coverage:
+                    missing_coverage.append(
+                        {
+                            "problem_id": problem_id,
+                            "checkpoint_index": index,
+                        }
+                    )
+        if missing_coverage:
+            blockers.append(
+                {
+                    "type": "incomplete_c2_acceptance_coverage",
+                    "missing_checkpoint_slots": missing_coverage,
+                }
+            )
+
+    ready = not blockers
+    return {
+        "id": "reduced_drift.evidence_gate",
+        "status": "pass" if ready else "block",
+        "message": (
+            "Configured run matrix is evidence-producing for a directional reduced-drift probe."
+            if ready
+            else f"Configured run matrix is not evidence-producing: {len(blockers)} blocker(s)."
+        ),
+        "ready": ready,
+        "minimum_checkpoint_depth": 3,
+        "required_conditions": sorted(required_conditions),
+        "blockers": blockers,
     }
 
 
@@ -224,7 +414,11 @@ def matrix_summary(
         problems = [str(problem) for problem in config["problems"]]
         replicates = list(config["replicates"])
         checkpoints = {
-            problem: checkpoint_count(problems_root, problem)
+            problem: selected_checkpoint_count(
+                problems_root=problems_root,
+                config=config,
+                problem_id=problem,
+            )
             for problem in problems
         }
         rows.append(
@@ -279,6 +473,25 @@ def markdown_report(report: dict[str, Any]) -> str:
             )
             + " |"
         )
+    evidence_gate = report.get("evidence_gate", {})
+    blockers = evidence_gate.get("blockers", [])
+    lines.extend(
+        [
+            "",
+            "## Reduced-Drift Evidence Gate",
+            "",
+            f"- Ready: `{bool(evidence_gate.get('ready'))}`",
+            f"- Message: {evidence_gate.get('message', '')}",
+        ]
+    )
+    if blockers:
+        lines.extend(["", "| blocker | detail |", "| --- | --- |"])
+        for blocker in blockers:
+            if not isinstance(blocker, dict):
+                continue
+            blocker_type = blocker.get("type")
+            detail = json.dumps(blocker, sort_keys=True).replace("|", "\\|")
+            lines.append(f"| {blocker_type} | `{detail}` |")
     lines.extend(
         [
             "",
@@ -302,6 +515,11 @@ def run_preflight(
     profile: str,
 ) -> dict[str, Any]:
     config_rels = CONFIG_PROFILES[profile]
+    evidence_gate = check_reduced_drift_evidence_gate(
+        repo_root=repo_root,
+        problems_root=problems_root,
+        config_rels=config_rels,
+    )
     checks = [
         check_freeze_manifest(repo_root, freeze_manifest),
         *check_model_and_agent(repo_root, config_rels),
@@ -312,6 +530,7 @@ def run_preflight(
             problems_root=problems_root,
             config_rels=config_rels,
         ),
+        evidence_gate,
     ]
     status = "ready" if all(check["status"] == "pass" for check in checks) else "blocked"
     return {
@@ -321,6 +540,11 @@ def run_preflight(
         "status": status,
         "freeze_manifest": freeze_manifest.as_posix(),
         "matrix_summary": matrix_summary(repo_root, problems_root, config_rels),
+        "evidence_gate": {
+            "ready": evidence_gate["ready"],
+            "message": evidence_gate["message"],
+            "blockers": evidence_gate["blockers"],
+        },
         "checks": checks,
     }
 
