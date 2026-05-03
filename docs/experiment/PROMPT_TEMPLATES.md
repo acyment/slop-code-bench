@@ -1,6 +1,6 @@
 # Prompt Templates
 
-These are implementation-agent prompt templates. The runner should render variables and record `prompt_hash` for every checkpoint.
+These are implementation-agent prompt templates. The materialized templates live in `experiment/prompts/*.md`. The runner should render variables and record `prompt_hash` for every checkpoint.
 
 ## Shared Variables
 
@@ -227,4 +227,3 @@ Focus:
 Remove unnecessary dependencies only when behavior remains unchanged.
 Do not modify locked experiment files.
 ```
-

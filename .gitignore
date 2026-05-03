@@ -211,6 +211,8 @@ outputs/*
 logs/*
 .vscode/*
 results/*
+experiment/runs/*
+!experiment/runs/.gitkeep
 
 dashboard/*.db
 dashboard/.states

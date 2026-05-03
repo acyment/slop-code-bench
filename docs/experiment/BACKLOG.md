@@ -243,6 +243,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-060 - Implement Prompt Files
 
 - Phase: Condition prompt templates
+- Status: completed in `experiment/prompts/*.md`
 - Rationale: Prompts must be versioned and hashable.
 - Description: Move templates from `PROMPT_TEMPLATES.md` into `experiment/prompts/*.md` with render variables.
 - Dependencies: EXP-030
@@ -254,6 +255,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-061 - Generate Condition Context
 
 - Phase: Condition prompt templates
+- Status: completed in `experiment/scripts/generate_condition_context.py`
 - Rationale: C0/C1/C2 differ mainly by supplied context and commands.
 - Description: Implement `generate_condition_context.py` that renders C0 prose, C1 Gherkin context, and C2 Gherkin plus acceptance commands.
 - Dependencies: EXP-060, EXP-041

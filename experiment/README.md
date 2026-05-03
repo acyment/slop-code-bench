@@ -12,6 +12,7 @@ Current setup status:
 - `EXP-030`-`EXP-031`: condition definitions are frozen and run-matrix configs validate.
 - `EXP-040`-`EXP-042`: Gherkin style guide, conversion ledger, MVP features, and full-pilot feature files are present.
 - `EXP-050`-`EXP-053`: acceptance-harness decision, CLI/API helpers, smoke runner, and scenario result schema are present.
+- `EXP-060`-`EXP-061`: condition prompt templates, context renderer, and prompt-boundary validator are present.
 
 The experiment is designed to wrap SCBench rather than modify benchmark internals. Keep runner, problem, scoring, and hidden-test behavior pinned and documented.
 
@@ -32,4 +33,4 @@ experiment/
 
 ## Next Setup Step
 
-Continue with Milestone 7, starting at `EXP-060`.
+Continue with Milestone 8, starting at `EXP-070`.

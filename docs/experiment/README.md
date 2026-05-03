@@ -88,6 +88,9 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `../../experiment/features/CONVERSION_LEDGER.md`: source and information-level ledger for converted feature files.
 - `../../experiment/steps/acceptance/`: locked CLI/API/result helpers for visible acceptance execution.
 - `../../experiment/schemas/scenario_result.schema.json`: schema for visible scenario result JSONL rows.
+- `../../experiment/prompts/*.md`: materialized condition prompt templates.
+- `../../experiment/scripts/generate_condition_context.py`: C0/C1/C2 prompt renderer.
+- `../../experiment/scripts/validate_prompt_contexts.py`: prompt stability and condition-boundary validator.
 
 ## Proposed First Pilot
 
@@ -147,4 +150,27 @@ uv run python experiment/scripts/run_acceptance_smoke.py \
   --output-dir /tmp/scbench-acceptance-smoke
 uv run python experiment/scripts/validate_scenario_results.py \
   /tmp/scbench-acceptance-smoke/scenarios.jsonl
+```
+
+## Condition Prompt Rendering
+
+Milestone 7 materializes the condition prompt templates and renders prompt context without exposing hidden scoring internals. C0 uses checkpoint prose only, C1 adds current/prior feature-file context without runnable acceptance commands, and C2 adds the locked feature context plus the visible acceptance command.
+
+Render one prompt with:
+
+```bash
+uv run python experiment/scripts/generate_condition_context.py \
+  --config experiment/configs/mvp_c2.yaml \
+  --problem code_search \
+  --checkpoint checkpoint_1 \
+  --problems-root ../scb-problems \
+  --output-dir /tmp/scbench-prompt-contexts
+```
+
+Validate prompt stability and condition separation with:
+
+```bash
+uv run python experiment/scripts/validate_prompt_contexts.py \
+  --problems-root ../scb-problems \
+  --output-dir /tmp/scbench-prompt-contexts
 ```
