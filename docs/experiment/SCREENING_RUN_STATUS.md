@@ -102,7 +102,7 @@ Shape:
 - Trajectories: 18
 - Evaluable checkpoint rows: 35
 - C2 visible-acceptance checkpoint rows: 12
-- C2 rows with harness feedback observed: 12
+- C2 rows with visible gate execution recorded: 12
 - Protocol violations: 0
 - Agent-reported cost: `$1.3592863`
 
@@ -112,7 +112,7 @@ Directional outcome:
 - `file_backup`: C0, C1, and C2 all failed hidden tests at checkpoint 1 in all three replicates.
 - C2 visible acceptance passed all 12 C2 checkpoint rows, but six of those rows failed hidden tests afterward.
 - Hidden-failure-after-visible-pass count stayed unchanged from the prior meaningful mini-screen: 6 before, 6 after acceptance strengthening.
-- The EXP-100R result validates the executed-feedback protocol, but does not provide positive evidence that C2 reduced functional/spec drift in this mini-screen.
+- The EXP-100R result validates that the visible gate executes, but every C2 gate passed on the first attempt, so no repair feedback was generated. It does not provide positive evidence that C2 reduced functional/spec drift in this mini-screen.
 
 Primary artifacts:
 
@@ -144,9 +144,17 @@ The C2 feedback blocker has been addressed for current and future C2 native runs
 
 ## Recommended Next Step
 
-Next complete EXP-100S: inspect the remaining EXP-100R C2 hidden-failure-after-visible-pass cases before scaling. If the remaining failures are original-spec visible-harness omissions, strengthen the relevant C2 acceptance checks again. If they are intentionally hidden-only or indicate problem unsuitability, update problem selection before running a broader matrix.
+EXP-100S is complete. The root-cause report is `experiment/results/meaningful_mini_screen_rerun/analysis/c2_root_cause_analysis.md`.
 
-After EXP-100S, complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
+Key finding:
+
+- `code_search`: C2 improved checkpoint 3 hidden subtest pass rate versus C0 but still missed strict pass due remaining pattern-semantics gaps.
+- `file_backup`: currently unsuitable for drift measurement because all conditions fail checkpoint 1; C2 visible examples allowed a brittle YAML parser that handled hand-written Gherkin examples but failed benchmark-style valid YAML fixture shapes.
+- All C2 acceptance gates passed on first attempt, so C2 execution produced no repair feedback in EXP-100R.
+
+Next complete EXP-100T through EXP-100X before another meaningful run: align visible runner commands with benchmark entrypoints, add `file_backup` fixture-shape parity checks, tighten `code_search` checkpoint 3 pattern acceptance, add near-miss metrics, and decide whether to keep or replace `file_backup`.
+
+After that, complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
 
 ```bash
 uv run python experiment/scripts/freeze_pilot_artifacts.py snapshot --problems-root ../scb-problems

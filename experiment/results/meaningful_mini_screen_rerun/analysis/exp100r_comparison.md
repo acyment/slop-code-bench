@@ -47,7 +47,7 @@ uv run python experiment/scripts/analyze_results.py \
 | Trajectories | 18 |
 | Exported checkpoint rows | 35 |
 | C2 visible-acceptance checkpoint rows | 12 |
-| C2 rows with harness feedback observed | 12 |
+| C2 rows with visible gate execution recorded | 12 |
 | C2 visible acceptance passes | 12 |
 | C2 hidden failures after visible pass | 6 |
 | Protocol violations | 0 |
@@ -114,7 +114,8 @@ This rerun validates the improved protocol, not the research thesis.
 What is now stronger:
 
 - C2 acceptance is definitely executed by the harness for every C2 checkpoint row.
-- C2 feedback is recorded as observed for every C2 checkpoint row.
+- C2 visible gate execution is recorded for every C2 checkpoint row.
+- No C2 repair feedback was generated because every visible gate passed on the first attempt.
 - Locked files stayed unchanged in C1/C2 runs.
 - The result schema captures visible pass, hidden pass, hidden-after-visible, cost, and acceptance runtime fields.
 

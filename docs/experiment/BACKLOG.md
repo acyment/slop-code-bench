@@ -581,20 +581,80 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Dependencies: EXP-100O, EXP-100P, EXP-100Q
 - Acceptance criteria: C2 visible-pass hidden-fail count decreases, or the remaining cases are documented as intentionally hidden-only; report compares survival and cost deltas against `experiment/results/meaningful_mini_screen`.
 - Complexity: XL
-- Implementation notes: Rerun completed 18 trajectories and 35 checkpoint rows. C2 feedback was observed for all 12 C2 visible-acceptance checkpoint rows and there were no protocol violations. C2 hidden-failure-after-visible-pass count stayed at 6, unchanged from the prior mini-screen; C2 matched C0 on `code_search` survival and all conditions failed `file_backup` at checkpoint 1. Comparison report: `experiment/results/meaningful_mini_screen_rerun/analysis/exp100r_comparison.md`.
+- Implementation notes: Rerun completed 18 trajectories and 35 checkpoint rows. C2 visible gate execution was recorded for all 12 C2 visible-acceptance checkpoint rows and there were no protocol violations, but every gate passed on the first attempt, so no repair feedback was generated. C2 hidden-failure-after-visible-pass count stayed at 6, unchanged from the prior mini-screen; C2 matched C0 on `code_search` strict survival and all conditions failed `file_backup` at checkpoint 1. Comparison report: `experiment/results/meaningful_mini_screen_rerun/analysis/exp100r_comparison.md`.
 - Risks/unknowns: Stronger visible acceptance increased C2 cost and repair-loop duration without reducing hidden failures in this mini-screen.
 
 ### EXP-100S - Inspect Remaining Rerun C2 Blind Spots
 
 - Phase: Full pilot run
-- Status: pending
+- Status: completed in `experiment/results/meaningful_mini_screen_rerun/analysis/c2_root_cause_analysis.md`
 - Rationale: EXP-100R still has six C2 hidden failures after visible acceptance passes, so scaling now would mainly measure remaining harness blind spots or problem unsuitability.
 - Description: Inspect the rerun C2 hidden-failure-after-visible cases for `code_search` checkpoint 3 and `file_backup` checkpoint 1. Compare hidden failure reports against original checkpoint prose, Gherkin feature intent, executable scenarios, and old/new acceptance strengthening changes.
 - Dependencies: EXP-100R
 - Acceptance criteria: report classifies each remaining failure cluster as original-spec visible-harness omission, intentionally hidden-only coverage, agent implementation failure unrelated to C2, or problem-selection issue; report recommends whether to strengthen acceptance again, replace/down-rank a problem, or proceed to a broader screen; backlog is updated with the selected follow-up.
 - Complexity: M
-- Implementation notes: Use hidden failures only as maintainer diagnostics. Do not copy hidden tests into visible acceptance; derive any new visible checks from original checkpoint prose and existing Gherkin intent.
-- Risks/unknowns: Overfitting to hidden tests would invalidate the intervention; if `file_backup` is intrinsically too hard at checkpoint 1 for this model, it may need to be replaced for drift measurement.
+- Implementation notes: Root cause is mixed. `code_search` C2 improved checkpoint 3 hidden subtest pass rate relative to C0 but missed strict pass due remaining pattern-semantics gaps. `file_backup` is currently unsuitable for drift measurement because all conditions fail checkpoint 1; C2 overfit to visible hand-written YAML shapes and failed benchmark-style valid YAML fixture shapes. All C2 acceptance gates passed on first attempt, so no repair feedback was generated.
+- Risks/unknowns: Overfitting to hidden tests would invalidate the intervention; `file_backup` may need replacement if it remains an all-condition checkpoint-1 failure after harness-fidelity fixes.
+
+### EXP-100T - Align C2 Visible Runner With Benchmark Entrypoints
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: C2 visible acceptance should exercise the same command shape as SCBench hidden evaluation wherever possible. EXP-100S found that visible acceptance currently invokes product scripts through the experiment runner's Python interpreter, while hidden evaluation uses benchmark entrypoints such as `uv run <script>`.
+- Description: Update the visible acceptance runner so each problem can declare and use its benchmark-equivalent command template. Add a runner-level check that records the exact command, interpreter, and working directory used for every visible scenario.
+- Dependencies: EXP-100S
+- Acceptance criteria: C2 visible scenario artifacts record benchmark-equivalent command templates; `file_backup` and `code_search` visible scenarios run through the same entrypoint form used by hidden evaluation unless explicitly waived; exports include visible command provenance; existing reference-solution acceptance still passes.
+- Complexity: M
+- Implementation notes: Preserve scenario logic while swapping command execution. If a direct hidden-equivalent entrypoint is unsafe or unavailable, record a structured waiver field so later analysis can flag the confound.
+- Risks/unknowns: Some problems may rely on different environment setup for visible tests; command parity can expose previously hidden fixture issues.
+
+### EXP-100U - Add `file_backup` Fixture-Shape Acceptance Parity
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: EXP-100S found that `file_backup` visible examples did not cover valid YAML shapes representative of benchmark fixture materialization, allowing a brittle custom parser to pass C2 acceptance and fail hidden checkpoint 1.
+- Description: Add visible acceptance cases for legal YAML formatting variants, especially schedules generated through `yaml.safe_dump` with top-level sequence entries under `jobs:`. Keep cases derived from original checkpoint semantics, not copied from hidden expected outputs.
+- Dependencies: EXP-100S, EXP-100T
+- Acceptance criteria: current EXP-100R C2 `file_backup` checkpoint 1 snapshots fail the new visible scenario for parser/fixture-shape parity; reference checkpoint 1 solution passes; the scenario distinguishes parser failure from behavioral event mismatch; coverage ledger is updated.
+- Complexity: M
+- Implementation notes: Prefer generating the schedule fixture with the same public YAML library style the harness already uses rather than hardcoding hidden case files. Include an assertion that successful schedules emit at least one expected event so empty-output failures cannot pass.
+- Risks/unknowns: This may still leave `file_backup` too hard for the selected model; if all conditions fail after this fix, replace or down-rank the problem.
+
+### EXP-100V - Tighten `code_search` Checkpoint 3 Pattern Acceptance
+
+- Phase: Full pilot run
+- Status: pending
+- Rationale: EXP-100S found that C2 substantially improved `code_search` checkpoint 3 hidden subtest pass rate but missed strict pass due under-covered pattern-semantics edges.
+- Description: Add original-spec-parity visible checks for exact optional-metavariable JSON shape, multiple optional present captures, JavaScript escaped/backtick string capture boundaries, simple numeric/expression captures in Python and C++, list-comprehension patterns, and multiline C++ block patterns.
+- Dependencies: EXP-100S, EXP-100T
+- Acceptance criteria: current EXP-100R C2 `code_search` checkpoint 3 snapshots fail at least one new visible scenario that corresponds to their remaining failure cluster; reference checkpoint 3 solution passes; existing strengthened scenarios continue to pass on reference solutions.
+- Complexity: L
+- Implementation notes: Do not mirror hidden tests verbatim. Use the original checkpoint prose and Gherkin domain language to construct representative examples with different names/data.
+- Risks/unknowns: Pattern semantics can explode into a full parser project; keep cases focused on already-observed representative semantic gaps.
+
+### EXP-100W - Add Near-Miss Metrics For Failed Checkpoints
+
+- Phase: Metrics extraction
+- Status: pending
+- Rationale: Strict survival is the primary trajectory metric, but EXP-100S showed it hides meaningful near-miss differences. C2 had zero strict checkpoint 3 passes for `code_search` but higher hidden subtest pass rate than C0.
+- Description: Extend analysis outputs with failed-checkpoint near-miss metrics: hidden subtest pass rate, failed hidden cluster count, failed cluster labels, and delta versus paired C0/C1 rows.
+- Dependencies: EXP-100S
+- Acceptance criteria: analysis report includes near-miss tables by condition/problem/checkpoint/replicate; strict survival remains the primary headline metric; reports clearly label near-miss metrics as secondary diagnostics.
+- Complexity: M
+- Implementation notes: Use existing normalized hidden test summaries and evaluation artifacts. Avoid exposing hidden test bodies in published reports; cluster labels from evaluation summaries are sufficient for internal diagnostics.
+- Risks/unknowns: Near-miss metrics can overstate practical correctness if hidden subtests are unevenly weighted.
+
+### EXP-100X - Decide Whether To Keep `file_backup` In The Mini-Screen
+
+- Phase: Problem selection
+- Status: pending
+- Rationale: A problem that fails checkpoint 1 in every condition cannot measure long-horizon drift.
+- Description: After EXP-100T and EXP-100U, rerun a cheap one-replicate `file_backup` checkpoint 1 gate/smoke across C0/C1/C2 or inspect reference/model feasibility. Decide whether to keep `file_backup`, down-rank it to harness-validation-only, or replace it with another selected CLI/file-processing problem.
+- Dependencies: EXP-100T, EXP-100U
+- Acceptance criteria: documented keep/replace decision with evidence; `PROBLEM_SELECTION.md` and mini-screen config updated if replacement is chosen; no broader mini-screen rerun until this decision is recorded.
+- Complexity: M
+- Implementation notes: Candidate replacements should have at least 2-3 checkpoint survival under baseline in prior or smoke evidence.
+- Risks/unknowns: Replacing the problem reduces comparability with earlier mini-screen runs but may be necessary for a meaningful drift signal.
 
 ### EXP-101 - Run Full Pilot Matrix
 
