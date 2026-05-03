@@ -1,0 +1,116 @@
+{
+  "checks": [
+    {
+      "details": {
+        "added_files": [],
+        "changed_files": [],
+        "checked_at": "2026-05-03T14:41:37.101346Z",
+        "file_count_after": 90,
+        "file_count_before": 90,
+        "freeze_hash": "cd7ad61a13846c998a6d89964a0a8d8395edfbb56214082df258ae7332df7b40",
+        "freeze_status": "pre_execution_artifact_freeze",
+        "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
+        "missing_patterns_after": [],
+        "missing_patterns_before": [],
+        "primary_run_gate": {
+          "reason": "The artifact package is frozen, but the full pilot should not run until the native execution bridge and C2 snapshot acceptance integration are implemented.",
+          "status": "blocked"
+        },
+        "protocol_violation": false,
+        "removed_files": [],
+        "schema_version": 1,
+        "status": "unchanged"
+      },
+      "freeze_hash": "cd7ad61a13846c998a6d89964a0a8d8395edfbb56214082df258ae7332df7b40",
+      "id": "pilot_artifacts.freeze_manifest",
+      "message": "Freeze manifest matches current files.",
+      "status": "pass"
+    },
+    {
+      "id": "pilot_c0.model_agent_selected",
+      "matrix_id": "pilot_c0",
+      "message": "Model/provider and agent harness/version still contain TBD placeholders.",
+      "status": "block"
+    },
+    {
+      "id": "pilot_c1.model_agent_selected",
+      "matrix_id": "pilot_c1",
+      "message": "Model/provider and agent harness/version still contain TBD placeholders.",
+      "status": "block"
+    },
+    {
+      "id": "pilot_c2.model_agent_selected",
+      "matrix_id": "pilot_c2",
+      "message": "Model/provider and agent harness/version still contain TBD placeholders.",
+      "status": "block"
+    },
+    {
+      "id": "trajectory.execution_bridge",
+      "message": "run_trajectory.py is still dry-run only.",
+      "status": "block"
+    },
+    {
+      "id": "c2.acceptance_snapshot_bridge",
+      "message": "C2 acceptance command still points at the smoke/reference runner, not agent checkpoint snapshots.",
+      "status": "block"
+    }
+  ],
+  "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
+  "generated_at": "2026-05-03T14:41:37.108217Z",
+  "matrix_summary": {
+    "matrices": [
+      {
+        "checkpoint_counts": {
+          "code_search": 5,
+          "file_backup": 4,
+          "file_merger": 4,
+          "log_query": 5,
+          "migrate_configs": 5,
+          "textdrop": 6
+        },
+        "checkpoint_executions": 87,
+        "condition_id": "C0",
+        "matrix_id": "pilot_c0",
+        "problem_count": 6,
+        "replicate_count": 3,
+        "trajectory_count": 18
+      },
+      {
+        "checkpoint_counts": {
+          "code_search": 5,
+          "file_backup": 4,
+          "file_merger": 4,
+          "log_query": 5,
+          "migrate_configs": 5,
+          "textdrop": 6
+        },
+        "checkpoint_executions": 87,
+        "condition_id": "C1",
+        "matrix_id": "pilot_c1",
+        "problem_count": 6,
+        "replicate_count": 3,
+        "trajectory_count": 18
+      },
+      {
+        "checkpoint_counts": {
+          "code_search": 5,
+          "file_backup": 4,
+          "file_merger": 4,
+          "log_query": 5,
+          "migrate_configs": 5,
+          "textdrop": 6
+        },
+        "checkpoint_executions": 87,
+        "condition_id": "C2",
+        "matrix_id": "pilot_c2",
+        "problem_count": 6,
+        "replicate_count": 3,
+        "trajectory_count": 18
+      }
+    ],
+    "total_checkpoint_executions": 261,
+    "total_trajectories": 54
+  },
+  "schema_version": 1,
+  "status": "blocked"
+}

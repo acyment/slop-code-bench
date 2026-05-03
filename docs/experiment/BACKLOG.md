@@ -359,21 +359,23 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100 - Freeze Pilot Artifacts
 
 - Phase: Full pilot run
+- Status: completed as pre-execution freeze in `experiment/locks/pilot_artifact_freeze.json`
 - Rationale: Features, steps, prompts, and schemas must be fixed before data collection.
 - Description: Tag or commit the experiment artifacts and write hashes to reproducibility docs.
 - Dependencies: EXP-091, EXP-042
-- Acceptance criteria: immutable experiment commit selected.
+- Acceptance criteria: immutable experiment commit selected, artifact freeze manifest written, and freeze verifier passes.
 - Complexity: S
-- Implementation notes: No feature/step edits after freeze except documented invalidation.
+- Implementation notes: No feature/step/prompt/schema/script edits after freeze except documented invalidation and a regenerated freeze manifest.
 - Risks/unknowns: late-discovered harness bugs.
 
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
+- Status: blocked by full-pilot preflight gate in `experiment/results/m11_full_pilot_preflight/preflight.json`
 - Rationale: Collect paired C0/C1/C2 trajectories.
 - Description: Run selected problems across C0/C1/C2 and 3 replicates if budget allows.
 - Dependencies: EXP-100
-- Acceptance criteria: all configured trajectories have completed/failed/invalid status and artifacts.
+- Acceptance criteria: all configured trajectories have completed/failed/invalid status and artifacts once the execution bridge, fixed model/agent config, and C2 snapshot acceptance integration are complete.
 - Complexity: XL
 - Implementation notes: Randomize condition order by replicate.
 - Risks/unknowns: cost/runtime may require partial matrix.

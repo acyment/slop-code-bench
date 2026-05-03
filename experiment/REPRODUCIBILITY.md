@@ -7,6 +7,8 @@ Status:
 - EXP-003 complete: local experiment directory skeleton exists.
 - EXP-004 complete: this reproducibility document exists.
 - EXP-070 through EXP-072 complete: protected-file lock checks and dry-run trajectory/subset wrappers exist. These dry runs do not execute model agents or hidden scoring.
+- EXP-100 complete as a pre-execution artifact freeze: `experiment/locks/pilot_artifact_freeze.json`.
+- EXP-101 blocked by full-pilot preflight until the execution bridge, fixed model/agent config, and C2 snapshot acceptance integration are complete.
 
 This file pins the canonical upstream repositories for the SpecCommons SCBench Gherkin drift pilot. It should be copied unchanged into the eventual experiment branch unless a deliberate upstream refresh is performed.
 
@@ -66,6 +68,32 @@ Rationale:
 - Commit pins are more precise than floating branch names or release tags.
 
 Do not change these pins during MVP or pilot runs without recording a new inspection block and rerunning the problem inventory.
+
+## Pilot Artifact Freeze
+
+The current pre-execution pilot artifact freeze manifest is:
+
+```text
+experiment/locks/pilot_artifact_freeze.json
+```
+
+Verify it before any primary data collection:
+
+```bash
+uv run python experiment/scripts/freeze_pilot_artifacts.py verify \
+  --manifest experiment/locks/pilot_artifact_freeze.json
+```
+
+The full-pilot preflight gate is:
+
+```bash
+uv run python experiment/scripts/validate_full_pilot_preflight.py \
+  --freeze-manifest experiment/locks/pilot_artifact_freeze.json \
+  --problems-root ../scb-problems \
+  --output-dir experiment/results/m11_full_pilot_preflight
+```
+
+Primary data collection is not valid until that gate returns `ready`.
 
 ## Planned Fork Layout
 

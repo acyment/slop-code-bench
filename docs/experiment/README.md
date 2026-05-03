@@ -97,7 +97,10 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `../../experiment/scripts/run_pilot_subset.py`: MVP/pilot subset dry-run wrapper.
 - `../../experiment/scripts/export_results.py`: normalized result exporter for wrapper dry-runs and native SCBench artifacts.
 - `../../experiment/scripts/analyze_results.py`: trajectory and technical-drift summary generator.
+- `../../experiment/scripts/freeze_pilot_artifacts.py`: pre-execution artifact freeze manifest generator and verifier.
+- `../../experiment/scripts/validate_full_pilot_preflight.py`: full-pilot readiness gate.
 - `MVP_DRY_RUN_REPORT.md`: Milestone 10 preflight run report.
+- `FULL_PILOT_RUN_GATE.md`: Milestone 11 freeze and full-pilot execution gate.
 
 ## Proposed First Pilot
 
@@ -238,3 +241,22 @@ uv run python experiment/scripts/analyze_results.py \
 ```
 
 The current MVP result is a pipeline validation only. It does not execute implementation agents, visible acceptance tests against agent snapshots, or hidden SCBench scoring.
+
+## Full Pilot Freeze And Gate
+
+Milestone 11 freezes the pre-execution pilot artifact package and adds a full-pilot gate. The freeze manifest is `experiment/locks/pilot_artifact_freeze.json`; the preflight output is `experiment/results/m11_full_pilot_preflight/`.
+
+Verify the freeze and run the gate with:
+
+```bash
+uv run python experiment/scripts/freeze_pilot_artifacts.py verify \
+  --manifest experiment/locks/pilot_artifact_freeze.json
+
+uv run python experiment/scripts/validate_full_pilot_preflight.py \
+  --freeze-manifest experiment/locks/pilot_artifact_freeze.json \
+  --problems-root ../scb-problems \
+  --output-dir experiment/results/m11_full_pilot_preflight \
+  --allow-blocked
+```
+
+The gate currently blocks primary data collection because model/agent values are still placeholders, the trajectory wrapper is dry-run only, and C2 acceptance is not yet wired to agent checkpoint snapshots.

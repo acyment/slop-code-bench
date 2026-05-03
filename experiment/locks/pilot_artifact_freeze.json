@@ -1,0 +1,514 @@
+{
+  "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
+  "created_at": "2026-05-03T14:41:31.262791Z",
+  "excluded_paths": [],
+  "files": {
+    "docs/experiment/ACCEPTANCE_HARNESS.md": {
+      "sha256": "c3bc72927c10ddaeeafda94d9a5d64b803f426761fbede7ccab039f0ae5dea2c",
+      "size_bytes": 2815
+    },
+    "docs/experiment/BACKLOG.md": {
+      "sha256": "aac09d0fc183112ce62b74d4108354ed34ae54a6a7a85a6463306e6f0b522854",
+      "size_bytes": 22853
+    },
+    "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
+      "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
+      "size_bytes": 7497
+    },
+    "docs/experiment/CONDITIONS.md": {
+      "sha256": "19481af128cb4d1a2ebe1173f03d0e9b8295a61d1a39c2d4f5f7720c5a011481",
+      "size_bytes": 5999
+    },
+    "docs/experiment/DATA_SCHEMA.md": {
+      "sha256": "0a19f3db7d897b374884b854eaca795fc4e6fabb5f0ee74e076932b66ff6533b",
+      "size_bytes": 4684
+    },
+    "docs/experiment/EXPERIMENT_DESIGN.md": {
+      "sha256": "1d28d8108019d32a0c56abea349457c1a6532dd6b7ed7416d6266327d618d555",
+      "size_bytes": 7358
+    },
+    "docs/experiment/FULL_PILOT_RUN_GATE.md": {
+      "sha256": "69875f99d4e83bd62e3232d0b9b64479a22dba7199e29b3c7b972c32e3e57ecd",
+      "size_bytes": 2369
+    },
+    "docs/experiment/HIDDEN_TEST_SEPARATION.md": {
+      "sha256": "6fe823641b371a5fc2523aadd09efa6235e89a2c1ce3658a7491611cd57bd54e",
+      "size_bytes": 5064
+    },
+    "docs/experiment/METRICS.md": {
+      "sha256": "e0948c718fa11b6199525a334a1466b2380727ed35ec4ee3ca2e95b3f587433d",
+      "size_bytes": 3853
+    },
+    "docs/experiment/METRIC_FIELD_MAP.md": {
+      "sha256": "54f7e22e12ce6418b80ffa024a6e5d1e0ce25f068af7f4838bb342964c2800d6",
+      "size_bytes": 13198
+    },
+    "docs/experiment/MVP_DRY_RUN_REPORT.md": {
+      "sha256": "38c7dcfbaccc47d6efb77c6315d8c9ed20f164a6826e505d28536931144f840c",
+      "size_bytes": 3575
+    },
+    "docs/experiment/PROBLEM_SELECTION.md": {
+      "sha256": "43c94ef610bb371e963f69b5f4310e418802e558e18aae75eac5c8db5f0b99e2",
+      "size_bytes": 6404
+    },
+    "docs/experiment/PROMPT_TEMPLATES.md": {
+      "sha256": "c2fdc4d7c7e20a84bed0d7342681cbb641dd9c9959b2b492da5d4a99dca24865",
+      "size_bytes": 5984
+    },
+    "docs/experiment/README.md": {
+      "sha256": "4c8b620b9705d9fb114d894d1633af85d50d118b87f87e462d6b08e1cfc7e090",
+      "size_bytes": 12969
+    },
+    "docs/experiment/REPO_FORK_PLAN.md": {
+      "sha256": "33202aab785830c49b86ea74f17b9462e2578175a19eb4e83324d6d08a8a3dd7",
+      "size_bytes": 5098
+    },
+    "docs/experiment/RISK_REGISTER.md": {
+      "sha256": "4d4e4c67373c7694567950449cc0b53366e4cce6392ba864d30e4460bafebc82",
+      "size_bytes": 3042
+    },
+    "docs/experiment/ROADMAP.md": {
+      "sha256": "68ba4484de2bbb2330e65b8fa9bc953b1cec1e3271aec713d96ab79cc68b429a",
+      "size_bytes": 2365
+    },
+    "experiment/FORK_SETUP.md": {
+      "sha256": "01e6116f410f791736ec9f7aba88043d59678e95c3c8855d501ab4822ca374ba",
+      "size_bytes": 1928
+    },
+    "experiment/README.md": {
+      "sha256": "1103ec370deb9d840afb8cbb3eb8d92229318f8f0a44ed6dfd113ae8dbedb97d",
+      "size_bytes": 1893
+    },
+    "experiment/REPRODUCIBILITY.md": {
+      "sha256": "420d8515309d61c4851283ece0f801f95c3566f0ae65616803483f5ef75a94cb",
+      "size_bytes": 6831
+    },
+    "experiment/configs/pilot_c0.yaml": {
+      "sha256": "477e1606b75ff66242f36fe45e2ead53be522cbdea5648a23bb1640de74ad2b1",
+      "size_bytes": 1507
+    },
+    "experiment/configs/pilot_c1.yaml": {
+      "sha256": "1ab23f38058919a9c75b1de34e01aa956621fbe2fc2a782434a01ee081a534e5",
+      "size_bytes": 1846
+    },
+    "experiment/configs/pilot_c2.yaml": {
+      "sha256": "8a14a2cc1c41c1935297f761925fbc236114daa59b6680058cbb4f159d6d2662",
+      "size_bytes": 1803
+    },
+    "experiment/features/.gitkeep": {
+      "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
+      "size_bytes": 7
+    },
+    "experiment/features/CONVERSION_LEDGER.md": {
+      "sha256": "d32c58d52a132b19a37d56f9fccbec9b5804a16c094f3eeb89da876467daafb2",
+      "size_bytes": 5516
+    },
+    "experiment/features/README.md": {
+      "sha256": "9c19a1277d7401539d9fb44a07e48286a5209f14c13acd3985c5f742a89a1766",
+      "size_bytes": 3178
+    },
+    "experiment/features/code_search/checkpoint_001.feature": {
+      "sha256": "9010197f2f0ea8d88a71a5b105179d5f7b692e8a8b50f1d548ed4a74e664a118",
+      "size_bytes": 2834
+    },
+    "experiment/features/code_search/checkpoint_002.feature": {
+      "sha256": "d57a2a6ec939f360077807084715c9b904384101f19217e146fc66aea4cc941b",
+      "size_bytes": 2530
+    },
+    "experiment/features/code_search/checkpoint_003.feature": {
+      "sha256": "1c0854096a44d948f64d2ba9d8a95556e6c43badd1e6e7855ea1feee95146b34",
+      "size_bytes": 2614
+    },
+    "experiment/features/code_search/checkpoint_004.feature": {
+      "sha256": "50e4492930329d69d3cfaa03735454931a910759228f7532e18fef9015087bd3",
+      "size_bytes": 2657
+    },
+    "experiment/features/code_search/checkpoint_005.feature": {
+      "sha256": "d620909a00d5b8c76b1d9dd02245fd2a582973dd2b55be2f6b0d581be45d7488",
+      "size_bytes": 2723
+    },
+    "experiment/features/file_backup/checkpoint_001.feature": {
+      "sha256": "2d5951e9bbf655e0ce7eef4f29fbb6ba4a0dd9deba9bfaa5cd43dac546eeb7a8",
+      "size_bytes": 2628
+    },
+    "experiment/features/file_backup/checkpoint_002.feature": {
+      "sha256": "aaa545051a5920111bb3a000d2ae1709b524b08cc777c3c22d62c1c9d7fe5b06",
+      "size_bytes": 1894
+    },
+    "experiment/features/file_backup/checkpoint_003.feature": {
+      "sha256": "0a7f3fb9f77abb3e94090bf3db8ec30135a9865bc0e183e0b55652f6abc6b3a9",
+      "size_bytes": 1916
+    },
+    "experiment/features/file_backup/checkpoint_004.feature": {
+      "sha256": "6e6c48635997090679d294a01d5cdd0aeb3fe2b285604602397e07492ae32728",
+      "size_bytes": 1874
+    },
+    "experiment/features/file_merger/checkpoint_001.feature": {
+      "sha256": "8345813b9b53bb7c71932afc89c7f663df604404a2f3b168532835535a11708f",
+      "size_bytes": 1965
+    },
+    "experiment/features/file_merger/checkpoint_002.feature": {
+      "sha256": "9a5f1cebad85fdd74daab2608d451ddaf40c052d7f95be0160ca0a81b341f055",
+      "size_bytes": 1822
+    },
+    "experiment/features/file_merger/checkpoint_003.feature": {
+      "sha256": "8d6151ae6ca8d6801ed4e6ad928e2b6f0561b6d71bbb2de3b596cb5fdae419ad",
+      "size_bytes": 1759
+    },
+    "experiment/features/file_merger/checkpoint_004.feature": {
+      "sha256": "afe1f4ad2cdaf98a07c363dffc691093c897ea993cef3bc5df4cd23221f92173",
+      "size_bytes": 1769
+    },
+    "experiment/features/log_query/checkpoint_001.feature": {
+      "sha256": "f30b0c4ad0671f54997cf9077a92c262b864d6fb16050e6d5e10ee5822b4c821",
+      "size_bytes": 1928
+    },
+    "experiment/features/log_query/checkpoint_002.feature": {
+      "sha256": "b08f8a883ca55b689854d359746156d305e6367bfd9f3b5ba40b48d6ad21536e",
+      "size_bytes": 1681
+    },
+    "experiment/features/log_query/checkpoint_003.feature": {
+      "sha256": "38a9ff20a54d50b1ec7eebb145e4680bce7f07613702849de54451d785e730da",
+      "size_bytes": 1910
+    },
+    "experiment/features/log_query/checkpoint_004.feature": {
+      "sha256": "fa8585af94ab0bd133acae53bd9aa685d17353065b0dba63884b1a6b6e8811d1",
+      "size_bytes": 1667
+    },
+    "experiment/features/log_query/checkpoint_005.feature": {
+      "sha256": "44b398d43d0eea56fb6d7ff39096627c8070b00676587f811c5063cb55805c31",
+      "size_bytes": 1663
+    },
+    "experiment/features/migrate_configs/checkpoint_001.feature": {
+      "sha256": "85ce5a2e59b8a0d64e8468b9df675d3f5e8c6bc51f330af09ad9a6ceb40588fc",
+      "size_bytes": 2464
+    },
+    "experiment/features/migrate_configs/checkpoint_002.feature": {
+      "sha256": "9a6df48221ad14e3cdef2bef4c766b40315a26c2ceb401777526c2727f533ac7",
+      "size_bytes": 2218
+    },
+    "experiment/features/migrate_configs/checkpoint_003.feature": {
+      "sha256": "72c7697bc453cbdc5fc9b06601ddb3cc1427d8585ee46b22a21e372a67179f0f",
+      "size_bytes": 1969
+    },
+    "experiment/features/migrate_configs/checkpoint_004.feature": {
+      "sha256": "0da97830a8a247687b2f92f9ef5f4bcf2f1df3b889a851f1f8432a57fdeb4bdb",
+      "size_bytes": 1874
+    },
+    "experiment/features/migrate_configs/checkpoint_005.feature": {
+      "sha256": "e0f64b1c75855464703ea95bcfd654d5b5ee387a84bc977aa445031fa0294996",
+      "size_bytes": 2156
+    },
+    "experiment/features/textdrop/checkpoint_001.feature": {
+      "sha256": "8a909f8a02abc3b895340f21d907be26402c026773f6b698ffda236fec7b54b4",
+      "size_bytes": 1709
+    },
+    "experiment/features/textdrop/checkpoint_002.feature": {
+      "sha256": "04526d01b280eec69a4936105fb622bd13931bacc93801023111387062531012",
+      "size_bytes": 1703
+    },
+    "experiment/features/textdrop/checkpoint_003.feature": {
+      "sha256": "11545120bc6633aaae9d68961278a0d8b09a36291f08cef0a4f054dd2a41cffd",
+      "size_bytes": 1790
+    },
+    "experiment/features/textdrop/checkpoint_004.feature": {
+      "sha256": "9d5787df51c92e904e8798fad8052e4be7437fafbb7b9859bb4eb00924d495cf",
+      "size_bytes": 1494
+    },
+    "experiment/features/textdrop/checkpoint_005.feature": {
+      "sha256": "c6f5c2807c2328a5c63423f0d3ccacec9dff84c3b37deb3591e23f960dde584f",
+      "size_bytes": 1909
+    },
+    "experiment/features/textdrop/checkpoint_006.feature": {
+      "sha256": "5c6abb7992b2cb2290ef055566b2b396ee84f358787b9add131841bb58ecdd1f",
+      "size_bytes": 2263
+    },
+    "experiment/prompts/.gitkeep": {
+      "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
+      "size_bytes": 7
+    },
+    "experiment/prompts/architecture_probe.md": {
+      "sha256": "3bb035dabccb60c4eb84beb79401c46c659ee93a0f054820352837501af212c7",
+      "size_bytes": 618
+    },
+    "experiment/prompts/baseline_prose.md": {
+      "sha256": "8c12871e2de13b9611b259f324af1ddfa39445286c6a5321cb687815843badf8",
+      "size_bytes": 440
+    },
+    "experiment/prompts/dependency_creep_probe.md": {
+      "sha256": "12b8069bcf907ec7fed541e5d5dc43734c006f622b11c5de54bf22bab191e2a9",
+      "size_bytes": 616
+    },
+    "experiment/prompts/gherkin_executable.md": {
+      "sha256": "b62ce580cb1c2b8bbc0262ed89a5850423ce3b72364362691e6fc3ae94276ec1",
+      "size_bytes": 1025
+    },
+    "experiment/prompts/gherkin_spec_only.md": {
+      "sha256": "7993e07b9262342d43f49360a18769de25d99c3d92bfb58dd014e58b4934cbb6",
+      "size_bytes": 953
+    },
+    "experiment/prompts/refactor_only.md": {
+      "sha256": "f25c7df19b9e842cfffc1fee3573789ff751e13bfcc9288b9c104ff882e010d1",
+      "size_bytes": 893
+    },
+    "experiment/prompts/security_probe.md": {
+      "sha256": "22b53e4e4ada3451fa5da301f527f8560d548cccf9b4453979f68b1fe6f65ecf",
+      "size_bytes": 576
+    },
+    "experiment/prompts/test_blind_spot_probe.md": {
+      "sha256": "7a9e856e91dfdb29ed155821e4cbda4dd811d48445ba622e60cda89df56780f6",
+      "size_bytes": 608
+    },
+    "experiment/prompts/test_harness_performance_probe.md": {
+      "sha256": "89e138837753374c7b15d8718f35347703ee527ae25c1b64cce1cbfdf49ecf3c",
+      "size_bytes": 573
+    },
+    "experiment/schemas/.gitkeep": {
+      "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
+      "size_bytes": 7
+    },
+    "experiment/schemas/run_matrix.schema.json": {
+      "sha256": "e4c1531a15ba7348a6eb7a35d7a2643ea208d047cca2e14345395a745f8c7032",
+      "size_bytes": 4901
+    },
+    "experiment/schemas/scenario_result.schema.json": {
+      "sha256": "efbb27aaff525197b00636473320ea94649a29ea0c04b399d850e428d52e36ac",
+      "size_bytes": 1687
+    },
+    "experiment/scripts/.gitkeep": {
+      "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
+      "size_bytes": 7
+    },
+    "experiment/scripts/analyze_results.py": {
+      "sha256": "1e2399e4493da9faae9cc1517d01e77da4bb36f3d7ae97b46ea0a0c3dae15c46",
+      "size_bytes": 14543
+    },
+    "experiment/scripts/export_results.py": {
+      "sha256": "c6f6019545d606ebd537b088e23145a401467d4f156b49ad3ca3c9cf91769b14",
+      "size_bytes": 33858
+    },
+    "experiment/scripts/freeze_pilot_artifacts.py": {
+      "sha256": "b5f22c6e3e6522b96081d6fea28f1e4bfbf8961f1500df7d3b00c3217ecf4cc4",
+      "size_bytes": 10830
+    },
+    "experiment/scripts/generate_condition_context.py": {
+      "sha256": "7e599c263f68bb3615fc8bccf8ca7e095c469804257caad74306eb2ba274dfb6",
+      "size_bytes": 13948
+    },
+    "experiment/scripts/run_acceptance_smoke.py": {
+      "sha256": "64aa0e5b4c5d536f80980b0f29e07d915e043ed44fc8d6566dd0b93849646f08",
+      "size_bytes": 12921
+    },
+    "experiment/scripts/run_pilot_subset.py": {
+      "sha256": "63b3ad6b415cc57702435c80aca2dd3f3aabc1cdf6da544120c4d0d6d77a3abb",
+      "size_bytes": 6006
+    },
+    "experiment/scripts/run_trajectory.py": {
+      "sha256": "c699af57799fc3bc47dd7ec386a4dc8363ee50dd380020d7c66f5dc2ca43e864",
+      "size_bytes": 15671
+    },
+    "experiment/scripts/select_problems.py": {
+      "sha256": "fd38aceb8a90c714a88947e63b123fe131a66abd11f5a403ad76272d1a80fcbd",
+      "size_bytes": 24960
+    },
+    "experiment/scripts/validate_features.py": {
+      "sha256": "9598579d5b67bdcf97cde94f1190763c38601745380eb3d4e128b2a4771ffa30",
+      "size_bytes": 3786
+    },
+    "experiment/scripts/validate_full_pilot_preflight.py": {
+      "sha256": "7756eb90fa91279cc293be19a0c88642e1eef0b7e60f76e3c28517b99f21cb78",
+      "size_bytes": 9614
+    },
+    "experiment/scripts/validate_locks.py": {
+      "sha256": "9b10710c22d1715df0409262e98aa51e4c0b93c81c6d7fef2f5a23d32561739c",
+      "size_bytes": 2836
+    },
+    "experiment/scripts/validate_prompt_contexts.py": {
+      "sha256": "750c1229bbde36d3d7d52afac7e11f50aadd7fb05a6b2f57c0c647d1392fe3e4",
+      "size_bytes": 5927
+    },
+    "experiment/scripts/validate_run_matrix.py": {
+      "sha256": "5b8ba15910c75219dcedd0df3a4a40e579d4de14835860fbb347c195708056f8",
+      "size_bytes": 4830
+    },
+    "experiment/scripts/validate_scenario_results.py": {
+      "sha256": "a1ae7b927135b59c2747f1a72b48597fa082ff6d6f0760f15213637d5c02474b",
+      "size_bytes": 2093
+    },
+    "experiment/scripts/verify_locks.py": {
+      "sha256": "01a83e11f0318f67490d6d38043b12793b09d2977371192614c3818389013388",
+      "size_bytes": 10945
+    },
+    "experiment/steps/.gitkeep": {
+      "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
+      "size_bytes": 7
+    },
+    "experiment/steps/README.md": {
+      "sha256": "79cd19dbc4e320b68a98c1d746ad7ad18e4e506c652aabdf803c1290c966e74f",
+      "size_bytes": 696
+    },
+    "experiment/steps/acceptance/__init__.py": {
+      "sha256": "7ef992717d95fde3db58e4e97715fc1bdeea09003a9acfafa0b9b19eac1f4c7d",
+      "size_bytes": 73
+    },
+    "experiment/steps/acceptance/api.py": {
+      "sha256": "1fe49c7bf4b88c37106833a123a434ea469853f97fd8c06998c33e2761f7cb97",
+      "size_bytes": 3839
+    },
+    "experiment/steps/acceptance/cli.py": {
+      "sha256": "96eaf174b69f2513085d9afb5b557986ce1c40ad7670f9b2eed87108f4779ba8",
+      "size_bytes": 4958
+    },
+    "experiment/steps/acceptance/results.py": {
+      "sha256": "f398ebd6a57209b1ec3b29660d746c65723307023be8c636b860fce8ee94549c",
+      "size_bytes": 1452
+    }
+  },
+  "freeze_created_at": "2026-05-03T14:41:31.301494Z",
+  "freeze_hash": "cd7ad61a13846c998a6d89964a0a8d8395edfbb56214082df258ae7332df7b40",
+  "freeze_schema_version": 1,
+  "freeze_status": "pre_execution_artifact_freeze",
+  "git": {
+    "branch": "experiment/gherkin-drift-pilot",
+    "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
+    "head_commit_at_manifest_generation": "b8d48979b2097a8c3de3133c72f04632aee00d17"
+  },
+  "locked_paths": [
+    "docs/experiment/**",
+    "experiment/README.md",
+    "experiment/REPRODUCIBILITY.md",
+    "experiment/FORK_SETUP.md",
+    "experiment/configs/pilot_c0.yaml",
+    "experiment/configs/pilot_c1.yaml",
+    "experiment/configs/pilot_c2.yaml",
+    "experiment/features/**",
+    "experiment/prompts/**",
+    "experiment/steps/**",
+    "experiment/scripts/**",
+    "experiment/schemas/**"
+  ],
+  "manifest_hash": "cdf23e389b7e88cc3f26b06cb6670a6db2cec00f1aef73d64bc69b00da066dbe",
+  "matrix_summary": {
+    "conditions": [
+      "C0",
+      "C1",
+      "C2"
+    ],
+    "matrices": [
+      {
+        "agent_harness": "TBD_AGENT_HARNESS",
+        "checkpoint_counts": {
+          "code_search": 5,
+          "file_backup": 4,
+          "file_merger": 4,
+          "log_query": 5,
+          "migrate_configs": 5,
+          "textdrop": 6
+        },
+        "checkpoint_executions": 87,
+        "condition_id": "C0",
+        "matrix_id": "pilot_c0",
+        "model_name": "TBD_FIXED_MODEL",
+        "path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/configs/pilot_c0.yaml",
+        "problem_count": 6,
+        "problems": [
+          "code_search",
+          "file_backup",
+          "migrate_configs",
+          "log_query",
+          "file_merger",
+          "textdrop"
+        ],
+        "replicate_count": 3,
+        "replicate_ids": [
+          1,
+          2,
+          3
+        ],
+        "trajectory_count": 18
+      },
+      {
+        "agent_harness": "TBD_AGENT_HARNESS",
+        "checkpoint_counts": {
+          "code_search": 5,
+          "file_backup": 4,
+          "file_merger": 4,
+          "log_query": 5,
+          "migrate_configs": 5,
+          "textdrop": 6
+        },
+        "checkpoint_executions": 87,
+        "condition_id": "C1",
+        "matrix_id": "pilot_c1",
+        "model_name": "TBD_FIXED_MODEL",
+        "path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/configs/pilot_c1.yaml",
+        "problem_count": 6,
+        "problems": [
+          "code_search",
+          "file_backup",
+          "migrate_configs",
+          "log_query",
+          "file_merger",
+          "textdrop"
+        ],
+        "replicate_count": 3,
+        "replicate_ids": [
+          1,
+          2,
+          3
+        ],
+        "trajectory_count": 18
+      },
+      {
+        "agent_harness": "TBD_AGENT_HARNESS",
+        "checkpoint_counts": {
+          "code_search": 5,
+          "file_backup": 4,
+          "file_merger": 4,
+          "log_query": 5,
+          "migrate_configs": 5,
+          "textdrop": 6
+        },
+        "checkpoint_executions": 87,
+        "condition_id": "C2",
+        "matrix_id": "pilot_c2",
+        "model_name": "TBD_FIXED_MODEL",
+        "path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/configs/pilot_c2.yaml",
+        "problem_count": 6,
+        "problems": [
+          "code_search",
+          "file_backup",
+          "migrate_configs",
+          "log_query",
+          "file_merger",
+          "textdrop"
+        ],
+        "replicate_count": 3,
+        "replicate_ids": [
+          1,
+          2,
+          3
+        ],
+        "trajectory_count": 18
+      }
+    ],
+    "problems": [
+      "code_search",
+      "file_backup",
+      "file_merger",
+      "log_query",
+      "migrate_configs",
+      "textdrop"
+    ],
+    "total_checkpoint_executions": 261,
+    "total_trajectories": 54
+  },
+  "missing_patterns": [],
+  "primary_run_gate": {
+    "reason": "The artifact package is frozen, but the full pilot should not run until the native execution bridge and C2 snapshot acceptance integration are implemented.",
+    "status": "blocked"
+  },
+  "problems_root": "/Users/acyment/dev/hit-sdd/repos/scb-problems",
+  "root": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench",
+  "schema_version": 1
+}
