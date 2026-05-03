@@ -281,13 +281,13 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-071 - Implement Trajectory Wrapper
 
 - Phase: Runner integration
-- Status: completed as dry-run integration in `experiment/scripts/run_trajectory.py`
+- Status: completed for dry-run and native execution in `experiment/scripts/run_trajectory.py`; one paid C2 smoke is recorded in `docs/experiment/SCREENING_RUN_STATUS.md`
 - Rationale: Need a single command per `(condition, problem, replicate)`.
 - Description: Implement `run_trajectory.py` to prepare workspace, render prompts, call SCBench runner, run visible acceptance for C2, run hidden eval, verify locks, and collect artifacts.
 - Dependencies: EXP-031, EXP-061, EXP-070
-- Acceptance criteria: dry run or mocked runner produces expected artifact tree and JSONL rows.
+- Acceptance criteria: dry run, mocked runner, and native smoke produce expected artifact trees and JSONL rows.
 - Complexity: XL
-- Implementation notes: Start with MVP; keep SCBench native outputs intact.
+- Implementation notes: Start with MVP; keep SCBench native outputs intact. Native smoke success is pipeline evidence only, not reduced-drift evidence.
 - Risks/unknowns: integrating per-checkpoint hooks may require runner changes.
 
 ### EXP-072 - Add Pilot Subset Scripts
@@ -333,11 +333,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-090 - Run MVP
 
 - Phase: Pilot dry run
-- Status: completed as dry-run/preflight in `docs/experiment/MVP_DRY_RUN_REPORT.md`
+- Status: completed as dry-run/preflight in `docs/experiment/MVP_DRY_RUN_REPORT.md`; native paid smoke completed for one C2 checkpoint and remains non-evidence
 - Rationale: Validate the whole pipeline before spending on full pilot.
 - Description: Run 2 problems, C0 vs C2, 1 replicate, 1 model/harness.
 - Dependencies: EXP-041, EXP-051, EXP-071, EXP-080
-- Acceptance criteria: 4 dry-run trajectories prepare successfully or fail with classified reasons; exports and report are generated. Evidence-producing agent execution remains blocked on the native execution bridge.
+- Acceptance criteria: 4 dry-run trajectories prepare successfully or fail with classified reasons; exports and report are generated; a single native smoke can run end-to-end. Evidence-producing interpretation remains blocked until paired counterfactuals, minimum checkpoint depth, and C2 coverage gates pass.
 - Complexity: L
 - Implementation notes: Do not interpret results as evidence beyond pipeline validation.
 - Risks/unknowns: agent cost/API availability.
@@ -345,11 +345,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-091 - Fix Pipeline Issues From MVP
 
 - Phase: Pilot dry run
-- Status: completed for dry-run/preflight; real-run fixes are deferred to execution-bridge work.
+- Status: completed for dry-run/preflight and native smoke fixes; evidence-producing run gaps are tracked under EXP-100A through EXP-100E.
 - Rationale: MVP should surface prompt, lock, harness, and export bugs.
 - Description: Triage failures, patch harness/wrapper/export code, and rerun MVP if needed.
 - Dependencies: EXP-090
-- Acceptance criteria: MVP dry-run can be reproduced from clean checkout; native execution blockers are recorded before any costly run.
+- Acceptance criteria: MVP dry-run can be reproduced from clean checkout; native smoke can run from frozen artifacts; remaining evidence blockers are recorded before larger costly runs.
 - Complexity: M
 - Implementation notes: Record all changes in reproducibility/deviation logs.
 - Risks/unknowns: fixing harness after seeing outcomes can bias full pilot; freeze before full run.
@@ -368,16 +368,76 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Implementation notes: No feature/step/prompt/schema/script edits after freeze except documented invalidation and a regenerated freeze manifest.
 - Risks/unknowns: late-discovered harness bugs.
 
+### EXP-100A - Define Reduced-Drift Evidence Gate
+
+- Phase: Full pilot run
+- Status: planned
+- Rationale: A successful pipeline smoke is not evidence of reduced drift without matched counterfactual trajectories and enough checkpoint depth.
+- Description: Add an explicit preflight gate that marks a configured run as evidence-producing only when it includes matched C0 and C2 trajectories, or matched C0/C1/C2 trajectories, for the same problems, checkpoint prefix, replicate IDs, model, and agent harness; includes at least 3 checkpoints per selected problem; and has no C2 acceptance coverage gaps for included checkpoints.
+- Dependencies: EXP-100
+- Acceptance criteria: preflight output reports `evidence_gate.ready` and structured blockers for missing counterfactuals, insufficient checkpoint depth, incomplete C2 coverage, model/harness mismatches, and incomplete lock snapshots.
+- Complexity: M
+- Implementation notes: This gate should support both the mini-screen and full screening profiles. Any report using data that fails this gate must be labeled pipeline-only or smoke-only.
+- Risks/unknowns: A 3-checkpoint prefix can show directional regression/survival behavior, but still does not represent the full long-horizon benchmark.
+
+### EXP-100B - Complete C2 Acceptance Coverage For Mini-Screen
+
+- Phase: Full pilot run
+- Status: planned
+- Rationale: C2 cannot be compared against C0 unless every included checkpoint has locked, maintainer-authored visible acceptance scenarios and steps.
+- Description: Author and lock C2 feature and step coverage for a reduced-drift mini-screen, initially `code_search` and `file_backup` through checkpoint 3 unless problem inspection recommends replacing one. Keep the implementation agent forbidden from modifying `.feature`, step, harness, scoring, prompt-template, schema, and lock files.
+- Dependencies: EXP-051, EXP-052, EXP-100A
+- Acceptance criteria: standalone acceptance runner reports scenario coverage for every included C2 problem/checkpoint slot; reference-solution or snapshot smoke passes; preflight coverage gate passes for the mini-screen profile; updated freeze manifest includes the new locked files.
+- Complexity: L
+- Implementation notes: Prefer observable CLI/file behavior and reuse step wording across checkpoints. Record any enriched examples that go beyond original prose in the Gherkin conversion notes.
+- Risks/unknowns: Coverage expansion can accidentally add information beyond the original checkpoint spec; mitigate by labeling parity versus enriched examples.
+
+### EXP-100C - Add Paired Mini-Screen Run Matrix
+
+- Phase: Full pilot run
+- Status: planned
+- Rationale: Reduced-drift tendency requires paired trajectories, not isolated condition results.
+- Description: Add a mini-screen config for `code_search` and `file_backup`, checkpoints 1-3, C0 vs C2 at minimum, optionally C0/C1/C2 if cost allows, one replicate, one model, one agent harness. The config must use identical problem/checkpoint prefixes and replicate IDs across conditions.
+- Dependencies: EXP-031, EXP-100A, EXP-100B
+- Acceptance criteria: config validation and preflight pass the reduced-drift evidence gate; generated run plan lists matched condition pairs per problem/checkpoint prefix; randomized execution order is recorded.
+- Complexity: M
+- Implementation notes: Keep this separate from the 5-6 problem full screening profile so the first evidence-producing run is affordable and easy to inspect.
+- Risks/unknowns: One replicate is only directional; do not use significance language.
+
+### EXP-100D - Run Paired Reduced-Drift Probe
+
+- Phase: Full pilot run
+- Status: planned
+- Rationale: The first interpretable signal should compare C0 and C2 on the same problem trajectories and checkpoint depth.
+- Description: Execute the mini-screen matrix after EXP-100A through EXP-100C pass. Collect native SCBench hidden-test outcomes, visible acceptance outcomes for C2, lock verification, artifacts, prompts, cost, token, latency, turn, command, and test-run counts.
+- Dependencies: EXP-100C, EXP-071, EXP-080
+- Acceptance criteria: all configured paired trajectories have completed, failed, or invalid status; exports contain checkpoint-level rows for each condition/problem/checkpoint/replicate; invalid runs are classified separately from behavioral failures.
+- Complexity: L
+- Implementation notes: Stop and document if lock violations, missing hidden tests, or harness errors appear. Do not patch acceptance files after seeing condition outcomes without invalidating and rerunning affected trajectories.
+- Risks/unknowns: Codex subscription limits, transient agent/tool failures, and local environment variance may reduce usable pairs.
+
+### EXP-100E - Report Directional Reduced-Drift Signal
+
+- Phase: Full pilot run
+- Status: planned
+- Rationale: The first useful report should answer whether there is a directional tendency worth scaling, while avoiding proof claims.
+- Description: Generate a reduced-drift mini-screen report with paired strict survival, regression rate, hidden failure after visible pass, checkpoint pass/fail matrix, technical drift slopes where available, and cost/runtime metrics. Label the report as directional and underpowered.
+- Dependencies: EXP-100D, EXP-081, EXP-110
+- Acceptance criteria: report includes paired C0 vs C2 tables by problem and checkpoint; identifies whether C2 improved, matched, or worsened survival/regression on each pair; lists missing or invalid data; states that no causal claim is supported by the mini-screen alone.
+- Complexity: M
+- Implementation notes: If C1 is included, report C0 vs C1 and C1 vs C2 separately to preserve the spec-format versus executable-harness distinction.
+- Risks/unknowns: Technical-drift metrics may be noisy over only 3 checkpoints; keep them secondary to functional/spec drift.
+
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
-- Status: blocked by full-pilot preflight gate in `experiment/results/m11_full_pilot_preflight/preflight.json`
+- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 2 of 19 selected checkpoint slots
 - Rationale: Collect paired C0/C1/C2 trajectories.
 - Description: Run selected problems across C0/C1/C2 and 3 replicates if budget allows.
-- Dependencies: EXP-100
-- Acceptance criteria: all configured trajectories have completed/failed/invalid status and artifacts once the execution bridge, fixed model/agent config, and C2 snapshot acceptance integration are complete.
+- Dependencies: EXP-100A, EXP-100B, EXP-100C, EXP-100D, EXP-100E
+- Acceptance criteria: all configured trajectories have completed/failed/invalid status and artifacts once C2 acceptance coverage, paired-run, minimum checkpoint-depth, fixed model/agent config, and lock gates pass.
 - Complexity: XL
-- Implementation notes: Randomize condition order by replicate.
+- Implementation notes: Randomize condition order by replicate. Do not scale to the 5-6 problem matrix until the reduced-drift mini-screen has produced a complete paired dataset.
 - Risks/unknowns: cost/runtime may require partial matrix.
 
 ## Milestone 12 - Analysis And Reporting

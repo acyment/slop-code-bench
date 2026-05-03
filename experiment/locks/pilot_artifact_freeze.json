@@ -1,6 +1,6 @@
 {
   "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
-  "created_at": "2026-05-03T15:56:05.636838Z",
+  "created_at": "2026-05-03T16:16:50.074584Z",
   "excluded_paths": [],
   "files": {
     "docs/experiment/ACCEPTANCE_HARNESS.md": {
@@ -8,8 +8,8 @@
       "size_bytes": 2815
     },
     "docs/experiment/BACKLOG.md": {
-      "sha256": "10e80841cf3ce0b0480652ad9532d4a5a86ab532f0956c928c631646dd097ee1",
-      "size_bytes": 23119
+      "sha256": "af4de2939bfb1046c0c1a7bc9450c1630a6b0e80e87102dae982cc0e51370cb9",
+      "size_bytes": 29595
     },
     "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
       "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
@@ -404,14 +404,14 @@
       "size_bytes": 13944
     }
   },
-  "freeze_created_at": "2026-05-03T15:56:05.674810Z",
-  "freeze_hash": "1ccc69c72cecbd4f8b4d7f4c9a473361e2c2522a07c121b919be404eccdc872e",
+  "freeze_created_at": "2026-05-03T16:16:50.113257Z",
+  "freeze_hash": "5c8ccad9e3b26416ef9770e8c53b98a03e97963f73e4e6720d34d92b78a58d71",
   "freeze_schema_version": 1,
   "freeze_status": "pre_execution_artifact_freeze",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
     "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
-    "head_commit_at_manifest_generation": "c1e53107ba05bccdb28d268ad6c10350d5f53f17"
+    "head_commit_at_manifest_generation": "64c060a9cc219dd64656a2bcb800214b6e00b48e"
   },
   "locked_paths": [
     "docs/experiment/**",
@@ -430,7 +430,7 @@
     "experiment/scripts/**",
     "experiment/schemas/**"
   ],
-  "manifest_hash": "332db2f27cdcbb24954612764883fdfec8170311209d53798b3e2dbf4ae5d94d",
+  "manifest_hash": "be6e169e0e28d9cd3c53cc713cae961cbd0dc5f13ae7d1a895475a03be88fb05",
   "matrix_summary": {
     "conditions": [
       "C0",
