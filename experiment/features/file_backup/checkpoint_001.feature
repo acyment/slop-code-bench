@@ -1,0 +1,81 @@
+@problem_file_backup @checkpoint_001
+Feature: Schedule-driven backup event simulation
+
+  Background:
+    Given the command line tool is available
+
+  @core @positive @cli @jsonl @file_io
+  Scenario: Run due daily jobs and report selected and excluded files
+    Given a mounted file tree rooted at "files" contains:
+      | path | content |
+      | A/B/C/D.py | |
+      | A/B/E.bin | |
+      | A/I.py | |
+      | M.py | |
+      | O.md | |
+    And a schedule file named "schedule.yaml" contains:
+      """
+      version: 1
+      timezone: UTC
+      jobs:
+        - id: job-root
+          source: mount://
+          exclude: ["A/*", "*.py", "**/*.bin"]
+          when:
+            kind: daily
+            at: "03:30"
+        - id: job-subdir
+          source: mount://A/B
+          exclude: ["*.py", "**/*.bin"]
+          when:
+            kind: daily
+            at: "03:30"
+      """
+    When I run the tool with arguments:
+      | argument |
+      | --now |
+      | 2025-09-10T03:30:00Z |
+      | --schedule |
+      | schedule.yaml |
+      | --duration |
+      | 1 |
+      | --mount |
+      | files |
+    Then the exit status is 0
+    And stdout starts with a SCHEDULE_PARSED event
+    And stdout reports due jobs in ascending job_id order
+    And stdout reports selected paths relative to each job source
+    And stdout reports the first matching exclusion pattern for excluded files
+    And stdout ends each job with a JOB_COMPLETED event containing selected and excluded counts
+
+  @core @positive @cli
+  Scenario Outline: Determine whether jobs are due inside the inclusive simulation window
+    Given a schedule with one enabled job:
+      | kind | at | days |
+      | <kind> | <at> | <days> |
+    When I run the scheduler at "<now>" for "<duration>" hours
+    Then the job is "<eligibility>"
+
+    Examples:
+      | kind | at | days | now | duration | eligibility |
+      | daily | 03:30 | | 2025-09-10T03:30:00Z | 0 | due |
+      | daily | 03:30 | | 2025-09-10T03:31:00Z | 24 | due |
+      | weekly | 03:30 | Wed | 2025-09-10T03:30:00Z | 0 | due |
+      | once | 2025-09-10T03:30:00 | | 2025-09-10T03:30:00Z | 0 | due |
+
+  @edge @negative @cli
+  Scenario: Disabled jobs emit no job events
+    Given a schedule file named "schedule.yaml" contains:
+      """
+      version: 1
+      timezone: UTC
+      jobs:
+        - id: disabled
+          enabled: false
+          source: mount://
+          when: {kind: daily, at: "03:30"}
+      """
+    When I run the scheduler at "2025-09-10T03:30:00Z"
+    Then stdout contains one SCHEDULE_PARSED event
+    And stdout does not contain JOB_ELIGIBLE, JOB_STARTED, or JOB_COMPLETED events
+

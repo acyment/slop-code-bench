@@ -83,6 +83,8 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 - `ROADMAP.md`: phased plan beyond the first pilot.
 - `../../experiment/configs/*.yaml`: MVP and first-pilot run matrix configs.
 - `../../experiment/schemas/run_matrix.schema.json`: schema for run matrix configs.
+- `../../experiment/features/README.md`: Gherkin conversion style guide.
+- `../../experiment/features/CONVERSION_LEDGER.md`: source and information-level ledger for converted feature files.
 
 ## Proposed First Pilot
 
@@ -115,4 +117,17 @@ Validate them with:
 
 ```bash
 uv run python experiment/scripts/validate_run_matrix.py
+```
+
+## Gherkin Feature Package
+
+Milestone 5 adds parser-neutral Gherkin feature files for all selected first-pilot problems:
+
+- MVP: `code_search`, `file_backup`
+- Full pilot: `migrate_configs`, `log_query`, `file_merger`, `textdrop`
+
+Validate feature structure and required tags with:
+
+```bash
+uv run python experiment/scripts/validate_features.py
 ```

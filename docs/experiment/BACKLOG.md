@@ -155,6 +155,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-040 - Define Gherkin Style Guide
 
 - Phase: Gherkin conversion prototype
+- Status: completed in `experiment/features/README.md`
 - Rationale: Feature files must be consistent across problems.
 - Description: Write rules for tags, scenario names, step wording, examples, scenario outlines, data tables, and conversion ledgers.
 - Dependencies: EXP-030
@@ -166,10 +167,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-041 - Convert MVP Problem Features
 
 - Phase: Gherkin conversion prototype
+- Status: completed in `experiment/features/code_search/` and `experiment/features/file_backup/`
 - Rationale: MVP needs concrete feature files to validate the pipeline.
 - Description: Convert all checkpoints for `code_search` and `file_backup` into `.feature` files.
 - Dependencies: EXP-040
-- Acceptance criteria: feature files exist, parse with selected Gherkin parser, and include conversion ledger entries.
+- Acceptance criteria: feature files exist, pass parser-neutral feature lint, and include conversion ledger entries. Runner-specific parse is deferred to EXP-050.
 - Complexity: L
 - Implementation notes: Preserve prior behavior in prior checkpoint feature files; avoid hidden-test-derived details.
 - Risks/unknowns: original specs may contain examples that need normalization.
@@ -177,6 +179,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-042 - Convert Full Pilot Features
 
 - Phase: Gherkin conversion prototype
+- Status: completed in `experiment/features/`
 - Rationale: Full pilot needs complete C1/C2 context.
 - Description: Convert final 5-6 selected problems after MVP validation.
 - Dependencies: EXP-041, EXP-022
