@@ -18,7 +18,7 @@ This pilot is not intended to prove the claim. It is designed to validate a pipe
 | --- | --- | --- |
 | C0 | Baseline prose | Agent receives original SCBench checkpoint prose using the benchmark's prompt style as closely as possible. |
 | C1 | Gherkin spec package | Agent receives derived `.feature` files as context, but no runnable Gherkin acceptance suite. |
-| C2 | Gherkin plus executable harness | Agent receives the same `.feature` files and commands for a locked acceptance suite. |
+| C2 | Gherkin plus executable harness | Agent receives the same `.feature` files and must execute the locked visible acceptance suite as implementation-time feedback. |
 
 Later conditions:
 
@@ -83,6 +83,7 @@ MVP may skip:
 5. Use paired comparisons by problem/checkpoint/replicate wherever possible.
 6. Run all conditions against the same upstream commits and environment configs.
 7. Never let implementation agents edit experiment harness files in C2+.
+8. Treat scorer-only post-hoc visible acceptance reruns as measurement, not the C2 intervention. Primary C2 evidence requires audited agent execution before checkpoint completion, or a harness-mediated repair loop that feeds visible acceptance failures back before checkpoint closure.
 
 ## Information Levels
 
@@ -136,11 +137,12 @@ Suggested first statistical treatment after data exists:
 | 2026-05-02 | Expose prior checkpoint feature files to C1/C2 agents. | Proposed | Prior behavior preservation is part of the intended intervention. |
 | 2026-05-02 | Treat locked-file changes in C1/C2 as protocol violations excluded from the primary comparison. | Frozen for MVP/pilot configs | Lock violations corrupt the condition; artifacts are still retained for audit. |
 | 2026-05-02 | Start with one model/harness. | Proposed | Reduces cost and design confounds for pipeline validation. |
+| 2026-05-03 | Require executed visible acceptance feedback for C2 primary evidence. | Frozen for C2 protocol | The thesis concerns an executable spec workflow that is actually executed; a runnable harness that is only scored after completion cannot prevent drift. |
 
 ## Unresolved Questions
 
 - Which exact fork owner should be used once GitHub credentials and authorization are available?
-- Should C2 acceptance tests be run by the agent during implementation, externally after each turn, or both? Proposed: expose commands and allow the agent to run them, while also running scorer-side verification.
+- Should C2 enforcement use transcript-audited agent command execution first, or a harness-mediated repair loop that automatically feeds visible acceptance failures back to the agent before checkpoint closure?
 - Should C1 use only `.feature` files or also a generated markdown spec package with examples extracted from Gherkin?
 - Should locked `.feature` files be visible but read-only, or copied outside the implementation workspace and only rendered into prompt context?
 - Should hidden SCBench tests be evaluated after every checkpoint or only at trajectory end? Proposed: every checkpoint, matching SCBench.

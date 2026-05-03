@@ -140,6 +140,76 @@ def check_acceptance_snapshot_bridge(repo_root: Path) -> dict[str, Any]:
     }
 
 
+def c2_feedback_policy_blockers(configs: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    blockers: list[dict[str, Any]] = []
+    accepted_enforcement = {"agent_transcript_audited", "harness_mediated"}
+    for config in configs:
+        condition = config.get("condition", {})
+        if condition.get("id") != "C2":
+            continue
+        policy = condition.get("acceptance_feedback_policy")
+        if not isinstance(policy, dict):
+            blockers.append(
+                {
+                    "type": "missing_c2_acceptance_feedback_policy",
+                    "matrix_id": config.get("matrix_id"),
+                }
+            )
+            continue
+        if policy.get("mode") not in {
+            "mandatory_pre_completion_execution",
+            "harness_mediated_repair_loop",
+        }:
+            blockers.append(
+                {
+                    "type": "c2_acceptance_feedback_mode_not_executed",
+                    "matrix_id": config.get("matrix_id"),
+                    "mode": policy.get("mode"),
+                }
+            )
+        if policy.get("enforcement") not in accepted_enforcement:
+            blockers.append(
+                {
+                    "type": "c2_acceptance_feedback_not_enforced",
+                    "matrix_id": config.get("matrix_id"),
+                    "enforcement": policy.get("enforcement"),
+                    "required_enforcement": sorted(accepted_enforcement),
+                }
+            )
+        if policy.get("scorer_rerun_after_checkpoint") is not True:
+            blockers.append(
+                {
+                    "type": "c2_scorer_acceptance_rerun_missing",
+                    "matrix_id": config.get("matrix_id"),
+                }
+            )
+        if policy.get("invalid_if_not_executed") is not True:
+            blockers.append(
+                {
+                    "type": "c2_missing_invalid_if_not_executed_policy",
+                    "matrix_id": config.get("matrix_id"),
+                }
+            )
+    return blockers
+
+
+def check_c2_feedback_enforcement(
+    repo_root: Path, config_rels: list[str]
+) -> dict[str, Any]:
+    configs = [load_yaml(repo_root / config_rel) for config_rel in config_rels]
+    blockers = c2_feedback_policy_blockers(configs)
+    return {
+        "id": "c2.acceptance_feedback_enforcement",
+        "status": "pass" if not blockers else "block",
+        "message": (
+            "C2 requires executed acceptance feedback and the runner can audit or enforce it."
+            if not blockers
+            else "C2 visible acceptance is not yet enforced as implementation-time feedback."
+        ),
+        "blockers": blockers,
+    }
+
+
 def acceptance_coverage_index(repo_root: Path) -> set[tuple[str, int]]:
     import importlib.util
 
@@ -339,6 +409,7 @@ def check_reduced_drift_evidence_gate(
     coverage = acceptance_coverage_index(repo_root)
     c2_config = by_condition.get("C2")
     if c2_config is not None:
+        blockers.extend(c2_feedback_policy_blockers(configs))
         missing_coverage: list[dict[str, Any]] = []
         for problem_id in [str(problem) for problem in c2_config["problems"]]:
             total = selected_checkpoint_count(
@@ -525,6 +596,7 @@ def run_preflight(
         *check_model_and_agent(repo_root, config_rels),
         check_execution_bridge(repo_root),
         check_acceptance_snapshot_bridge(repo_root),
+        check_c2_feedback_enforcement(repo_root, config_rels),
         check_acceptance_coverage(
             repo_root=repo_root,
             problems_root=problems_root,

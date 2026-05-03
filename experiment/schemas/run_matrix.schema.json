@@ -67,6 +67,42 @@
         "acceptance_harness_runnable": {
           "type": "boolean"
         },
+        "acceptance_feedback_policy": {
+          "type": "object",
+          "required": [
+            "mode",
+            "enforcement",
+            "scorer_rerun_after_checkpoint",
+            "invalid_if_not_executed"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "mode": {
+              "type": "string",
+              "enum": [
+                "mandatory_pre_completion_execution",
+                "harness_mediated_repair_loop"
+              ]
+            },
+            "enforcement": {
+              "type": "string",
+              "enum": [
+                "prompt_only",
+                "agent_transcript_audited",
+                "harness_mediated"
+              ]
+            },
+            "scorer_rerun_after_checkpoint": {
+              "type": "boolean"
+            },
+            "invalid_if_not_executed": {
+              "type": "boolean"
+            },
+            "notes": {
+              "type": "string"
+            }
+          }
+        },
         "hidden_tests_visible_to_agent": {
           "type": "boolean",
           "const": false

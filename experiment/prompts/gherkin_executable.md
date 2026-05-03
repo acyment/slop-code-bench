@@ -8,6 +8,9 @@ Visible acceptance command:
 {{ acceptance_command.strip() }}
 ```
 
+Execution requirement:
+Run the visible acceptance command after every material product-code change and again after your final product-code change before ending this checkpoint. If it fails, use the visible failure output to repair the product code and rerun it. A C2 checkpoint is not complete until this command has been executed and its result is reported.
+
 Locked experiment files:
 {{ protected_file_manifest.strip() }}
 
@@ -29,7 +32,8 @@ Original checkpoint specification:
 {{ original_checkpoint_spec.strip() }}
 
 Completion criteria:
-- The visible acceptance command passes, or you explain the remaining failures.
+- The visible acceptance command was executed after the final product-code change.
+- The visible acceptance command passes for a successful checkpoint; any remaining failure must be reported as a failed checkpoint.
 - Product code implements the current checkpoint.
 - Prior checkpoint behavior remains intact.
 - Locked files are unchanged.

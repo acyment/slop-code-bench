@@ -19,7 +19,7 @@ Status: frozen for the first MVP and C0/C1/C2 pilot design. Any later change mus
 | Native checkpoint prose | visible | converted into Gherkin context | converted into Gherkin context |
 | Gherkin `.feature` files | hidden/not used | visible as read-only spec context | visible and locked |
 | Gherkin step definitions | hidden/not used | hidden/not used | visible enough to run, locked against edits |
-| Visible acceptance command | hidden/not used | hidden/not used | visible/runnable |
+| Visible acceptance command | hidden/not used | hidden/not used | visible/runnable/mandatory |
 | Native SCBench pytest tests | hidden | hidden | hidden |
 | Experiment scripts/schemas/locks | hidden from prompt unless needed by command docs | locked where referenced | locked |
 | Native hidden evaluation result | external scorer only | external scorer only | external scorer only |
@@ -92,10 +92,13 @@ Rules:
 - `.feature` files are read-only/protected.
 - step definitions are read-only/protected.
 - experiment scripts, scoring scripts, schemas, and lock manifests are read-only/protected.
-- Agent may run acceptance commands.
+- Agent must run the visible acceptance command after material product-code changes and again after the final product-code change before ending each checkpoint.
+- The visible acceptance command must execute the current checkpoint scenarios plus all prior checkpoint scenarios, not future checkpoint scenarios.
+- Primary C2 evidence requires proof that the implementation agent saw and used visible acceptance feedback during the checkpoint. A scorer-only post-hoc acceptance rerun is measurement, not the C2 intervention.
 - Scorer independently reruns acceptance and hidden SCBench tests after each checkpoint.
 - Hidden SCBench pytest tests remain hidden from the implementation agent.
 - Feature, step, prompt, script, schema, and lock files are verified before and after each checkpoint.
+- If the implementation agent does not execute the visible acceptance command, mark the checkpoint or trajectory as `c2_feedback_not_observed`/invalid for the primary C2 comparison.
 
 Primary purpose: isolate executable behavioral harness effect.
 

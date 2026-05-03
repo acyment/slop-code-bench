@@ -65,6 +65,21 @@ def validate_condition_consistency(path: Path, payload: dict[str, Any]) -> list[
     elif condition_id == "C2":
         if not (gherkin_visible and harness_visible and harness_runnable):
             errors.append("C2 must expose runnable Gherkin acceptance harness")
+        feedback_policy = condition.get("acceptance_feedback_policy")
+        if not isinstance(feedback_policy, dict):
+            errors.append("C2 must define acceptance_feedback_policy")
+        else:
+            if feedback_policy.get("mode") not in {
+                "mandatory_pre_completion_execution",
+                "harness_mediated_repair_loop",
+            }:
+                errors.append("C2 feedback policy must require executed acceptance feedback")
+            if feedback_policy.get("scorer_rerun_after_checkpoint") is not True:
+                errors.append("C2 must rerun visible acceptance after each checkpoint")
+            if feedback_policy.get("invalid_if_not_executed") is not True:
+                errors.append(
+                    "C2 primary evidence must be invalid if visible acceptance was not executed"
+                )
         if lock_mode != "manifest_before_after_checkpoint":
             errors.append("C2 must verify locked experiment files")
         for required_path in {

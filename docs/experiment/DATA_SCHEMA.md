@@ -76,6 +76,11 @@ One row per trajectory checkpoint.
   "lock_manifest_hash": "sha256-or-null",
   "lock_status": "unchanged|changed|not_applicable",
   "visible_acceptance_passed": true,
+  "visible_acceptance_executed_by_agent": true,
+  "visible_acceptance_execution_count": 3,
+  "visible_acceptance_last_execution_after_final_code_change": true,
+  "acceptance_feedback_observed": true,
+  "c2_feedback_status": "observed|not_observed|not_applicable|unknown",
   "hidden_tests_passed": true,
   "current_checkpoint_passed": true,
   "prior_regression_count": 0,
@@ -103,6 +108,14 @@ One row per trajectory checkpoint.
   "artifact_paths": {}
 }
 ```
+
+C2 feedback fields distinguish the intervention from post-hoc measurement:
+
+- `visible_acceptance_passed`: result of the visible acceptance suite on the checkpoint snapshot.
+- `visible_acceptance_executed_by_agent`: true only when audit data show the implementation agent executed the visible command before checkpoint completion.
+- `visible_acceptance_last_execution_after_final_code_change`: true only when the audited final visible acceptance run occurred after the final product-code change for that checkpoint.
+- `acceptance_feedback_observed`: true when visible acceptance output was available to the implementation agent before checkpoint completion, either by audited command execution or by a harness-mediated repair loop.
+- `c2_feedback_status`: `observed` is required for primary C2 evidence; `not_observed` or `unknown` should be excluded from the primary C2 comparison.
 
 ## Scenario Record
 

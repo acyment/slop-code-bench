@@ -1,6 +1,6 @@
 {
   "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
-  "created_at": "2026-05-03T16:47:28.979100Z",
+  "created_at": "2026-05-03T17:09:21.971671Z",
   "excluded_paths": [],
   "files": {
     "docs/experiment/ACCEPTANCE_HARNESS.md": {
@@ -8,36 +8,36 @@
       "size_bytes": 2815
     },
     "docs/experiment/BACKLOG.md": {
-      "sha256": "a2e9299d6f42a949a496fcafcbed50e1b7cd15a9649e37ccf9ab1292131fff59",
-      "size_bytes": 30083
+      "sha256": "29991d7a6e4008bf8ded95ff5301e10224194d74fa71366509595fc9a6c35df0",
+      "size_bytes": 32804
     },
     "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
       "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
       "size_bytes": 7497
     },
     "docs/experiment/CONDITIONS.md": {
-      "sha256": "19481af128cb4d1a2ebe1173f03d0e9b8295a61d1a39c2d4f5f7720c5a011481",
-      "size_bytes": 5999
+      "sha256": "5e0dc6b490c0b44fd3e7bb8ec5487e95334baa95b104f9fc76f688fbf70c41b1",
+      "size_bytes": 6676
     },
     "docs/experiment/DATA_SCHEMA.md": {
-      "sha256": "0a19f3db7d897b374884b854eaca795fc4e6fabb5f0ee74e076932b66ff6533b",
-      "size_bytes": 4684
+      "sha256": "e57c7d56270a3cb0e5d6ad3a231086e8c642a0220226bb00d82c2b7dea3fe439",
+      "size_bytes": 5840
     },
     "docs/experiment/EXPERIMENT_DESIGN.md": {
-      "sha256": "1d28d8108019d32a0c56abea349457c1a6532dd6b7ed7416d6266327d618d555",
-      "size_bytes": 7358
+      "sha256": "59a3fd9dcc306a4702ef8c42bea3e975c15608828d27f08828eab750a9dc5d10",
+      "size_bytes": 7949
     },
     "docs/experiment/FULL_PILOT_RUN_GATE.md": {
-      "sha256": "69875f99d4e83bd62e3232d0b9b64479a22dba7199e29b3c7b972c32e3e57ecd",
-      "size_bytes": 2369
+      "sha256": "669e5ff74c9cf0ee4d60f75d10928c6fa02594a68d9940992e59be78787246b6",
+      "size_bytes": 2285
     },
     "docs/experiment/HIDDEN_TEST_SEPARATION.md": {
-      "sha256": "6fe823641b371a5fc2523aadd09efa6235e89a2c1ce3658a7491611cd57bd54e",
-      "size_bytes": 5064
+      "sha256": "832eeae0a3a3398b28603f696be11ce807164820dbb1eef8d5012e3c6499b0f7",
+      "size_bytes": 5494
     },
     "docs/experiment/METRICS.md": {
-      "sha256": "e0948c718fa11b6199525a334a1466b2380727ed35ec4ee3ca2e95b3f587433d",
-      "size_bytes": 3853
+      "sha256": "389a785ab1b2a029c01e7ac2408cd4129f5bc1ce2fc5fa7f1f361f4dedca1764",
+      "size_bytes": 4169
     },
     "docs/experiment/METRIC_FIELD_MAP.md": {
       "sha256": "54f7e22e12ce6418b80ffa024a6e5d1e0ce25f068af7f4838bb342964c2800d6",
@@ -56,8 +56,8 @@
       "size_bytes": 7046
     },
     "docs/experiment/PROMPT_TEMPLATES.md": {
-      "sha256": "c2fdc4d7c7e20a84bed0d7342681cbb641dd9c9959b2b492da5d4a99dca24865",
-      "size_bytes": 5984
+      "sha256": "d3735235528d25f632cbd4b6f04d7d9dbf757ed8ece774fe026270795bae5a6a",
+      "size_bytes": 6465
     },
     "docs/experiment/README.md": {
       "sha256": "272089a136fef4de14a9f82bb08ad1a01a82b742191973f38a387592a7d9fac4",
@@ -76,8 +76,8 @@
       "size_bytes": 2365
     },
     "docs/experiment/SCREENING_RUN_STATUS.md": {
-      "sha256": "d809704b3504c2192ef2bc0c0e2e9c17f0ab065d1c3ab827537a2d47b6f3829f",
-      "size_bytes": 5404
+      "sha256": "4b8ab5f1439d91263b4e824c3833ca1e910cf3dba4140bcef64e6f70de8931ba",
+      "size_bytes": 6322
     },
     "docs/experiment/SCREENING_SUBSET.md": {
       "sha256": "a157cd071b3ed5357e452b19d3767203fffdae8e7a85bed7adb25828583569d7",
@@ -100,16 +100,16 @@
       "size_bytes": 1487
     },
     "experiment/configs/mini_screen_c2.yaml": {
-      "sha256": "149b04a94d58efbc821a20c33578a408ddff8b8ed89841695fb15d9a2ce9ac31",
-      "size_bytes": 1771
+      "sha256": "6b10d3f273f98e7a115513012bd63a79d3252f04fd3c57c4e42b17293f94d05f",
+      "size_bytes": 2146
     },
     "experiment/configs/mvp_c0.yaml": {
       "sha256": "16f3bdc62f16b16c9a38d2d56c7e0ff6637bb57ac085d784dddf7a8e33fa0c4f",
       "size_bytes": 1406
     },
     "experiment/configs/mvp_c2.yaml": {
-      "sha256": "fc3eb81d7eae309cdd73e63cb38fc2bde9ccd2ed3f55a99e153d052855590bc7",
-      "size_bytes": 1624
+      "sha256": "9eb807d06a65d617dd2367dbdd4573c2dd49644640dd6c4a625b82568872e238",
+      "size_bytes": 1999
     },
     "experiment/configs/pilot_c0.yaml": {
       "sha256": "477e1606b75ff66242f36fe45e2ead53be522cbdea5648a23bb1640de74ad2b1",
@@ -120,8 +120,8 @@
       "size_bytes": 1846
     },
     "experiment/configs/pilot_c2.yaml": {
-      "sha256": "8a14a2cc1c41c1935297f761925fbc236114daa59b6680058cbb4f159d6d2662",
-      "size_bytes": 1803
+      "sha256": "ba51c488d50ab10536a9b3cfd68966c7638fa8327da93894a6a5116825a242c3",
+      "size_bytes": 2178
     },
     "experiment/configs/screening_c0.yaml": {
       "sha256": "50634bbcd96afb7354db69a0baab960c601289026ed48b0e33ef703fd1515e2d",
@@ -132,8 +132,8 @@
       "size_bytes": 1777
     },
     "experiment/configs/screening_c2.yaml": {
-      "sha256": "caa576a57a6d6143ff3363e0586632d59f73dce537ae071d92369a2f223902d4",
-      "size_bytes": 1734
+      "sha256": "0fd749cb374a5d150c239e5008aaa39946409d0186f0e00813a0eee5420fa216",
+      "size_bytes": 2109
     },
     "experiment/features/.gitkeep": {
       "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
@@ -280,8 +280,8 @@
       "size_bytes": 616
     },
     "experiment/prompts/gherkin_executable.md": {
-      "sha256": "b62ce580cb1c2b8bbc0262ed89a5850423ce3b72364362691e6fc3ae94276ec1",
-      "size_bytes": 1025
+      "sha256": "bc4ceecee808aad2f4fea54596dc6bfa4f8cd810147aafcd58ace28044fd9423",
+      "size_bytes": 1520
     },
     "experiment/prompts/gherkin_spec_only.md": {
       "sha256": "7993e07b9262342d43f49360a18769de25d99c3d92bfb58dd014e58b4934cbb6",
@@ -308,8 +308,8 @@
       "size_bytes": 7
     },
     "experiment/schemas/run_matrix.schema.json": {
-      "sha256": "d06f07fc6a1aa7e424bd2770a49c29eaeadd57579bb393fd0fd53f10ff9ac1d0",
-      "size_bytes": 5327
+      "sha256": "4f708805dbde592f3404443e866cb433ca36af8a2c892bf55ec8c4e44d6c8b56",
+      "size_bytes": 6338
     },
     "experiment/schemas/scenario_result.schema.json": {
       "sha256": "efbb27aaff525197b00636473320ea94649a29ea0c04b399d850e428d52e36ac",
@@ -344,8 +344,8 @@
       "size_bytes": 12613
     },
     "experiment/scripts/generate_reduced_drift_report.py": {
-      "sha256": "f7275f22e51b241f555dcf12fab77e67dffb8a67772f7456e2d6e7b67e6e9381",
-      "size_bytes": 14696
+      "sha256": "807df1182c9c303cc13ceb24c51ee64a2b09304b217395dd6040e7b86677796d",
+      "size_bytes": 15116
     },
     "experiment/scripts/merge_visible_acceptance.py": {
       "sha256": "3c73ea5124123ab572d000c0fb8d1b0ffc75b81eef8df2f601c2dab99acfac11",
@@ -372,8 +372,8 @@
       "size_bytes": 3786
     },
     "experiment/scripts/validate_full_pilot_preflight.py": {
-      "sha256": "b3237506e1d1820e431c162a22f406cf78aac67582659a3360ce8c56d60c2300",
-      "size_bytes": 21178
+      "sha256": "a2f32b8dc8a2c8174fff74529b58adf3d8bd6fc6bd51669bb6e39168b246ede1",
+      "size_bytes": 23983
     },
     "experiment/scripts/validate_locks.py": {
       "sha256": "9b10710c22d1715df0409262e98aa51e4c0b93c81c6d7fef2f5a23d32561739c",
@@ -384,8 +384,8 @@
       "size_bytes": 5998
     },
     "experiment/scripts/validate_run_matrix.py": {
-      "sha256": "5b8ba15910c75219dcedd0df3a4a40e579d4de14835860fbb347c195708056f8",
-      "size_bytes": 4830
+      "sha256": "9085123062cf4de7c81f06274e9c89f6fda9cbff869df7748393efa0b7cf6230",
+      "size_bytes": 5688
     },
     "experiment/scripts/validate_scenario_results.py": {
       "sha256": "a1ae7b927135b59c2747f1a72b48597fa082ff6d6f0760f15213637d5c02474b",
@@ -424,14 +424,14 @@
       "size_bytes": 30249
     }
   },
-  "freeze_created_at": "2026-05-03T16:47:29.032506Z",
-  "freeze_hash": "c9594474ee6f429768fa22323f6d93ea84759e08c5378139c3d218fff4fc83ff",
+  "freeze_created_at": "2026-05-03T17:09:22.021822Z",
+  "freeze_hash": "ba79f364979b81b7b07850348ca29338d1c2fe50c13677a16656763be2d449ff",
   "freeze_schema_version": 1,
   "freeze_status": "pre_execution_artifact_freeze",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
     "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
-    "head_commit_at_manifest_generation": "18f2d7efcdb0500b443987237882dfd42d86910d"
+    "head_commit_at_manifest_generation": "aceb4dd0c9066c845ccbed8c9d56114cf80b65c2"
   },
   "locked_paths": [
     "docs/experiment/**",
@@ -445,7 +445,7 @@
     "experiment/scripts/**",
     "experiment/schemas/**"
   ],
-  "manifest_hash": "b4eb0b5416b589c31f5ca600e689688b80c1c3ee9b9f44b723259c9a9a544cf7",
+  "manifest_hash": "311a03009dfc35a69952a82a80951544fe66162388e5a6d8be38f337045462df",
   "matrix_summary": {
     "conditions": [
       "C0",

@@ -83,8 +83,11 @@ You are implementing checkpoint {{checkpoint_id}} for SCBench problem {{problem_
 Objective:
 Make the product satisfy the current and prior Gherkin scenarios.
 
-You may run the visible acceptance suite:
+Visible acceptance command:
 {{acceptance_command}}
+
+Execution requirement:
+Run the visible acceptance command after every material product-code change and again after your final product-code change before ending this checkpoint. If it fails, use the visible failure output to repair the product code and rerun it. A C2 checkpoint is not complete until this command has been executed and its result is reported.
 
 Locked files:
 {{protected_file_manifest}}
@@ -109,7 +112,8 @@ Original checkpoint specification:
 Preserve all prior checkpoint behavior.
 
 Completion criteria:
-- The visible acceptance command passes, or you explain the remaining failures.
+- The visible acceptance command was executed after the final product-code change.
+- The visible acceptance command passes for a successful checkpoint; any remaining failure must be reported as a failed checkpoint.
 - Product code implements the current checkpoint.
 - Locked files are unchanged.
 - Final response reports changed files, acceptance command result, other commands run, and known failures.

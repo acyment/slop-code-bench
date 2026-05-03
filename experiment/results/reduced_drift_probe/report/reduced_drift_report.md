@@ -1,12 +1,12 @@
 # Reduced-Drift Mini-Screen Report
 
-Generated at: `2026-05-03T16:47:41.295188Z`
-Status: `directional_probe_complete`
-Claim status: `directional_only`
+Generated at: `2026-05-03T17:09:34.577902Z`
+Status: `blocked_not_evidence`
+Claim status: `not_interpretable`
 
 ## Bottom Line
 
-This report is directional only. It can indicate whether the paired C0 vs C2 mini-screen is worth scaling, but it cannot support a causal research claim.
+This report is directional only. It can indicate whether the paired C0 vs C2 mini-screen pipeline is worth inspecting, but it cannot support a causal research claim. Treat C2 as primary evidence only after visible acceptance execution is audited or harness-enforced as implementation-time feedback.
 
 ## Data Shape
 
@@ -49,5 +49,6 @@ This report is directional only. It can indicate whether the paired C0 vs C2 min
 
 - One replicate and two problems are underpowered and directional only.
 - Visible acceptance tests are an intervention; hidden SCBench tests remain the correctness judge.
+- C2 agent-side visible acceptance execution must be audited or harness-enforced as implementation-time feedback; scorer-only post-hoc reruns are measurement, not the intervention.
 - Technical drift slopes over three checkpoints are noisy and should be treated as secondary.
 - Before scaling, inspect C2 asset staging so future checkpoint scenarios are not exposed early.

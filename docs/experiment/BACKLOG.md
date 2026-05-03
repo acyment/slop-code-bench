@@ -371,11 +371,11 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100A - Define Reduced-Drift Evidence Gate
 
 - Phase: Full pilot run
-- Status: completed in `experiment/scripts/validate_full_pilot_preflight.py` and passing for `--profile mini_screen`
+- Status: completed in `experiment/scripts/validate_full_pilot_preflight.py`; now intentionally blocks `--profile mini_screen` until C2 executed-feedback enforcement is implemented
 - Rationale: A successful pipeline smoke is not evidence of reduced drift without matched counterfactual trajectories and enough checkpoint depth.
-- Description: Add an explicit preflight gate that marks a configured run as evidence-producing only when it includes matched C0 and C2 trajectories, or matched C0/C1/C2 trajectories, for the same problems, checkpoint prefix, replicate IDs, model, and agent harness; includes at least 3 checkpoints per selected problem; and has no C2 acceptance coverage gaps for included checkpoints.
+- Description: Add an explicit preflight gate that marks a configured run as evidence-producing only when it includes matched C0 and C2 trajectories, or matched C0/C1/C2 trajectories, for the same problems, checkpoint prefix, replicate IDs, model, and agent harness; includes at least 3 checkpoints per selected problem; has no C2 acceptance coverage gaps for included checkpoints; and has mandatory C2 executed acceptance feedback audited or harness-enforced before checkpoint completion.
 - Dependencies: EXP-100
-- Acceptance criteria: preflight output reports `evidence_gate.ready` and structured blockers for missing counterfactuals, insufficient checkpoint depth, incomplete C2 coverage, model/harness mismatches, and incomplete lock snapshots.
+- Acceptance criteria: preflight output reports `evidence_gate.ready` and structured blockers for missing counterfactuals, insufficient checkpoint depth, incomplete C2 coverage, missing C2 executed-feedback enforcement, model/harness mismatches, and incomplete lock snapshots.
 - Complexity: M
 - Implementation notes: This gate should support both the mini-screen and full screening profiles. Any report using data that fails this gate must be labeled pipeline-only or smoke-only.
 - Risks/unknowns: A 3-checkpoint prefix can show directional regression/survival behavior, but still does not represent the full long-horizon benchmark.
@@ -407,7 +407,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100D - Run Paired Reduced-Drift Probe
 
 - Phase: Full pilot run
-- Status: completed in `experiment/runs/reduced_drift_probe/` with normalized exports in `experiment/results/reduced_drift_probe/`
+- Status: completed in `experiment/runs/reduced_drift_probe/` with normalized exports in `experiment/results/reduced_drift_probe/`; retrospective classification is directional/pipeline-only for C2 because agent-side acceptance execution was not audited as mandatory feedback
 - Rationale: The first interpretable signal should compare C0 and C2 on the same problem trajectories and checkpoint depth.
 - Description: Execute the mini-screen matrix after EXP-100A through EXP-100C pass. Collect native SCBench hidden-test outcomes, visible acceptance outcomes for C2, lock verification, artifacts, prompts, cost, token, latency, turn, command, and test-run counts.
 - Dependencies: EXP-100C, EXP-071, EXP-080
@@ -419,7 +419,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100E - Report Directional Reduced-Drift Signal
 
 - Phase: Full pilot run
-- Status: completed in `experiment/results/reduced_drift_probe/report/reduced_drift_report.md`
+- Status: completed in `experiment/results/reduced_drift_probe/report/reduced_drift_report.md`; report must be read with the added limitation that C2 execution feedback was not yet audited/enforced
 - Rationale: The first useful report should answer whether there is a directional tendency worth scaling, while avoiding proof claims.
 - Description: Generate a reduced-drift mini-screen report with paired strict survival, regression rate, hidden failure after visible pass, checkpoint pass/fail matrix, technical drift slopes where available, and cost/runtime metrics. Label the report as directional and underpowered.
 - Dependencies: EXP-100D, EXP-081, EXP-110
@@ -428,13 +428,25 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 - Implementation notes: If C1 is included, report C0 vs C1 and C1 vs C2 separately to preserve the spec-format versus executable-harness distinction.
 - Risks/unknowns: Technical-drift metrics may be noisy over only 3 checkpoints; keep them secondary to functional/spec drift.
 
+### EXP-100F - Enforce Executed C2 Acceptance Feedback
+
+- Phase: Full pilot run
+- Status: not started; now a blocker for evidence-producing C2 runs
+- Rationale: The C2 thesis is about an executable spec workflow that is actually executed and used for repair. A harness that is merely present, or only rerun by the scorer after checkpoint completion, cannot prevent drift during implementation.
+- Description: Implement mandatory C2 acceptance execution before checkpoint completion. Choose one enforcement path and pre-register it: transcript-audited agent execution, where the agent must run the visible command and the runner parses artifacts/transcripts to confirm execution after the final product-code change; or a harness-mediated repair loop, where the experiment runner runs visible acceptance after the agent draft, feeds visible failures back for repair, and reruns before closing the checkpoint. Preserve post-hoc scorer reruns as measurement, not the intervention.
+- Dependencies: EXP-071, EXP-080, EXP-100A, EXP-100B
+- Acceptance criteria: C2 prompt requires visible acceptance execution after material code changes and after the final product-code change; result schema records `visible_acceptance_executed_by_agent` or equivalent, execution count, last execution timestamp/order relative to final code change, and `acceptance_feedback_observed`; missing execution is classified as `c2_feedback_not_observed` or protocol-invalid; preflight `c2.acceptance_feedback_enforcement` passes only when audit or harness enforcement is implemented; rerun mini-screen artifacts show the C2 feedback gate passing.
+- Complexity: XL
+- Implementation notes: Transcript audit is cheaper but depends on native SCBench/Codex artifact fidelity. Harness-mediated repair is more causally faithful but may require a custom checkpoint loop around native SCBench rather than a single opaque native run. In either path, also fix C2 staging so future checkpoint scenarios are not available before their checkpoint.
+- Risks/unknowns: Native SCBench may not expose enough transcript detail to prove command timing; a repair loop can change comparability with the original benchmark if not carefully documented.
+
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
-- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 6 of 19 selected checkpoint slots
+- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 6 of 19 selected checkpoint slots and C2 executed-feedback enforcement is not implemented
 - Rationale: Collect paired C0/C1/C2 trajectories.
 - Description: Run selected problems across C0/C1/C2 and 3 replicates if budget allows.
-- Dependencies: EXP-100A, EXP-100B, EXP-100C, EXP-100D, EXP-100E
+- Dependencies: EXP-100A, EXP-100B, EXP-100C, EXP-100D, EXP-100E, EXP-100F
 - Acceptance criteria: all configured trajectories have completed/failed/invalid status and artifacts once C2 acceptance coverage, paired-run, minimum checkpoint-depth, fixed model/agent config, and lock gates pass.
 - Complexity: XL
 - Implementation notes: Randomize condition order by replicate. Do not scale to the 5-6 problem matrix until the reduced-drift mini-screen has produced a complete paired dataset.

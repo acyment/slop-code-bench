@@ -57,7 +57,7 @@ The pilot should use three distinct visibility levels:
 - Visible C1/C2 specs: experiment-owned `.feature` files intentionally shown to the agent in C1 and C2.
 - Locked C2 harness: experiment-owned step definitions and scoring wrappers runnable by the agent but forbidden to modify.
 
-For C2, the implementation agent may run the visible acceptance harness, but must not modify:
+For C2, the implementation agent must run the visible acceptance harness as feedback before checkpoint completion, but must not modify:
 
 - `experiment/features/**`
 - `experiment/steps/**`
@@ -84,18 +84,20 @@ Milestone 8 should implement lock enforcement before any pilot run:
 - Do not allow C2 visible acceptance files to contain hidden-test implementation details.
 - Do not let prompt-generation scripts read pytest files while deriving Gherkin.
 - Do not expose native evaluator stdout/stderr to the agent between checkpoints unless the condition explicitly permits that feedback.
+- Do not treat a scorer-only post-hoc visible acceptance rerun as the C2 intervention; it is only an audit signal unless its output was available to the implementation agent before checkpoint completion.
 
 ## Recommended Policy For Failed Lock Checks
 
 Initial pilot policy:
 
 - If the agent modifies locked C2 files, record `locked_file_violation: true`.
+- If the agent does not execute visible acceptance feedback before checkpoint completion, record `c2_feedback_status: not_observed`.
 - Treat the checkpoint as failed for visible acceptance.
 - Still run native evaluation on the saved product snapshot when feasible, so the analysis can distinguish product correctness from protocol violation.
 - Mark the trajectory as invalid for the main C2 causal comparison unless a pre-registered robustness analysis includes protocol-violation runs.
 
 ## Unresolved Questions
 
-- Should C2 agents see visible acceptance failure details after each checkpoint, or only a pass/fail command result?
+- Should C2 enforcement use transcript-audited agent execution first, or a harness-mediated repair loop that returns visible failure details before checkpoint closure?
 - Should native hidden-test failures ever be shown to the implementation agent during a trajectory? The default answer for comparability should be no.
 - Should a harness modification be scored as an immediate trajectory termination or a checkpoint-level failure with continuation?

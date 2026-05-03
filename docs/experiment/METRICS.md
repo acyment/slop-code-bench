@@ -33,6 +33,16 @@ hidden_tests_passed == false
 
 Report by problem, checkpoint, replicate, and scenario tags active at that checkpoint.
 
+### C2 Feedback Observed
+
+For primary C2 analysis, require:
+
+```text
+c2_feedback_status == "observed"
+```
+
+This means visible acceptance output reached the implementation agent before checkpoint completion. Scorer-only post-hoc visible acceptance reruns are useful diagnostics but do not count as feedback observed.
+
 ### Checkpoint Pass/Fail Matrix
 
 Build a matrix over:
@@ -161,4 +171,3 @@ Record when available:
 - hidden evaluation invocations.
 
 SCBench already exports cost, duration, steps, and token categories from inference result files where the agent harness provides them.
-

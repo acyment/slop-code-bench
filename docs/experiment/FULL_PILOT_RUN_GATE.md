@@ -53,20 +53,19 @@ uv run python experiment/scripts/validate_full_pilot_preflight.py \
   --allow-blocked
 ```
 
-The gate currently blocks primary execution for three reasons:
+The gate currently blocks primary execution for these reasons:
 
-1. `pilot_c0.yaml`, `pilot_c1.yaml`, and `pilot_c2.yaml` still contain `TBD_*` model and agent placeholders.
-2. `run_trajectory.py` is dry-run only and does not yet call native SCBench implementation-agent execution.
-3. C2 acceptance still points at the smoke/reference runner instead of running against each agent checkpoint snapshot.
+1. Representative C2 visible acceptance coverage is incomplete for selected checkpoint slots.
+2. C2 visible acceptance is not yet audited or harness-enforced as implementation-time feedback before checkpoint completion.
+3. Any freeze mismatch after protocol edits must be resolved before primary execution.
 
 ## Required Work Before EXP-101
 
 Before running the full pilot matrix:
 
-1. Select and record the fixed model/provider and agent harness/version in all pilot configs.
-2. Implement a native execution bridge that feeds rendered C0/C1/C2 prompts into SCBench checkpoint runs.
-3. Run C2 visible acceptance against agent-produced checkpoint snapshots.
-4. Preserve native hidden SCBench evaluation as the final judge.
-5. Re-run the freeze verifier and full-pilot preflight.
+1. Implement EXP-100F so C2 requires executed visible acceptance feedback and records whether that feedback was observed by the implementation agent.
+2. Complete C2 visible acceptance coverage for selected checkpoints.
+3. Preserve native hidden SCBench evaluation as the final judge.
+4. Re-run the freeze verifier and full-pilot preflight.
 
 Until those gates pass, Milestone 11 is frozen/preflighted but not evidence-producing.

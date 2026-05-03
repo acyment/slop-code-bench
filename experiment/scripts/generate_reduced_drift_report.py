@@ -310,6 +310,10 @@ def build_report(
         "limitations": [
             "One replicate and two problems are underpowered and directional only.",
             "Visible acceptance tests are an intervention; hidden SCBench tests remain the correctness judge.",
+            (
+                "C2 agent-side visible acceptance execution must be audited or harness-enforced as "
+                "implementation-time feedback; scorer-only post-hoc reruns are measurement, not the intervention."
+            ),
             "Technical drift slopes over three checkpoints are noisy and should be treated as secondary.",
             "Before scaling, inspect C2 asset staging so future checkpoint scenarios are not exposed early.",
         ],
@@ -345,7 +349,9 @@ def report_markdown(
         "",
         (
             "This report is directional only. It can indicate whether the paired C0 vs C2 "
-            "mini-screen is worth scaling, but it cannot support a causal research claim."
+            "mini-screen pipeline is worth inspecting, but it cannot support a causal "
+            "research claim. Treat C2 as primary evidence only after visible acceptance "
+            "execution is audited or harness-enforced as implementation-time feedback."
         ),
         "",
         "## Data Shape",

@@ -9,6 +9,12 @@ condition:
   gherkin_context_visible: true
   acceptance_harness_visible: true
   acceptance_harness_runnable: true
+  acceptance_feedback_policy:
+    mode: mandatory_pre_completion_execution
+    enforcement: prompt_only
+    scorer_rerun_after_checkpoint: true
+    invalid_if_not_executed: true
+    notes: Current bridge exposes the command and reruns post-hoc; primary C2 evidence is blocked until transcript audit or harness-mediated repair confirms execution before checkpoint completion.
   hidden_tests_visible_to_agent: false
   prompt_template: experiment/prompts/gherkin_executable.md
   completion_policy: pass visible acceptance checks and native hidden SCBench core checks after each checkpoint

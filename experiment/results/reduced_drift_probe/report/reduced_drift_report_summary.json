@@ -48,7 +48,7 @@
       "replicate": 1
     }
   ],
-  "claim_status": "directional_only",
+  "claim_status": "not_interpretable",
   "cost_summary": {
     "agent_steps": 150,
     "api_cost_usd": 0.2900795,
@@ -58,10 +58,11 @@
     "reasoning_tokens_net": 42569
   },
   "evaluable_checkpoint_count": 8,
-  "generated_at": "2026-05-03T16:47:41.295188Z",
+  "generated_at": "2026-05-03T17:09:34.577902Z",
   "limitations": [
     "One replicate and two problems are underpowered and directional only.",
     "Visible acceptance tests are an intervention; hidden SCBench tests remain the correctness judge.",
+    "C2 agent-side visible acceptance execution must be audited or harness-enforced as implementation-time feedback; scorer-only post-hoc reruns are measurement, not the intervention.",
     "Technical drift slopes over three checkpoints are noisy and should be treated as secondary.",
     "Before scaling, inspect C2 asset staging so future checkpoint scenarios are not exposed early."
   ],
@@ -101,7 +102,7 @@
   "results_dir": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/reduced_drift_probe",
   "run_count": 4,
   "schema_version": 1,
-  "status": "directional_probe_complete",
+  "status": "blocked_not_evidence",
   "technical_slope_rows": [
     {
       "acceptance_runtime_ms_slope": null,
