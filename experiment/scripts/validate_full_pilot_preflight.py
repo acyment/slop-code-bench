@@ -10,6 +10,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+import audit_acceptance_coverage
 import freeze_pilot_artifacts
 import yaml
 
@@ -249,6 +250,38 @@ def selected_checkpoint_count(
     return min(total, limit)
 
 
+def selected_c2_slots(
+    *, repo_root: Path, problems_root: Path, config_rels: list[str]
+) -> set[tuple[str, int]]:
+    slots: set[tuple[str, int]] = set()
+    for config_rel in config_rels:
+        config = load_yaml(repo_root / config_rel)
+        if config["condition"]["id"] != "C2":
+            continue
+        for problem_id in config["problems"]:
+            total = selected_checkpoint_count(
+                problems_root=problems_root,
+                config=config,
+                problem_id=str(problem_id),
+            )
+            for index in range(1, total + 1):
+                slots.add((str(problem_id), index))
+    return slots
+
+
+def build_feature_runner_coverage_audit(
+    *, repo_root: Path, problems_root: Path, config_rels: list[str]
+) -> dict[str, Any]:
+    return audit_acceptance_coverage.build_coverage_audit(
+        repo_root=repo_root,
+        selected_slots=selected_c2_slots(
+            repo_root=repo_root,
+            problems_root=problems_root,
+            config_rels=config_rels,
+        ),
+    )
+
+
 def check_acceptance_coverage(
     *, repo_root: Path, problems_root: Path, config_rels: list[str]
 ) -> dict[str, Any]:
@@ -286,6 +319,38 @@ def check_acceptance_coverage(
         ),
         "checked_checkpoint_slots": checked,
         "missing_checkpoint_slots": missing,
+    }
+
+
+def check_feature_runner_coverage(
+    *, repo_root: Path, problems_root: Path, config_rels: list[str]
+) -> dict[str, Any]:
+    audit = build_feature_runner_coverage_audit(
+        repo_root=repo_root,
+        problems_root=problems_root,
+        config_rels=config_rels,
+    )
+    summary = audit["summary"]
+    has_features = summary["feature_scenario_count"] > 0
+    ready = audit["status"] == "pass" and has_features
+    return {
+        "id": "c2.feature_runner_coverage",
+        "status": "pass" if ready else "block",
+        "message": (
+            "C2 feature scenarios are mapped to locked executable runner coverage or documented as spec-only."
+            if ready
+            else "C2 feature-to-runner coverage has blockers: "
+            f"{summary['blocker_count']} required/missing scenario(s) need locked executable coverage."
+        ),
+        "feature_scenario_count": summary["feature_scenario_count"],
+        "executable_scenario_count": summary["executable_scenario_count"],
+        "spec_only_scenario_count": summary["spec_only_scenario_count"],
+        "required_missing_count": summary["required_missing_count"],
+        "missing_ledger_count": summary["missing_ledger_count"],
+        "invalid_coverage_count": summary["invalid_coverage_count"],
+        "blocker_count": summary["blocker_count"],
+        "blockers": summary["blockers"],
+        "details": summary,
     }
 
 
@@ -431,6 +496,29 @@ def check_reduced_drift_evidence_gate(
                 {
                     "type": "incomplete_c2_acceptance_coverage",
                     "missing_checkpoint_slots": missing_coverage,
+                }
+            )
+        feature_runner_audit = build_feature_runner_coverage_audit(
+            repo_root=repo_root,
+            problems_root=problems_root,
+            config_rels=config_rels,
+        )
+        feature_runner_summary = feature_runner_audit["summary"]
+        if feature_runner_summary["blocker_count"] > 0:
+            blockers.append(
+                {
+                    "type": "incomplete_c2_feature_runner_coverage",
+                    "blocker_count": feature_runner_summary["blocker_count"],
+                    "required_missing_count": feature_runner_summary[
+                        "required_missing_count"
+                    ],
+                    "missing_ledger_count": feature_runner_summary[
+                        "missing_ledger_count"
+                    ],
+                    "invalid_coverage_count": feature_runner_summary[
+                        "invalid_coverage_count"
+                    ],
+                    "blockers": feature_runner_summary["blockers"],
                 }
             )
 
@@ -599,6 +687,11 @@ def run_preflight(
         check_acceptance_snapshot_bridge(repo_root),
         check_c2_feedback_enforcement(repo_root, config_rels),
         check_acceptance_coverage(
+            repo_root=repo_root,
+            problems_root=problems_root,
+            config_rels=config_rels,
+        ),
+        check_feature_runner_coverage(
             repo_root=repo_root,
             problems_root=problems_root,
             config_rels=config_rels,

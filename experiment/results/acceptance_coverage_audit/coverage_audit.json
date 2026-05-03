@@ -1,0 +1,597 @@
+{
+  "generated_at": "2026-05-03T19:59:32.092851Z",
+  "ledger_path": "experiment/steps/acceptance/coverage_ledger.yaml",
+  "rows": [
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "executable",
+      "feature_line": 8,
+      "feature_path": "experiment/features/code_search/checkpoint_001.feature",
+      "feature_scenario": "Search Python files with exact and regex rules",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Exact and regex behavior is exercised by the checkpoint 1 runner scenario.",
+      "runner_scenario_ids": [
+        "code_search.cp001.workspace-cli-search"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp001.workspace-cli-search",
+          "scenario_name": "Workspace product searches Python exact and regex rules",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "spec_only",
+      "feature_line": 41,
+      "feature_path": "experiment/features/code_search/checkpoint_001.feature",
+      "feature_scenario": "Ignore non-Python files and skip files that cannot be decoded",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "The first mini-screen did not show C2 checkpoint 1 hidden failures; keep this as spec-only until the acceptance suite is broadened beyond observed blind spots.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "spec_only",
+      "feature_line": 67,
+      "feature_path": "experiment/features/code_search/checkpoint_001.feature",
+      "feature_scenario": "Reject invalid rule definitions",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Error-path validation is intentionally deferred; not implicated by the first C2 visible-pass hidden-fail cases.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "executable",
+      "feature_line": 8,
+      "feature_path": "experiment/features/code_search/checkpoint_002.feature",
+      "feature_scenario": "Search Python, JavaScript, and C++ files with language filters",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Multi-language filtering is exercised by the checkpoint 2 runner scenario.",
+      "runner_scenario_ids": [
+        "code_search.cp002.multi-language-filters"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 2,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp002.multi-language-filters",
+          "scenario_name": "Workspace product searches Python, JavaScript, and C++ with language filters",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:2",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "executable",
+      "feature_line": 45,
+      "feature_path": "experiment/features/code_search/checkpoint_002.feature",
+      "feature_scenario": "Python-only behavior from checkpoint 1 still works",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Through-checkpoint C2 runs execute the checkpoint 1 runner scenario as prior behavior.",
+      "runner_scenario_ids": [
+        "code_search.cp001.workspace-cli-search"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp001.workspace-cli-search",
+          "scenario_name": "Workspace product searches Python exact and regex rules",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "spec_only",
+      "feature_line": 66,
+      "feature_path": "experiment/features/code_search/checkpoint_002.feature",
+      "feature_scenario": "Reject a rule that names an unsupported language",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Error-path validation is intentionally deferred; not implicated by the first C2 visible-pass hidden-fail cases.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 8,
+      "feature_path": "experiment/features/code_search/checkpoint_003.feature",
+      "feature_scenario": "Pattern rules capture source text and ranges",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "The checkpoint 3 runner scenario exercises repeated metavariables and basic capture presence.",
+      "runner_scenario_ids": [
+        "code_search.cp003.pattern-metavariables"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp003.pattern-metavariables",
+          "scenario_name": "Workspace product matches pattern rules with metavariable captures",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:3",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": true,
+      "checkpoint_index": 3,
+      "coverage": "required",
+      "feature_line": 38,
+      "feature_path": "experiment/features/code_search/checkpoint_003.feature",
+      "feature_scenario": "Nested expressions bind as a single metavariable value",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 57,
+      "feature_path": "experiment/features/code_search/checkpoint_003.feature",
+      "feature_scenario": "Exact and regex rules from previous checkpoints still produce match lines",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "code_search",
+      "reason": "Through-checkpoint C2 runs execute the prior exact/regex runner scenarios.",
+      "runner_scenario_ids": [
+        "code_search.cp001.workspace-cli-search",
+        "code_search.cp002.multi-language-filters"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp001.workspace-cli-search",
+          "scenario_name": "Workspace product searches Python exact and regex rules",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        },
+        {
+          "checkpoint_index": 2,
+          "problem_id": "code_search",
+          "scenario_id": "code_search.cp002.multi-language-filters",
+          "scenario_name": "Workspace product searches Python, JavaScript, and C++ with language filters",
+          "tags": [
+            "problem:code_search",
+            "checkpoint:2",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "executable",
+      "feature_line": 8,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "Run due daily jobs and report selected and excluded files",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 1 runner scenario exercises due jobs, relative source paths, first matching exclusion pattern, job sorting, and selected/excluded counts.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.workspace-cli-events"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.workspace-cli-events",
+          "scenario_name": "Workspace product emits due-job JSONL event history",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": true,
+      "checkpoint_index": 1,
+      "coverage": "required",
+      "feature_line": 52,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": true,
+      "checkpoint_index": 1,
+      "coverage": "required",
+      "feature_line": 67,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "Disabled jobs emit no job events",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "executable",
+      "feature_line": 8,
+      "feature_path": "experiment/features/file_backup/checkpoint_002.feature",
+      "feature_scenario": "Full and verify strategies process selected files individually",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 2 runner scenario exercises full and verify strategy events.",
+      "runner_scenario_ids": [
+        "file_backup.cp002.strategy-events"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 2,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp002.strategy-events",
+          "scenario_name": "Workspace product emits strategy events for full, verify, and pack backups",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:2",
+            "core",
+            "positive",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "executable",
+      "feature_line": 22,
+      "feature_path": "experiment/features/file_backup/checkpoint_002.feature",
+      "feature_scenario": "Pack strategy creates deterministic packs under the size limit",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 2 runner scenario exercises pack creation and deterministic pack events.",
+      "runner_scenario_ids": [
+        "file_backup.cp002.strategy-events"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 2,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp002.strategy-events",
+          "scenario_name": "Workspace product emits strategy events for full, verify, and pack backups",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:2",
+            "core",
+            "positive",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "executable",
+      "feature_line": 39,
+      "feature_path": "experiment/features/file_backup/checkpoint_002.feature",
+      "feature_scenario": "Jobs without a strategy keep checkpoint 1 simulated behavior",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "Through-checkpoint C2 runs execute the checkpoint 1 simulated-behavior runner scenario.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.workspace-cli-events"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.workspace-cli-events",
+          "scenario_name": "Workspace product emits due-job JSONL event history",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "core",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "spec_only",
+      "feature_line": 8,
+      "feature_path": "experiment/features/file_backup/checkpoint_003.feature",
+      "feature_scenario": "First run writes full backups into destination job directories",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 17,
+      "feature_path": "experiment/features/file_backup/checkpoint_003.feature",
+      "feature_scenario": "Subsequent run skips unchanged files and backs up changed files",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 3 runner scenario exercises loaded destination state, unchanged skips, changed-file backup, and destination counts.",
+      "runner_scenario_ids": [
+        "file_backup.cp003.incremental-destination"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp003.incremental-destination",
+          "scenario_name": "Workspace product writes destinations and skips unchanged full backups",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:3",
+            "core",
+            "positive",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "spec_only",
+      "feature_line": 28,
+      "feature_path": "experiment/features/file_backup/checkpoint_003.feature",
+      "feature_scenario": "Pack strategy does not use file-level incremental state",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1.",
+      "runner_scenario_ids": [],
+      "runner_scenarios": []
+    }
+  ],
+  "runner_path": "experiment/steps/acceptance/standalone_runner.py",
+  "schema_version": 1,
+  "selected_slots": [
+    {
+      "checkpoint_index": 1,
+      "problem_id": "code_search"
+    },
+    {
+      "checkpoint_index": 2,
+      "problem_id": "code_search"
+    },
+    {
+      "checkpoint_index": 3,
+      "problem_id": "code_search"
+    },
+    {
+      "checkpoint_index": 1,
+      "problem_id": "file_backup"
+    },
+    {
+      "checkpoint_index": 2,
+      "problem_id": "file_backup"
+    },
+    {
+      "checkpoint_index": 3,
+      "problem_id": "file_backup"
+    }
+  ],
+  "status": "block",
+  "summary": {
+    "blocker_count": 3,
+    "blockers": [
+      {
+        "checkpoint_index": 3,
+        "coverage": "required",
+        "feature_scenario": "Nested expressions bind as a single metavariable value",
+        "problem_id": "code_search",
+        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
+      },
+      {
+        "checkpoint_index": 1,
+        "coverage": "required",
+        "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
+        "problem_id": "file_backup",
+        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
+      },
+      {
+        "checkpoint_index": 1,
+        "coverage": "required",
+        "feature_scenario": "Disabled jobs emit no job events",
+        "problem_id": "file_backup",
+        "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
+      }
+    ],
+    "by_problem_checkpoint": [
+      {
+        "blocker_count": 0,
+        "checkpoint_index": 1,
+        "executable_scenario_count": 1,
+        "feature_scenario_count": 3,
+        "problem_id": "code_search",
+        "required_missing_count": 0,
+        "spec_only_scenario_count": 2
+      },
+      {
+        "blocker_count": 0,
+        "checkpoint_index": 2,
+        "executable_scenario_count": 2,
+        "feature_scenario_count": 3,
+        "problem_id": "code_search",
+        "required_missing_count": 0,
+        "spec_only_scenario_count": 1
+      },
+      {
+        "blocker_count": 1,
+        "checkpoint_index": 3,
+        "executable_scenario_count": 2,
+        "feature_scenario_count": 3,
+        "problem_id": "code_search",
+        "required_missing_count": 1,
+        "spec_only_scenario_count": 0
+      },
+      {
+        "blocker_count": 2,
+        "checkpoint_index": 1,
+        "executable_scenario_count": 1,
+        "feature_scenario_count": 3,
+        "problem_id": "file_backup",
+        "required_missing_count": 2,
+        "spec_only_scenario_count": 0
+      },
+      {
+        "blocker_count": 0,
+        "checkpoint_index": 2,
+        "executable_scenario_count": 3,
+        "feature_scenario_count": 3,
+        "problem_id": "file_backup",
+        "required_missing_count": 0,
+        "spec_only_scenario_count": 0
+      },
+      {
+        "blocker_count": 0,
+        "checkpoint_index": 3,
+        "executable_scenario_count": 1,
+        "feature_scenario_count": 3,
+        "problem_id": "file_backup",
+        "required_missing_count": 0,
+        "spec_only_scenario_count": 2
+      }
+    ],
+    "coverage_counts": {
+      "executable": 10,
+      "required": 3,
+      "spec_only": 5
+    },
+    "executable_scenario_count": 10,
+    "feature_scenario_count": 18,
+    "invalid_coverage_count": 0,
+    "missing_ledger_count": 0,
+    "omitted_scenarios": [
+      {
+        "checkpoint_index": 1,
+        "coverage": "spec_only",
+        "feature_scenario": "Ignore non-Python files and skip files that cannot be decoded",
+        "problem_id": "code_search",
+        "reason": "The first mini-screen did not show C2 checkpoint 1 hidden failures; keep this as spec-only until the acceptance suite is broadened beyond observed blind spots."
+      },
+      {
+        "checkpoint_index": 1,
+        "coverage": "spec_only",
+        "feature_scenario": "Reject invalid rule definitions",
+        "problem_id": "code_search",
+        "reason": "Error-path validation is intentionally deferred; not implicated by the first C2 visible-pass hidden-fail cases."
+      },
+      {
+        "checkpoint_index": 2,
+        "coverage": "spec_only",
+        "feature_scenario": "Reject a rule that names an unsupported language",
+        "problem_id": "code_search",
+        "reason": "Error-path validation is intentionally deferred; not implicated by the first C2 visible-pass hidden-fail cases."
+      },
+      {
+        "checkpoint_index": 3,
+        "coverage": "required",
+        "feature_scenario": "Nested expressions bind as a single metavariable value",
+        "problem_id": "code_search",
+        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 3 hidden failures around capture boundaries and expression matching."
+      },
+      {
+        "checkpoint_index": 1,
+        "coverage": "required",
+        "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
+        "problem_id": "file_backup",
+        "reason": "Required before rerunning the mini-screen; EXP-100N found checkpoint 1 hidden failures around schedule due windows, weekly/once jobs, defaults, and inclusive boundaries."
+      },
+      {
+        "checkpoint_index": 1,
+        "coverage": "required",
+        "feature_scenario": "Disabled jobs emit no job events",
+        "problem_id": "file_backup",
+        "reason": "Required before rerunning the mini-screen; disabled/default-enabled behavior is part of the original checkpoint prose and failed hidden coverage."
+      },
+      {
+        "checkpoint_index": 3,
+        "coverage": "spec_only",
+        "feature_scenario": "First run writes full backups into destination job directories",
+        "problem_id": "file_backup",
+        "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1."
+      },
+      {
+        "checkpoint_index": 3,
+        "coverage": "spec_only",
+        "feature_scenario": "Pack strategy does not use file-level incremental state",
+        "problem_id": "file_backup",
+        "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1."
+      }
+    ],
+    "required_missing_count": 3,
+    "spec_only_scenario_count": 5
+  }
+}

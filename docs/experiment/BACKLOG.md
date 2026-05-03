@@ -539,19 +539,19 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100O - Add Feature-To-Runner Coverage Audit
 
 - Phase: Full pilot run
-- Status: pending
+- Status: completed in `experiment/results/acceptance_coverage_audit/`; mini-screen preflight now blocks on 3 required missing executable scenarios
 - Rationale: C2 currently executes one representative scenario per covered checkpoint, while feature files may contain multiple scenarios. The experiment needs an explicit coverage ledger before interpreting C2 as an executable-spec workflow.
 - Description: Add a script/report that maps every `.feature` scenario to its executable runner scenario, or marks it as spec-only with a reason. Fail mini-screen preflight if required C2 scenarios lack executable coverage.
 - Dependencies: EXP-100N
 - Acceptance criteria: coverage report lists feature scenario count, executable scenario count, and omitted scenario reasons by problem/checkpoint; mini-screen C2 coverage gate checks the report.
 - Complexity: M
-- Implementation notes: Start with `code_search` and `file_backup`; avoid requiring full coverage for future screening problems until their C2 harnesses are implemented.
+- Implementation notes: The mini-screen audit currently maps 18 feature scenarios: 10 executable, 5 documented spec-only, and 3 required missing. Screening remains intentionally blocked until future C2 harnesses add both slot-level and feature-level coverage.
 - Risks/unknowns: Some Gherkin scenarios may be intentionally broad and need more than one executable example.
 
 ### EXP-100P - Strengthen `code_search` Checkpoint 3 Acceptance
 
 - Phase: Full pilot run
-- Status: pending
+- Status: pending; required by `c2.feature_runner_coverage` blocker for `code_search` checkpoint 3
 - Rationale: C2 passed visible checkpoint 3 acceptance while hidden tests found pattern-matching drift.
 - Description: Add original-spec-parity visible checks for multiple distinct metavariables, optional metavariables, literal `$$`, multiline Python capture boundaries, language-specific pattern filtering, and deterministic ordering across files. Automate the existing nested-expression Gherkin scenario.
 - Dependencies: EXP-100N, EXP-100O
@@ -563,7 +563,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100Q - Strengthen `file_backup` Checkpoint 1 Acceptance
 
 - Phase: Full pilot run
-- Status: pending
+- Status: pending; required by `c2.feature_runner_coverage` blockers for `file_backup` checkpoint 1
 - Rationale: C2 passed visible checkpoint 1 acceptance while hidden tests showed basic schedule parsing and scheduling gaps.
 - Description: Add original-spec-parity visible checks for block-style YAML lists, daily/weekly/once due windows, disabled/default-enabled jobs, default timezone, inclusive duration boundaries, malformed YAML errors, and representative glob operators.
 - Dependencies: EXP-100N, EXP-100O
@@ -575,7 +575,7 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100R - Rerun Meaningful Mini-Screen After Acceptance Audit
 
 - Phase: Full pilot run
-- Status: pending EXP-100O through EXP-100Q
+- Status: pending EXP-100P and EXP-100Q
 - Rationale: The completed mini-screen tested the protocol but not a sufficiently aligned executable acceptance suite.
 - Description: Regenerate freeze/preflight, rerun the same C0/C1/C2 two-problem mini-screen, export/analyze results, and compare against the first mini-screen.
 - Dependencies: EXP-100O, EXP-100P, EXP-100Q
