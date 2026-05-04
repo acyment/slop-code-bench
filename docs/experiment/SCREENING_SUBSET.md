@@ -1,6 +1,6 @@
 # Screening Subset
 
-Status: selected before any evidence-producing run; partially superseded by the EXP-100X `file_backup` decision.
+Status: selected before any evidence-producing run; partially superseded by the EXP-100X `file_backup` decision and EXP-100Y `migrate_configs` mini-screen promotion.
 
 The screening subset is a smaller C0/C1/C2 matrix intended to detect obvious directional signal and pipeline problems before spending on the full EXP-101 matrix. It is not a replacement for the full pilot and should not be treated as conclusive.
 
@@ -24,7 +24,9 @@ These four problems are the best first screening set because they cover the beha
 
 Together they cover CLI tools, file processing, structured transformations, query behavior, cumulative prior-test preservation, and example-rich Gherkin conversion. All have reference probes with no SCBench infrastructure failures.
 
-EXP-100X update: `file_backup` failed checkpoint 1 in every C0/C1/C2 EXP-100R replicate, so it is down-ranked to harness-validation-only. The next representative evidence mini-screen should promote `migrate_configs` as the replacement after locked C2 coverage and reference acceptance pass.
+EXP-100X update: `file_backup` failed checkpoint 1 in every C0/C1/C2 EXP-100R replicate, so it is down-ranked to harness-validation-only.
+
+EXP-100Y update: `migrate_configs` now has locked C2 coverage and reference acceptance for checkpoints 1-3, and the active evidence mini-screen configs use `code_search` plus `migrate_configs`. The broader screening set above remains a planning target, not a runnable evidence matrix, because it still includes `file_backup` and lacks full C2 coverage for later checkpoints and `log_query`.
 
 ## Deferred From Screening
 
@@ -57,4 +59,13 @@ uv run python experiment/scripts/run_pilot_subset.py \
   --run-id-prefix screening
 ```
 
-The evidence-producing screening run remains blocked until the replacement problem decision is reflected in configs, locked C2 acceptance coverage exists for every included checkpoint slot, and preflight returns `ready`.
+The evidence-producing screening run remains blocked until `file_backup` is removed or requalified for screening, locked C2 acceptance coverage exists for every included checkpoint slot, and preflight returns `ready`.
+
+The current evidence-producing mini-screen is separate from this broader screening subset:
+
+- configs: `experiment/configs/mini_screen_c0.yaml`, `experiment/configs/mini_screen_c1.yaml`, `experiment/configs/mini_screen_c2.yaml`
+- problems: `code_search`, `migrate_configs`
+- checkpoint prefix: 1-3
+- conditions: `C0`, `C1`, `C2`
+- replicates: 3
+- status: ready in `experiment/results/mini_screen_preflight/preflight.json`

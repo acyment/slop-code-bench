@@ -139,9 +139,13 @@ One row per visible Gherkin scenario execution.
   "failure_type": "scenario_failure|step_error|product_error|harness_error|null",
   "duration_ms": 123.4,
   "stdout_path": "path-or-null",
-  "stderr_path": "path-or-null"
+  "stderr_path": "path-or-null",
+  "command_path": "path-or-null",
+  "command_log_path": "path-or-null"
 }
 ```
+
+The command provenance fields are optional but expected for locked standalone acceptance runner rows.
 
 ## Technical Metric Record
 

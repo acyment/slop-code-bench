@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-04T01:05:36.025644Z",
+  "generated_at": "2026-05-04T01:39:51.711433Z",
   "ledger_path": "experiment/steps/acceptance/coverage_ledger.yaml",
   "rows": [
     {
@@ -350,26 +350,27 @@
       "checkpoint_index": 1,
       "coverage": "executable",
       "feature_line": 8,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "Run due daily jobs and report selected and excluded files",
+      "feature_path": "experiment/features/migrate_configs/checkpoint_001.feature",
+      "feature_scenario": "Replace values and rename keys in supported config files",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner scenario exercises due jobs, relative source paths, first matching exclusion pattern, job sorting, and selected/excluded counts.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 1 runner applies replace_value and rename_key rules to JSON and verifies file content plus JSONL file_updated output.",
       "runner_scenario_ids": [
-        "file_backup.cp001.workspace-cli-events"
+        "migrate_configs.cp001.basic-rules"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.workspace-cli-events",
-          "scenario_name": "Workspace product emits due-job JSONL event history",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp001.basic-rules",
+          "scenario_name": "Workspace product applies replace, rename, and deep-merge rules",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:1",
             "core",
             "positive",
-            "cli"
+            "cli",
+            "file_io"
           ]
         }
       ]
@@ -378,27 +379,28 @@
       "blocker": false,
       "checkpoint_index": 1,
       "coverage": "executable",
-      "feature_line": 52,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "Determine whether jobs are due inside the inclusive simulation window",
+      "feature_line": 30,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_001.feature",
+      "feature_scenario": "Deep merge data into matching files without replacing sibling fields",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner now executes daily, weekly, and once due-window examples, including duration-zero and inclusive-window cases.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 1 runner deep-merges YAML logging/cache data and verifies sibling fields are preserved.",
       "runner_scenario_ids": [
-        "file_backup.cp001.due-window-semantics"
+        "migrate_configs.cp001.basic-rules"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.due-window-semantics",
-          "scenario_name": "Workspace product evaluates daily, weekly, and once due windows",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp001.basic-rules",
+          "scenario_name": "Workspace product applies replace, rename, and deep-merge rules",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:1",
             "core",
             "positive",
-            "cli"
+            "cli",
+            "file_io"
           ]
         }
       ]
@@ -407,27 +409,28 @@
       "blocker": false,
       "checkpoint_index": 1,
       "coverage": "executable",
-      "feature_line": 67,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "Recurring jobs run once for each trigger inside the simulation window",
+      "feature_line": 40,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_001.feature",
+      "feature_scenario": "Process only supported configuration file extensions",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner verifies that a daily job emits one eligible/start/file/completion sequence for every trigger in a multi-day inclusive window.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 1 runner updates JSON, YAML, YML, TOML, and INI files with the same observable region rule.",
       "runner_scenario_ids": [
-        "file_backup.cp001.recurring-triggers"
+        "migrate_configs.cp001.formats-and-ignored-files"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.recurring-triggers",
-          "scenario_name": "Workspace product runs recurring jobs for every trigger in the window",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp001.formats-and-ignored-files",
+          "scenario_name": "Workspace product processes supported config formats and ignores unsupported files",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:1",
             "core",
             "positive",
-            "cli"
+            "cli",
+            "file_io"
           ]
         }
       ]
@@ -436,114 +439,28 @@
       "blocker": false,
       "checkpoint_index": 1,
       "coverage": "executable",
-      "feature_line": 90,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "Disabled jobs emit no job events",
+      "feature_line": 55,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_001.feature",
+      "feature_scenario": "Ignore files with unsupported extensions",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner now verifies that disabled jobs emit only SCHEDULE_PARSED and no job/file events.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 1 runner includes a .txt file and verifies it is unchanged and not reported as file_updated.",
       "runner_scenario_ids": [
-        "file_backup.cp001.disabled-jobs"
+        "migrate_configs.cp001.formats-and-ignored-files"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.disabled-jobs",
-          "scenario_name": "Workspace product suppresses events for disabled jobs",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp001.formats-and-ignored-files",
+          "scenario_name": "Workspace product processes supported config formats and ignores unsupported files",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:1",
-            "edge",
-            "negative",
-            "cli"
-          ]
-        }
-      ]
-    },
-    {
-      "blocker": false,
-      "checkpoint_index": 1,
-      "coverage": "executable",
-      "feature_line": 107,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "Block-style lists, default fields, and representative glob operators are honored",
-      "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner exercises block-style YAML lists, omitted timezone and enabled defaults, and representative tmp/**, data?.txt, and report[12].log globs.",
-      "runner_scenario_ids": [
-        "file_backup.cp001.block-lists-defaults-globs"
-      ],
-      "runner_scenarios": [
-        {
-          "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.block-lists-defaults-globs",
-          "scenario_name": "Workspace product handles block lists, defaults, and representative globs",
-          "tags": [
-            "problem:file_backup",
-            "checkpoint:1",
-            "edge",
+            "core",
             "positive",
-            "cli"
-          ]
-        }
-      ]
-    },
-    {
-      "blocker": false,
-      "checkpoint_index": 1,
-      "coverage": "executable",
-      "feature_line": 140,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "YAML library dumped schedule shape is accepted",
-      "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner writes the schedule with yaml.safe_dump so list items under jobs and exclude use the same valid indentation shape produced by a standard YAML dumper.",
-      "runner_scenario_ids": [
-        "file_backup.cp001.safe-dump-shape"
-      ],
-      "runner_scenarios": [
-        {
-          "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.safe-dump-shape",
-          "scenario_name": "Workspace product accepts YAML dumper sequence indentation",
-          "tags": [
-            "problem:file_backup",
-            "checkpoint:1",
-            "edge",
-            "positive",
-            "cli"
-          ]
-        }
-      ]
-    },
-    {
-      "blocker": false,
-      "checkpoint_index": 1,
-      "coverage": "executable",
-      "feature_line": 169,
-      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
-      "feature_scenario": "Malformed schedule YAML exits with an error",
-      "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 1 runner verifies malformed YAML returns a non-zero status without JSONL stdout.",
-      "runner_scenario_ids": [
-        "file_backup.cp001.malformed-yaml"
-      ],
-      "runner_scenarios": [
-        {
-          "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.malformed-yaml",
-          "scenario_name": "Workspace product rejects malformed YAML schedules",
-          "tags": [
-            "problem:file_backup",
-            "checkpoint:1",
-            "edge",
-            "negative",
-            "cli"
+            "cli",
+            "file_io"
           ]
         }
       ]
@@ -553,22 +470,22 @@
       "checkpoint_index": 2,
       "coverage": "executable",
       "feature_line": 8,
-      "feature_path": "experiment/features/file_backup/checkpoint_002.feature",
-      "feature_scenario": "Full and verify strategies process selected files individually",
+      "feature_path": "experiment/features/migrate_configs/checkpoint_002.feature",
+      "feature_scenario": "Pattern replacement captures path components and uses them in values",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 2 runner scenario exercises full and verify strategy events.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 2 runner verifies services.$name.host captures api/database path components and renders them into replacement values.",
       "runner_scenario_ids": [
-        "file_backup.cp002.strategy-events"
+        "migrate_configs.cp002.patterns-templates-conditions"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 2,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp002.strategy-events",
-          "scenario_name": "Workspace product emits strategy events for full, verify, and pack backups",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp002.patterns-templates-conditions",
+          "scenario_name": "Workspace product applies pattern, template, and conditional rules",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:2",
             "core",
             "positive",
@@ -582,23 +499,23 @@
       "blocker": false,
       "checkpoint_index": 2,
       "coverage": "executable",
-      "feature_line": 22,
-      "feature_path": "experiment/features/file_backup/checkpoint_002.feature",
-      "feature_scenario": "Pack strategy creates deterministic packs under the size limit",
+      "feature_line": 23,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_002.feature",
+      "feature_scenario": "Template string builds a target value from other keys",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 2 runner scenario exercises pack creation and deterministic pack events.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 2 runner verifies a YAML s3.bucket value rendered from environment and aws.region variables.",
       "runner_scenario_ids": [
-        "file_backup.cp002.strategy-events"
+        "migrate_configs.cp002.patterns-templates-conditions"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 2,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp002.strategy-events",
-          "scenario_name": "Workspace product emits strategy events for full, verify, and pack backups",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp002.patterns-templates-conditions",
+          "scenario_name": "Workspace product applies pattern, template, and conditional rules",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:2",
             "core",
             "positive",
@@ -612,27 +529,73 @@
       "blocker": false,
       "checkpoint_index": 2,
       "coverage": "executable",
-      "feature_line": 39,
-      "feature_path": "experiment/features/file_backup/checkpoint_002.feature",
-      "feature_scenario": "Jobs without a strategy keep checkpoint 1 simulated behavior",
+      "feature_line": 30,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_002.feature",
+      "feature_scenario": "Conditional replacement only applies when the condition matches",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "Through-checkpoint C2 runs execute the checkpoint 1 simulated-behavior runner scenario.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 2 runner verifies a localhost match is replaced while a staging host remains unchanged and unreported.",
       "runner_scenario_ids": [
-        "file_backup.cp001.workspace-cli-events"
+        "migrate_configs.cp002.patterns-templates-conditions"
       ],
       "runner_scenarios": [
         {
-          "checkpoint_index": 1,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp001.workspace-cli-events",
-          "scenario_name": "Workspace product emits due-job JSONL event history",
+          "checkpoint_index": 2,
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp002.patterns-templates-conditions",
+          "scenario_name": "Workspace product applies pattern, template, and conditional rules",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
+            "checkpoint:2",
+            "core",
+            "positive",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 2,
+      "coverage": "executable",
+      "feature_line": 42,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_002.feature",
+      "feature_scenario": "Checkpoint 1 replace_value rename_key and merge_data rules still work",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "migrate_configs",
+      "reason": "Through-checkpoint C2 runs execute checkpoint 1 scenarios, and the checkpoint 2 regression runner combines prior and new rules while checking lexicographic rules_applied order.",
+      "runner_scenario_ids": [
+        "migrate_configs.cp002.prior-rules-order",
+        "migrate_configs.cp001.basic-rules"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 2,
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp002.prior-rules-order",
+          "scenario_name": "Workspace product preserves prior rules and reports lexicographic rule order",
+          "tags": [
+            "problem:migrate_configs",
+            "checkpoint:2",
+            "regression",
+            "positive",
+            "cli",
+            "file_io"
+          ]
+        },
+        {
+          "checkpoint_index": 1,
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp001.basic-rules",
+          "scenario_name": "Workspace product applies replace, rename, and deep-merge rules",
+          "tags": [
+            "problem:migrate_configs",
             "checkpoint:1",
             "core",
             "positive",
-            "cli"
+            "cli",
+            "file_io"
           ]
         }
       ]
@@ -640,37 +603,24 @@
     {
       "blocker": false,
       "checkpoint_index": 3,
-      "coverage": "spec_only",
-      "feature_line": 8,
-      "feature_path": "experiment/features/file_backup/checkpoint_003.feature",
-      "feature_scenario": "First run writes full backups into destination job directories",
-      "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1.",
-      "runner_scenario_ids": [],
-      "runner_scenarios": []
-    },
-    {
-      "blocker": false,
-      "checkpoint_index": 3,
       "coverage": "executable",
-      "feature_line": 17,
-      "feature_path": "experiment/features/file_backup/checkpoint_003.feature",
-      "feature_scenario": "Subsequent run skips unchanged files and backs up changed files",
+      "feature_line": 8,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_003.feature",
+      "feature_scenario": "Array filter pattern updates matching elements only",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "The checkpoint 3 runner scenario exercises loaded destination state, unchanged skips, changed-file backup, and destination counts.",
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 3 runner updates only services[?enabled=true].host and verifies the disabled service host remains unchanged.",
       "runner_scenario_ids": [
-        "file_backup.cp003.incremental-destination"
+        "migrate_configs.cp003.arrays-and-inheritance"
       ],
       "runner_scenarios": [
         {
           "checkpoint_index": 3,
-          "problem_id": "file_backup",
-          "scenario_id": "file_backup.cp003.incremental-destination",
-          "scenario_name": "Workspace product writes destinations and skips unchanged full backups",
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp003.arrays-and-inheritance",
+          "scenario_name": "Workspace product resolves inheritance and updates filtered array items",
           "tags": [
-            "problem:file_backup",
+            "problem:migrate_configs",
             "checkpoint:3",
             "core",
             "positive",
@@ -683,15 +633,92 @@
     {
       "blocker": false,
       "checkpoint_index": 3,
-      "coverage": "spec_only",
-      "feature_line": 28,
-      "feature_path": "experiment/features/file_backup/checkpoint_003.feature",
-      "feature_scenario": "Pack strategy does not use file-level incremental state",
+      "coverage": "executable",
+      "feature_line": 18,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_003.feature",
+      "feature_scenario": "Inheritance merges parent configs before applying rules",
       "missing_runner_scenario_ids": [],
-      "problem_id": "file_backup",
-      "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1.",
-      "runner_scenario_ids": [],
-      "runner_scenarios": []
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 3 runner resolves root-to-base-to-child JSON inheritance, verifies child overrides, inherited fields, directive removal, and post-inheritance rule application.",
+      "runner_scenario_ids": [
+        "migrate_configs.cp003.arrays-and-inheritance"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp003.arrays-and-inheritance",
+          "scenario_name": "Workspace product resolves inheritance and updates filtered array items",
+          "tags": [
+            "problem:migrate_configs",
+            "checkpoint:3",
+            "core",
+            "positive",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 27,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_003.feature",
+      "feature_scenario": "Circular inheritance fails before modifying files",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 3 runner creates a YAML inheritance cycle, expects a non-zero exit with a circular-dependency error, and verifies files are unchanged.",
+      "runner_scenario_ids": [
+        "migrate_configs.cp003.errors-and-skips"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp003.errors-and-skips",
+          "scenario_name": "Workspace product rejects circular inheritance and skips missing matches",
+          "tags": [
+            "problem:migrate_configs",
+            "checkpoint:3",
+            "edge",
+            "negative",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 3,
+      "coverage": "executable",
+      "feature_line": 37,
+      "feature_path": "experiment/features/migrate_configs/checkpoint_003.feature",
+      "feature_scenario": "Missing array filter matches and missing template variables skip without output",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "migrate_configs",
+      "reason": "The checkpoint 3 runner verifies missing array-filter matches and unresolved template variables leave the target JSON unchanged with empty stdout.",
+      "runner_scenario_ids": [
+        "migrate_configs.cp003.errors-and-skips"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 3,
+          "problem_id": "migrate_configs",
+          "scenario_id": "migrate_configs.cp003.errors-and-skips",
+          "scenario_name": "Workspace product rejects circular inheritance and skips missing matches",
+          "tags": [
+            "problem:migrate_configs",
+            "checkpoint:3",
+            "edge",
+            "negative",
+            "cli",
+            "file_io"
+          ]
+        }
+      ]
     }
   ],
   "runner_path": "experiment/steps/acceptance/standalone_runner.py",
@@ -711,15 +738,15 @@
     },
     {
       "checkpoint_index": 1,
-      "problem_id": "file_backup"
+      "problem_id": "migrate_configs"
     },
     {
       "checkpoint_index": 2,
-      "problem_id": "file_backup"
+      "problem_id": "migrate_configs"
     },
     {
       "checkpoint_index": 3,
-      "problem_id": "file_backup"
+      "problem_id": "migrate_configs"
     }
   ],
   "status": "pass",
@@ -757,37 +784,37 @@
       {
         "blocker_count": 0,
         "checkpoint_index": 1,
-        "executable_scenario_count": 7,
-        "feature_scenario_count": 7,
-        "problem_id": "file_backup",
+        "executable_scenario_count": 4,
+        "feature_scenario_count": 4,
+        "problem_id": "migrate_configs",
         "required_missing_count": 0,
         "spec_only_scenario_count": 0
       },
       {
         "blocker_count": 0,
         "checkpoint_index": 2,
-        "executable_scenario_count": 3,
-        "feature_scenario_count": 3,
-        "problem_id": "file_backup",
+        "executable_scenario_count": 4,
+        "feature_scenario_count": 4,
+        "problem_id": "migrate_configs",
         "required_missing_count": 0,
         "spec_only_scenario_count": 0
       },
       {
         "blocker_count": 0,
         "checkpoint_index": 3,
-        "executable_scenario_count": 1,
-        "feature_scenario_count": 3,
-        "problem_id": "file_backup",
+        "executable_scenario_count": 4,
+        "feature_scenario_count": 4,
+        "problem_id": "migrate_configs",
         "required_missing_count": 0,
-        "spec_only_scenario_count": 2
+        "spec_only_scenario_count": 0
       }
     ],
     "coverage_counts": {
-      "executable": 21,
-      "spec_only": 5
+      "executable": 22,
+      "spec_only": 3
     },
-    "executable_scenario_count": 21,
-    "feature_scenario_count": 26,
+    "executable_scenario_count": 22,
+    "feature_scenario_count": 25,
     "invalid_coverage_count": 0,
     "missing_ledger_count": 0,
     "omitted_scenarios": [
@@ -811,23 +838,9 @@
         "feature_scenario": "Reject a rule that names an unsupported language",
         "problem_id": "code_search",
         "reason": "Error-path validation is intentionally deferred; not implicated by the first C2 visible-pass hidden-fail cases."
-      },
-      {
-        "checkpoint_index": 3,
-        "coverage": "spec_only",
-        "feature_scenario": "First run writes full backups into destination job directories",
-        "problem_id": "file_backup",
-        "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1."
-      },
-      {
-        "checkpoint_index": 3,
-        "coverage": "spec_only",
-        "feature_scenario": "Pack strategy does not use file-level incremental state",
-        "problem_id": "file_backup",
-        "reason": "Deferred until file_backup survives checkpoint 1; not evaluated in the first mini-screen because every condition failed checkpoint 1."
       }
     ],
     "required_missing_count": 0,
-    "spec_only_scenario_count": 5
+    "spec_only_scenario_count": 3
   }
 }

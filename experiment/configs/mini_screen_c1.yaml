@@ -1,6 +1,6 @@
 schema_version: 1
 matrix_id: mini_screen_c1
-description: Meaningful reduced-drift mini-screen Gherkin spec-package-only run matrix for checkpoints 1-3.
+description: Meaningful reduced-drift mini-screen Gherkin spec-package-only run matrix for checkpoints 1-3, replacing file_backup with migrate_configs after EXP-100X/EXP-100Y.
 status: ready_to_run
 checkpoint_limit: 3
 condition:
@@ -14,7 +14,7 @@ condition:
   completion_policy: pass native hidden SCBench core checks after each checkpoint
 problems:
   - code_search
-  - file_backup
+  - migrate_configs
 replicates:
   - replicate_id: 1
     seed: 7101

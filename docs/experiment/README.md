@@ -118,11 +118,19 @@ Important version note: the arXiv abstract describes the paper snapshot as 20 pr
 
 ## Minimum Viable Pilot
 
-- Problems: `code_search` and `file_backup`.
+- Historical problems: `code_search` and `file_backup`.
 - Conditions: C0 and C2 only.
 - Model/agent: one fixed model and one fixed agent harness.
 - Replicates: 1.
 - Purpose: validate repository setup, prompt generation, lock enforcement, acceptance execution, hidden scoring, metric extraction, and export end to end.
+
+Current evidence mini-screen after EXP-100Y:
+
+- Problems: `code_search` and `migrate_configs`.
+- Conditions: C0, C1, C2.
+- Replicates: 3.
+- Checkpoint prefix: 1-3.
+- Status: ready in `experiment/results/mini_screen_preflight/preflight.json`.
 
 ## Run Matrix Configs
 
@@ -143,7 +151,7 @@ Validate them with:
 uv run python experiment/scripts/validate_run_matrix.py
 ```
 
-The recommended representative screening subset is `code_search`, `file_backup`, `migrate_configs`, and `log_query`, across C0/C1/C2 with one replicate. It is intentionally smaller than full EXP-101 and avoids the first-run service lifecycle and heavy dependency confounds.
+The recommended representative screening subset is `code_search`, `file_backup`, `migrate_configs`, and `log_query`, across C0/C1/C2 with one replicate. It is intentionally smaller than full EXP-101 and avoids the first-run service lifecycle and heavy dependency confounds. EXP-100X/EXP-100Y supersede this for the immediate evidence mini-screen: `file_backup` is harness-validation-only, and `migrate_configs` replaces it in the active mini-screen.
 
 ## Gherkin Feature Package
 
@@ -160,7 +168,7 @@ uv run python experiment/scripts/validate_features.py
 
 ## Acceptance Harness Prototype
 
-Milestone 6 selects a custom parser-to-pytest adapter path and adds the locked helper layer. The current smoke runner validates the helper layer against reference solutions for `code_search`, `file_backup`, and `textdrop`.
+Milestone 6 selects a custom parser-to-pytest adapter path and adds the locked helper layer. The smoke runner validates the helper layer against reference solutions for `code_search`, `file_backup`, and `textdrop`; the standalone locked C2 runner also covers `migrate_configs` checkpoints 1-3 for the active mini-screen.
 
 Run smoke checks with:
 

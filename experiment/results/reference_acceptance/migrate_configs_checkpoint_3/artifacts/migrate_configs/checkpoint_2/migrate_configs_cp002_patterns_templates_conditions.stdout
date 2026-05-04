@@ -1,0 +1,2 @@
+{"event": "file_updated", "file": "bucket.yaml", "rules_applied": ["set_bucket_name"]}
+{"event": "file_updated", "file": "config.json", "rules_applied": ["normalize_service_hosts", "prod_only"]}

@@ -78,7 +78,14 @@
     },
     "stderr_path": {
       "type": ["string", "null"]
+    },
+    "command_path": {
+      "type": ["string", "null"],
+      "description": "Optional artifact path for the product command metadata captured by the locked acceptance runner."
+    },
+    "command_log_path": {
+      "type": ["string", "null"],
+      "description": "Optional artifact path for the per-scenario command JSONL log captured by the locked acceptance runner."
     }
   }
 }
-

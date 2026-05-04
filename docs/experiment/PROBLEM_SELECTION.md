@@ -26,7 +26,7 @@ Avoid or defer problems that:
 | --- | --- | --- | --- | --- | --- |
 | `code_search` | CLI code search/refactoring | Easy | 5 | none observed in config | Strong MVP candidate: JSONL outputs and clear examples. |
 | `file_backup` | CLI YAML backup scheduler/file walk | Easy | 4 | `pyyaml`, static assets | Down-ranked after EXP-100X for evidence-producing drift runs: all C0/C1/C2 EXP-100R replicates failed checkpoint 1. Keep as harness-validation-only until a post-fix smoke proves checkpoint-1 feasibility. |
-| `migrate_configs` | CLI config migration tool | Easy | 5 | `pyyaml` | Strong full-pilot candidate: config/file-processing behavior and clean reference pass rates. |
+| `migrate_configs` | CLI config migration tool | Easy | 5 | `pyyaml` | Promoted by EXP-100Y as the second evidence mini-screen problem: config/file-processing behavior, clean reference pass rates, and locked C2 coverage for checkpoints 1-3. |
 | `log_query` | CLI NDJSON query language | Medium | 5 | none observed in config | Good pilot candidate: examples can be concrete and user-facing. |
 | `file_merger` | CLI data merge pipeline | Medium | 4 | `pyyaml`, `pyarrow` | Good pilot candidate; check runtime and Parquet dependencies. |
 | `file_query_tool` | SQL over files | Medium | 5 | `pyyaml`, `pyarrow` | Valuable but may overlap with `log_query` and increase SQL parser complexity. |
@@ -104,12 +104,29 @@ Interpretation:
 - It is not currently useful as an evidence-producing long-horizon drift problem because no condition reaches checkpoint 2.
 - Do not run another representative reduced-drift mini-screen with `file_backup` unless a post-fix smoke shows checkpoint-1 survival and at least one later checkpoint opportunity.
 
-Replacement candidate:
+Replacement candidate decision:
 
-1. `migrate_configs`: first choice, pending locked C2 acceptance coverage for checkpoints 1-3.
-2. `log_query`: fallback if `migrate_configs` coverage or smoke feasibility is poor.
+1. `migrate_configs`: promoted by EXP-100Y after locked C2 acceptance coverage and reference acceptance passed for checkpoints 1-3.
+2. `log_query`: fallback for a later screen if `migrate_configs` proves too easy, too hard, or otherwise unrepresentative in the next run.
 
-Do not update the mini-screen configs until the replacement candidate has locked C2 coverage and reference acceptance passes. Preflight now blocks evidence-producing profiles that still include `file_backup` with the EXP-100X evidence-disabled-problem decision.
+The current mini-screen configs now replace `file_backup` with `migrate_configs`. Preflight still blocks other evidence-producing profiles that include `file_backup` with the EXP-100X evidence-disabled-problem decision.
+
+## EXP-100Y Update
+
+Decision: promote `migrate_configs` into the evidence-producing mini-screen.
+
+Evidence from EXP-100Y:
+
+- `migrate_configs` checkpoints 1-3 now have locked executable C2 acceptance scenarios.
+- Every checkpoint 1-3 Gherkin feature scenario is mapped in the acceptance coverage ledger.
+- Reference-solution acceptance passes through checkpoint 1, checkpoint 2, and checkpoint 3 under `experiment/results/reference_acceptance/`.
+- `experiment/results/mini_screen_preflight/preflight.json` is `ready` for `code_search` and `migrate_configs`, C0/C1/C2, 3 replicates, checkpoints 1-3.
+
+Interpretation:
+
+- The next mini-screen can measure paired drift tendencies over two problems with at least three checkpoint opportunities each.
+- The replacement decision is still selection-aware: it was made after the failed `file_backup` run, so reports should state that earlier `file_backup` artifacts are historical and not discarded.
+- The next run should be interpreted as a replacement mini-screen, not as a direct rerun of the original `code_search`/`file_backup` mini-screen.
 
 ## MVP Problem Set
 
@@ -131,11 +148,11 @@ Current interpretation after EXP-100X:
 
 - keep `code_search`;
 - use `file_backup` only for harness-validation tasks;
-- promote `migrate_configs` as the next MVP/reduced-drift evidence candidate after C2 coverage is implemented.
+- use `migrate_configs` as the active second MVP/reduced-drift evidence candidate.
 
 ## Screening Subset
 
-Use:
+Use for broader screening planning:
 
 1. `code_search`
 2. `file_backup` for historical comparison and harness validation only
@@ -153,7 +170,7 @@ Rationale:
 
 This gives 12 C0/C1/C2 trajectories and 57 checkpoint executions with one replicate.
 
-Current EXP-100X constraint: do not treat this as an evidence-producing screening subset until either `file_backup` is replaced by `migrate_configs` in the mini-screen path or a post-fix `file_backup` smoke demonstrates multi-checkpoint feasibility.
+Current EXP-100Y constraint: the mini-screen path is evidence-ready after replacing `file_backup` with `migrate_configs`, but the broader screening subset is still blocked until `file_backup` is removed/replaced there and locked C2 coverage exists for every included screening checkpoint slot.
 
 ## Required Follow-Up Inspection Task
 

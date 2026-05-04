@@ -1,0 +1,29 @@
+{
+  "command": [
+    "uv",
+    "run",
+    "migrate.py",
+    "/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-2d7m_eu3/rules.json",
+    "/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-2d7m_eu3/configs"
+  ],
+  "command_template_id": "scbench_uv_run_migrate_configs",
+  "cwd": "/private/tmp/scbench-migrate-ref.aqJW4y/checkpoint_2",
+  "duration_ms": 82.50016698730178,
+  "entrypoint_waiver_reason": null,
+  "environment_overrides": {
+    "VIRTUAL_ENV": null
+  },
+  "exit_code": 0,
+  "name": "migrate_configs_cp002_prior_rules_order",
+  "original_command": [
+    "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/.venv/bin/python3",
+    "/private/tmp/scbench-migrate-ref.aqJW4y/checkpoint_2/migrate.py",
+    "/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-2d7m_eu3/rules.json",
+    "/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-2d7m_eu3/configs"
+  ],
+  "runner_python": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/.venv/bin/python3",
+  "schema_version": 1,
+  "stderr_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/reference_acceptance/migrate_configs_checkpoint_2/artifacts/migrate_configs/checkpoint_2/migrate_configs_cp002_prior_rules_order.stderr",
+  "stdout_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/results/reference_acceptance/migrate_configs_checkpoint_2/artifacts/migrate_configs/checkpoint_2/migrate_configs_cp002_prior_rules_order.stdout",
+  "uv_executable": "/opt/homebrew/bin/uv"
+}

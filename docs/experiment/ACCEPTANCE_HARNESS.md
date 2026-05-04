@@ -28,6 +28,10 @@ Implemented now:
 - API helper functions for free-port allocation, server startup, health polling,
   HTTP requests, teardown, and server log capture.
 - Scenario result records emitted as JSONL with SCBench-compatible fields.
+- Standalone locked C2 runner coverage for the active mini-screen:
+  - `code_search` checkpoints 1-3,
+  - `file_backup` checkpoints 1-3 for harness validation only,
+  - `migrate_configs` checkpoints 1-3 for the EXP-100Y replacement mini-screen.
 - Smoke runner covering:
   - `code_search` checkpoint 1 reference solution,
   - `file_backup` checkpoint 1 reference solution,
@@ -66,4 +70,3 @@ Validate emitted scenario records:
 uv run python experiment/scripts/validate_scenario_results.py \
   /tmp/scbench-acceptance-smoke/scenarios.jsonl
 ```
-

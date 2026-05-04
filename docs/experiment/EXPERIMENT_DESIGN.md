@@ -47,11 +47,20 @@ Checkpoint-level rows are still recorded for pass/fail matrices, regression coun
 
 Use this cut before spending on the full pilot:
 
-- Problems: `code_search`, `file_backup`.
+- Historical problems: `code_search`, `file_backup`.
 - Conditions: C0 and C2.
 - Model/agent: one fixed model and one fixed harness.
 - Replicates: 1.
 - Total trajectories: 4.
+
+Current replacement mini-screen after EXP-100Y:
+
+- Problems: `code_search`, `migrate_configs`.
+- Conditions: C0, C1, C2.
+- Replicates: 3.
+- Checkpoint prefix: 1-3.
+- Total trajectories: 18.
+- Status: ready for a directional replacement mini-screen; still underpowered for causal claims.
 
 MVP must keep:
 

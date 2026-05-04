@@ -1,0 +1,5 @@
+{"event": "file_updated", "file": "app.ini", "rules_applied": ["update_region"]}
+{"event": "file_updated", "file": "app.json", "rules_applied": ["update_region"]}
+{"event": "file_updated", "file": "app.toml", "rules_applied": ["update_region"]}
+{"event": "file_updated", "file": "service.yaml", "rules_applied": ["update_region"]}
+{"event": "file_updated", "file": "service.yml", "rules_applied": ["update_region"]}

@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import argparse
 import ast
+import configparser
 import json
 import os
 import shutil
 import subprocess
 import sys
 import time
+import tomllib
 from collections.abc import Callable
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -23,6 +25,7 @@ ScenarioFunc = Callable[[Path, Path], tuple[str | None, str | None]]
 ENTRYPOINT_TEMPLATE_BY_SCRIPT = {
     "code_search.py": "scbench_uv_run_code_search",
     "backup_scheduler.py": "scbench_uv_run_backup_scheduler",
+    "migrate.py": "scbench_uv_run_migrate_configs",
 }
 
 LAST_COMMAND_RESULT: dict[str, Any] | None = None
@@ -326,6 +329,71 @@ def assert_json_line_count(text: str, expected_count: int) -> list[dict[str, Any
             f"expected {expected_count} JSONL rows, got {len(dict_rows)}"
         )
     return dict_rows
+
+
+def assert_stdout_empty(result: dict[str, Any]) -> None:
+    if result["stdout"].strip():
+        raise ScenarioFailureError("stdout must be empty")
+
+
+def assert_path_value(data: Any, path: str, expected: Any) -> None:
+    current = data
+    for segment in path.split("."):
+        if not isinstance(current, dict) or segment not in current:
+            raise ScenarioFailureError(f"missing path {path}")
+        current = current[segment]
+    if current != expected:
+        raise ScenarioFailureError(
+            f"path {path} expected {expected!r}, got {current!r}"
+        )
+
+
+def load_json_config(path: Path) -> Any:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_yaml_config(path: Path) -> Any:
+    return yaml.safe_load(path.read_text(encoding="utf-8"))
+
+
+def load_toml_config(path: Path) -> Any:
+    return tomllib.loads(path.read_text(encoding="utf-8"))
+
+
+def load_ini_config(path: Path) -> configparser.ConfigParser:
+    parser = configparser.ConfigParser(interpolation=None)
+    parser.optionxform = str
+    parser.read(path, encoding="utf-8")
+    return parser
+
+
+def assert_file_updated_event(
+    stdout: str,
+    *,
+    file_path: str,
+    rules_applied: list[str] | None = None,
+) -> dict[str, Any]:
+    for row in parse_json_lines(stdout):
+        if not isinstance(row, dict):
+            continue
+        if row.get("event") != "file_updated" or row.get("file") != file_path:
+            continue
+        if rules_applied is not None and row.get("rules_applied") != rules_applied:
+            raise ScenarioFailureError(
+                f"file_updated event for {file_path} had wrong rules_applied"
+            )
+        return row
+    raise ScenarioFailureError(f"missing file_updated event for {file_path}")
+
+
+def assert_no_file_updated_event(stdout: str, *, file_path: str) -> None:
+    for row in parse_json_lines(stdout):
+        if (
+            isinstance(row, dict)
+            and row.get("event") == "file_updated"
+            and row.get("file") == file_path
+        ):
+            raise ScenarioFailureError(f"unexpected file_updated event for {file_path}")
 
 
 def rows_for_rule(rows: list[Any], rule_id: str) -> list[dict[str, Any]]:
@@ -1823,6 +1891,607 @@ def assert_file_exists(path: Path) -> None:
         raise ScenarioFailureError(f"expected file to exist: {path}")
 
 
+def run_migrate_configs(
+    *,
+    workspace: Path,
+    script_path: Path,
+    artifact_dir: Path,
+    name: str,
+    rules: Path,
+    target_dir: Path,
+    inheritance: Path | None = None,
+) -> dict[str, Any]:
+    command = [
+        sys.executable,
+        str(script_path),
+        str(rules),
+        str(target_dir),
+    ]
+    if inheritance is not None:
+        command.extend(["--inheritance", str(inheritance)])
+    return run_command(
+        command,
+        cwd=workspace,
+        artifact_dir=artifact_dir,
+        name=name,
+    )
+
+
+def scenario_migrate_configs_cp1_basic_rules(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "migrate.py")
+    artifact_dir = artifact_root / "migrate_configs" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="migrate-configs-acceptance-") as tmp:
+        scratch = Path(tmp)
+        configs = scratch / "configs"
+        rules_path = scratch / "rules.json"
+        write_text(
+            rules_path,
+            json.dumps(
+                {
+                    "add_logging_config": {
+                        "type": "merge_data",
+                        "glob": "**/*.yaml",
+                        "data": {
+                            "logging": {
+                                "level": "info",
+                                "handlers": ["console", "file"],
+                            },
+                            "cache": {"enabled": True},
+                        },
+                    },
+                    "prod_env": {
+                        "type": "replace_value",
+                        "key": "environment",
+                        "value": "production",
+                    },
+                    "rename_db_key": {
+                        "type": "rename_key",
+                        "old_key": "db.hostname",
+                        "new_key": "db.host",
+                    },
+                },
+                indent=2,
+            ),
+        )
+        write_text(
+            configs / "app.json",
+            json.dumps(
+                {
+                    "environment": "development",
+                    "db": {"hostname": "localhost", "port": 5432},
+                }
+            ),
+        )
+        write_text(
+            configs / "config.yaml",
+            """
+app: myapp
+logging:
+  level: debug
+  format: json
+cache:
+  ttl: 300
+""".lstrip(),
+        )
+        result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp001_basic_rules",
+            rules=rules_path,
+            target_dir=configs,
+        )
+
+        app_json = load_json_config(configs / "app.json")
+        config_yaml = load_yaml_config(configs / "config.yaml")
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    assert_path_value(app_json, "environment", "production")
+    assert_path_value(app_json, "db.host", "localhost")
+    if isinstance(app_json.get("db"), dict) and "hostname" in app_json["db"]:
+        raise ScenarioFailureError("renamed db.hostname key must be removed")
+    assert_path_value(config_yaml, "logging.level", "info")
+    assert_path_value(config_yaml, "logging.format", "json")
+    assert_path_value(config_yaml, "cache.ttl", 300)
+    assert_path_value(config_yaml, "cache.enabled", True)
+    assert_file_updated_event(
+        result["stdout"],
+        file_path="app.json",
+        rules_applied=["prod_env", "rename_db_key"],
+    )
+    assert_file_updated_event(
+        result["stdout"],
+        file_path="config.yaml",
+        rules_applied=["add_logging_config"],
+    )
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_migrate_configs_cp1_formats_and_ignored_files(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "migrate.py")
+    artifact_dir = artifact_root / "migrate_configs" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="migrate-configs-acceptance-") as tmp:
+        scratch = Path(tmp)
+        configs = scratch / "configs"
+        rules_path = scratch / "rules.json"
+        write_text(
+            rules_path,
+            json.dumps(
+                {
+                    "update_region": {
+                        "type": "replace_value",
+                        "key": "app.region",
+                        "value": "us-west-2",
+                    }
+                }
+            ),
+        )
+        write_text(configs / "app.json", '{"app":{"region":"us-east-1"}}\n')
+        write_text(configs / "service.yaml", "app:\n  region: us-east-1\n")
+        write_text(configs / "service.yml", "app:\n  region: us-east-1\n")
+        write_text(configs / "app.toml", '[app]\nregion = "us-east-1"\n')
+        write_text(configs / "app.ini", "[app]\nregion = us-east-1\n")
+        write_text(configs / "readme.txt", "app.region=us-east-1\n")
+        result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp001_formats_and_ignored_files",
+            rules=rules_path,
+            target_dir=configs,
+        )
+
+        app_json = load_json_config(configs / "app.json")
+        service_yaml = load_yaml_config(configs / "service.yaml")
+        service_yml = load_yaml_config(configs / "service.yml")
+        app_toml = load_toml_config(configs / "app.toml")
+        app_ini = load_ini_config(configs / "app.ini")
+        ignored_text = (configs / "readme.txt").read_text(encoding="utf-8")
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    for data in [app_json, service_yaml, service_yml, app_toml]:
+        assert_path_value(data, "app.region", "us-west-2")
+    if app_ini["app"]["region"] != "us-west-2":
+        raise ScenarioFailureError("INI app.region was not updated")
+    if ignored_text != "app.region=us-east-1\n":
+        raise ScenarioFailureError("unsupported .txt file must remain unchanged")
+    for file_path in ["app.ini", "app.json", "app.toml", "service.yaml", "service.yml"]:
+        assert_file_updated_event(
+            result["stdout"],
+            file_path=file_path,
+            rules_applied=["update_region"],
+        )
+    assert_no_file_updated_event(result["stdout"], file_path="readme.txt")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_migrate_configs_cp2_patterns_templates_conditions(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "migrate.py")
+    artifact_dir = artifact_root / "migrate_configs" / "checkpoint_2"
+
+    with TemporaryDirectory(prefix="migrate-configs-acceptance-") as tmp:
+        scratch = Path(tmp)
+        configs = scratch / "configs"
+        rules_path = scratch / "rules.json"
+        write_text(
+            rules_path,
+            json.dumps(
+                {
+                    "normalize_service_hosts": {
+                        "type": "pattern_replace",
+                        "key_pattern": "services.$name.host",
+                        "value": "${name}.internal.example.com",
+                    },
+                    "prod_only": {
+                        "type": "conditional_replace",
+                        "key": "server.host",
+                        "value": "prod.example.com",
+                        "condition": {"current_value_equals": "localhost"},
+                    },
+                    "set_bucket_name": {
+                        "type": "template_string",
+                        "key": "s3.bucket",
+                        "variables": {
+                            "env": "environment",
+                            "region": "aws.region",
+                        },
+                        "template": "data-${env}-${region}",
+                    },
+                },
+                indent=2,
+            ),
+        )
+        write_text(
+            configs / "config.json",
+            json.dumps(
+                {
+                    "services": {
+                        "api": {"host": "localhost", "port": 8080},
+                        "database": {"host": "localhost", "port": 5432},
+                    },
+                    "server": {"host": "localhost"},
+                }
+            ),
+        )
+        write_text(
+            configs / "bucket.yaml",
+            """
+environment: staging
+aws:
+  region: us-west-2
+s3:
+  bucket: old-bucket
+""".lstrip(),
+        )
+        write_text(
+            configs / "stage.json",
+            json.dumps({"server": {"host": "staging.example.com"}}),
+        )
+        stage_before = (configs / "stage.json").read_text(encoding="utf-8")
+        result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp002_patterns_templates_conditions",
+            rules=rules_path,
+            target_dir=configs,
+        )
+
+        config_json = load_json_config(configs / "config.json")
+        bucket_yaml = load_yaml_config(configs / "bucket.yaml")
+        stage_after = (configs / "stage.json").read_text(encoding="utf-8")
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    assert_path_value(
+        config_json,
+        "services.api.host",
+        "api.internal.example.com",
+    )
+    assert_path_value(
+        config_json,
+        "services.database.host",
+        "database.internal.example.com",
+    )
+    assert_path_value(config_json, "server.host", "prod.example.com")
+    assert_path_value(bucket_yaml, "s3.bucket", "data-staging-us-west-2")
+    if stage_after != stage_before:
+        raise ScenarioFailureError("failed conditional replacement must not update file")
+    assert_file_updated_event(
+        result["stdout"],
+        file_path="config.json",
+        rules_applied=["normalize_service_hosts", "prod_only"],
+    )
+    assert_file_updated_event(
+        result["stdout"],
+        file_path="bucket.yaml",
+        rules_applied=["set_bucket_name"],
+    )
+    assert_no_file_updated_event(result["stdout"], file_path="stage.json")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_migrate_configs_cp2_prior_rules_order(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "migrate.py")
+    artifact_dir = artifact_root / "migrate_configs" / "checkpoint_2"
+
+    with TemporaryDirectory(prefix="migrate-configs-acceptance-") as tmp:
+        scratch = Path(tmp)
+        configs = scratch / "configs"
+        rules_path = scratch / "rules.json"
+        write_text(
+            rules_path,
+            json.dumps(
+                {
+                    "a_merge_defaults": {
+                        "type": "merge_data",
+                        "data": {
+                            "environment": "production",
+                            "timeout": 30,
+                        },
+                    },
+                    "b_set_description": {
+                        "type": "template_string",
+                        "key": "description",
+                        "variables": {"env": "environment"},
+                        "template": "${env} service",
+                    },
+                    "c_update_ports": {
+                        "type": "pattern_replace",
+                        "key_pattern": "services.*.port",
+                        "value": 9000,
+                    },
+                    "d_normalize_host": {
+                        "type": "conditional_replace",
+                        "key": "server.host",
+                        "value": "127.0.0.1",
+                        "condition": {"current_value_matches": "^localhost$"},
+                    },
+                    "e_rename_db": {
+                        "type": "rename_key",
+                        "old_key": "db.hostname",
+                        "new_key": "db.host",
+                    },
+                },
+                indent=2,
+            ),
+        )
+        write_text(
+            configs / "app.json",
+            json.dumps(
+                {
+                    "description": "My service",
+                    "services": {
+                        "api": {"port": 8080},
+                        "worker": {"port": 8081},
+                    },
+                    "server": {"host": "localhost"},
+                    "db": {"hostname": "db.local"},
+                }
+            ),
+        )
+        result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp002_prior_rules_order",
+            rules=rules_path,
+            target_dir=configs,
+        )
+
+        app_json = load_json_config(configs / "app.json")
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    assert_path_value(app_json, "environment", "production")
+    assert_path_value(app_json, "description", "production service")
+    assert_path_value(app_json, "services.api.port", 9000)
+    assert_path_value(app_json, "services.worker.port", 9000)
+    assert_path_value(app_json, "server.host", "127.0.0.1")
+    assert_path_value(app_json, "db.host", "db.local")
+    assert_file_updated_event(
+        result["stdout"],
+        file_path="app.json",
+        rules_applied=[
+            "a_merge_defaults",
+            "b_set_description",
+            "c_update_ports",
+            "d_normalize_host",
+            "e_rename_db",
+        ],
+    )
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_migrate_configs_cp3_arrays_and_inheritance(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "migrate.py")
+    artifact_dir = artifact_root / "migrate_configs" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="migrate-configs-acceptance-") as tmp:
+        scratch = Path(tmp)
+        configs = scratch / "configs"
+        rules_path = scratch / "rules.json"
+        inheritance_path = scratch / "inheritance.json"
+        write_text(
+            rules_path,
+            json.dumps(
+                {
+                    "a_promote_enabled": {
+                        "type": "pattern_replace",
+                        "key_pattern": "services[?enabled=true].host",
+                        "value": "internal.example.com",
+                    },
+                    "b_build_primary_url": {
+                        "type": "template_string",
+                        "key": "primary_endpoint",
+                        "variables": {
+                            "host": "services[0].host",
+                            "port": "services[0].port",
+                        },
+                        "template": "http://${host}:${port}",
+                    },
+                },
+                indent=2,
+            ),
+        )
+        write_text(
+            inheritance_path,
+            json.dumps({"json": {"pattern": "import"}}, indent=2),
+        )
+        write_text(
+            configs / "root.json",
+            json.dumps({"root_only": True, "defaults": {"retries": 2}}),
+        )
+        write_text(
+            configs / "base.json",
+            json.dumps(
+                {
+                    "import": "root.json",
+                    "base_only": True,
+                    "environment": "base",
+                }
+            ),
+        )
+        write_text(
+            configs / "app.json",
+            json.dumps(
+                {
+                    "import": "base.json",
+                    "environment": "child",
+                    "primary_endpoint": "unused",
+                    "services": [
+                        {
+                            "name": "api",
+                            "enabled": True,
+                            "host": "localhost",
+                            "port": 8080,
+                        },
+                        {
+                            "name": "worker",
+                            "enabled": False,
+                            "host": "localhost",
+                            "port": 9000,
+                        },
+                    ],
+                }
+            ),
+        )
+        result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp003_arrays_and_inheritance",
+            rules=rules_path,
+            target_dir=configs,
+            inheritance=inheritance_path,
+        )
+
+        app_json = load_json_config(configs / "app.json")
+        root_json = load_json_config(configs / "root.json")
+        base_json = load_json_config(configs / "base.json")
+
+    assert_exit_status(result, 0)
+    assert_stderr_empty(result)
+    assert_path_value(app_json, "root_only", True)
+    assert_path_value(app_json, "defaults.retries", 2)
+    assert_path_value(app_json, "base_only", True)
+    assert_path_value(app_json, "environment", "child")
+    if "import" in app_json:
+        raise ScenarioFailureError("inheritance directive must be removed")
+    services = app_json.get("services")
+    if not isinstance(services, list) or len(services) != 2:
+        raise ScenarioFailureError("expected inherited app services array")
+    if services[0].get("host") != "internal.example.com":
+        raise ScenarioFailureError("enabled array item host was not replaced")
+    if services[1].get("host") != "localhost":
+        raise ScenarioFailureError("disabled array item host must remain unchanged")
+    assert_path_value(app_json, "primary_endpoint", "http://internal.example.com:8080")
+    if root_json != {"root_only": True, "defaults": {"retries": 2}}:
+        raise ScenarioFailureError("parent root config must not be modified")
+    if base_json.get("import") != "root.json":
+        raise ScenarioFailureError("parent base config must not be rewritten")
+    assert_file_updated_event(
+        result["stdout"],
+        file_path="app.json",
+        rules_applied=["a_promote_enabled", "b_build_primary_url"],
+    )
+    assert_no_file_updated_event(result["stdout"], file_path="base.json")
+    assert_no_file_updated_event(result["stdout"], file_path="root.json")
+    return result["stdout_path"], result["stderr_path"]
+
+
+def scenario_migrate_configs_cp3_errors_and_skips(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "migrate.py")
+    artifact_dir = artifact_root / "migrate_configs" / "checkpoint_3"
+
+    with TemporaryDirectory(prefix="migrate-configs-acceptance-") as tmp:
+        scratch = Path(tmp)
+
+        circular_dir = scratch / "circular"
+        circular_rules = scratch / "circular_rules.json"
+        circular_inheritance = scratch / "circular_inheritance.json"
+        write_text(circular_rules, "{}\n")
+        write_text(
+            circular_inheritance,
+            json.dumps({"yaml": {"pattern": "extends"}}),
+        )
+        a_path = circular_dir / "a.yaml"
+        b_path = circular_dir / "b.yaml"
+        write_text(a_path, "extends: b.yaml\nname: a\n")
+        write_text(b_path, "extends: a.yaml\nname: b\n")
+        a_before = a_path.read_text(encoding="utf-8")
+        b_before = b_path.read_text(encoding="utf-8")
+        circular_result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp003_circular_inheritance",
+            rules=circular_rules,
+            target_dir=circular_dir,
+            inheritance=circular_inheritance,
+        )
+        a_after = a_path.read_text(encoding="utf-8")
+        b_after = b_path.read_text(encoding="utf-8")
+
+        skip_dir = scratch / "skip"
+        skip_rules = scratch / "skip_rules.json"
+        write_text(
+            skip_rules,
+            json.dumps(
+                {
+                    "array_no_match": {
+                        "type": "pattern_replace",
+                        "key_pattern": "services[?enabled=true].host",
+                        "value": "internal.example.com",
+                    },
+                    "missing_template_var": {
+                        "type": "template_string",
+                        "key": "endpoint",
+                        "variables": {"host": "services[1].host"},
+                        "template": "http://${host}",
+                    },
+                }
+            ),
+        )
+        skip_config = skip_dir / "app.json"
+        write_text(
+            skip_config,
+            json.dumps(
+                {
+                    "endpoint": "unchanged",
+                    "services": [
+                        {
+                            "name": "worker",
+                            "enabled": False,
+                            "host": "localhost",
+                        }
+                    ],
+                },
+                sort_keys=True,
+            )
+            + "\n",
+        )
+        skip_before = skip_config.read_text(encoding="utf-8")
+        skip_result = run_migrate_configs(
+            workspace=workspace,
+            script_path=script_path,
+            artifact_dir=artifact_dir,
+            name="migrate_configs_cp003_skipped_rules",
+            rules=skip_rules,
+            target_dir=skip_dir,
+        )
+        skip_after = skip_config.read_text(encoding="utf-8")
+
+    if circular_result["exit_code"] == 0:
+        raise ScenarioFailureError("circular inheritance must fail")
+    if "circular dependency" not in circular_result["stderr"]:
+        raise ScenarioFailureError("circular inheritance error must mention the cycle")
+    if a_after != a_before or b_after != b_before:
+        raise ScenarioFailureError("circular inheritance must not modify files")
+    assert_exit_status(skip_result, 0)
+    assert_stderr_empty(skip_result)
+    assert_stdout_empty(skip_result)
+    if skip_after != skip_before:
+        raise ScenarioFailureError("skipped array/template rules must not modify files")
+    return skip_result["stdout_path"], skip_result["stderr_path"]
+
+
 def scenario_file_backup_cp3(
     workspace: Path, artifact_root: Path
 ) -> tuple[str | None, str | None]:
@@ -1970,6 +2639,54 @@ SCENARIO_SPECS: list[dict[str, Any]] = [
         "scenario_name": "Workspace product captures list comprehensions and multiline C++ blocks",
         "tags": ["problem:code_search", "checkpoint:3", "edge", "positive", "cli"],
         "scenario_func": scenario_code_search_cp3_comprehension_and_cpp_blocks,
+    },
+    {
+        "problem_id": "migrate_configs",
+        "checkpoint_index": 1,
+        "scenario_id": "migrate_configs.cp001.basic-rules",
+        "scenario_name": "Workspace product applies replace, rename, and deep-merge rules",
+        "tags": ["problem:migrate_configs", "checkpoint:1", "core", "positive", "cli", "file_io"],
+        "scenario_func": scenario_migrate_configs_cp1_basic_rules,
+    },
+    {
+        "problem_id": "migrate_configs",
+        "checkpoint_index": 1,
+        "scenario_id": "migrate_configs.cp001.formats-and-ignored-files",
+        "scenario_name": "Workspace product processes supported config formats and ignores unsupported files",
+        "tags": ["problem:migrate_configs", "checkpoint:1", "core", "positive", "cli", "file_io"],
+        "scenario_func": scenario_migrate_configs_cp1_formats_and_ignored_files,
+    },
+    {
+        "problem_id": "migrate_configs",
+        "checkpoint_index": 2,
+        "scenario_id": "migrate_configs.cp002.patterns-templates-conditions",
+        "scenario_name": "Workspace product applies pattern, template, and conditional rules",
+        "tags": ["problem:migrate_configs", "checkpoint:2", "core", "positive", "cli", "file_io"],
+        "scenario_func": scenario_migrate_configs_cp2_patterns_templates_conditions,
+    },
+    {
+        "problem_id": "migrate_configs",
+        "checkpoint_index": 2,
+        "scenario_id": "migrate_configs.cp002.prior-rules-order",
+        "scenario_name": "Workspace product preserves prior rules and reports lexicographic rule order",
+        "tags": ["problem:migrate_configs", "checkpoint:2", "regression", "positive", "cli", "file_io"],
+        "scenario_func": scenario_migrate_configs_cp2_prior_rules_order,
+    },
+    {
+        "problem_id": "migrate_configs",
+        "checkpoint_index": 3,
+        "scenario_id": "migrate_configs.cp003.arrays-and-inheritance",
+        "scenario_name": "Workspace product resolves inheritance and updates filtered array items",
+        "tags": ["problem:migrate_configs", "checkpoint:3", "core", "positive", "cli", "file_io"],
+        "scenario_func": scenario_migrate_configs_cp3_arrays_and_inheritance,
+    },
+    {
+        "problem_id": "migrate_configs",
+        "checkpoint_index": 3,
+        "scenario_id": "migrate_configs.cp003.errors-and-skips",
+        "scenario_name": "Workspace product rejects circular inheritance and skips missing matches",
+        "tags": ["problem:migrate_configs", "checkpoint:3", "edge", "negative", "cli", "file_io"],
+        "scenario_func": scenario_migrate_configs_cp3_errors_and_skips,
     },
     {
         "problem_id": "file_backup",

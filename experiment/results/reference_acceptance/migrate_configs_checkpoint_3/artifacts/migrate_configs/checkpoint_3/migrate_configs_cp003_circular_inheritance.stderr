@@ -1,0 +1,1 @@
+Error: circular dependency detected: /private/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-797q5mwc/circular/a.yaml -> /private/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-797q5mwc/circular/b.yaml -> /private/var/folders/07/8cmbs4hn54zdpn1r9gryl4tc0000gn/T/migrate-configs-acceptance-797q5mwc/circular/a.yaml

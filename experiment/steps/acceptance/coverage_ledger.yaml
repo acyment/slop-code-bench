@@ -89,6 +89,91 @@ entries:
       - code_search.cp001.workspace-cli-search
       - code_search.cp002.multi-language-filters
     reason: Through-checkpoint C2 runs execute the prior exact/regex runner scenarios.
+  - problem_id: migrate_configs
+    checkpoint_index: 1
+    feature_scenario: Replace values and rename keys in supported config files
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp001.basic-rules
+    reason: The checkpoint 1 runner applies replace_value and rename_key rules to JSON and verifies file content plus JSONL file_updated output.
+  - problem_id: migrate_configs
+    checkpoint_index: 1
+    feature_scenario: Deep merge data into matching files without replacing sibling fields
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp001.basic-rules
+    reason: The checkpoint 1 runner deep-merges YAML logging/cache data and verifies sibling fields are preserved.
+  - problem_id: migrate_configs
+    checkpoint_index: 1
+    feature_scenario: Process only supported configuration file extensions
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp001.formats-and-ignored-files
+    reason: The checkpoint 1 runner updates JSON, YAML, YML, TOML, and INI files with the same observable region rule.
+  - problem_id: migrate_configs
+    checkpoint_index: 1
+    feature_scenario: Ignore files with unsupported extensions
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp001.formats-and-ignored-files
+    reason: The checkpoint 1 runner includes a .txt file and verifies it is unchanged and not reported as file_updated.
+  - problem_id: migrate_configs
+    checkpoint_index: 2
+    feature_scenario: Pattern replacement captures path components and uses them in values
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp002.patterns-templates-conditions
+    reason: The checkpoint 2 runner verifies services.$name.host captures api/database path components and renders them into replacement values.
+  - problem_id: migrate_configs
+    checkpoint_index: 2
+    feature_scenario: Template string builds a target value from other keys
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp002.patterns-templates-conditions
+    reason: The checkpoint 2 runner verifies a YAML s3.bucket value rendered from environment and aws.region variables.
+  - problem_id: migrate_configs
+    checkpoint_index: 2
+    feature_scenario: Conditional replacement only applies when the condition matches
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp002.patterns-templates-conditions
+    reason: The checkpoint 2 runner verifies a localhost match is replaced while a staging host remains unchanged and unreported.
+  - problem_id: migrate_configs
+    checkpoint_index: 2
+    feature_scenario: Checkpoint 1 replace_value rename_key and merge_data rules still work
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp002.prior-rules-order
+      - migrate_configs.cp001.basic-rules
+    reason: Through-checkpoint C2 runs execute checkpoint 1 scenarios, and the checkpoint 2 regression runner combines prior and new rules while checking lexicographic rules_applied order.
+  - problem_id: migrate_configs
+    checkpoint_index: 3
+    feature_scenario: Array filter pattern updates matching elements only
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp003.arrays-and-inheritance
+    reason: The checkpoint 3 runner updates only services[?enabled=true].host and verifies the disabled service host remains unchanged.
+  - problem_id: migrate_configs
+    checkpoint_index: 3
+    feature_scenario: Inheritance merges parent configs before applying rules
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp003.arrays-and-inheritance
+    reason: The checkpoint 3 runner resolves root-to-base-to-child JSON inheritance, verifies child overrides, inherited fields, directive removal, and post-inheritance rule application.
+  - problem_id: migrate_configs
+    checkpoint_index: 3
+    feature_scenario: Circular inheritance fails before modifying files
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp003.errors-and-skips
+    reason: The checkpoint 3 runner creates a YAML inheritance cycle, expects a non-zero exit with a circular-dependency error, and verifies files are unchanged.
+  - problem_id: migrate_configs
+    checkpoint_index: 3
+    feature_scenario: Missing array filter matches and missing template variables skip without output
+    coverage: executable
+    runner_scenario_ids:
+      - migrate_configs.cp003.errors-and-skips
+    reason: The checkpoint 3 runner verifies missing array-filter matches and unresolved template variables leave the target JSON unchanged with empty stdout.
   - problem_id: file_backup
     checkpoint_index: 1
     feature_scenario: Run due daily jobs and report selected and excluded files

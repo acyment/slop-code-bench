@@ -647,31 +647,31 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100X - Decide Whether To Keep `file_backup` In The Mini-Screen
 
 - Phase: Problem selection
-- Status: completed; `file_backup` is down-ranked to harness-validation-only for now, with `migrate_configs` nominated as the first replacement candidate once locked C2 coverage exists
+- Status: completed; `file_backup` is down-ranked to harness-validation-only for now, and EXP-100Y promoted `migrate_configs` as the replacement after locked C2 coverage passed
 - Rationale: A problem that fails checkpoint 1 in every condition cannot measure long-horizon drift.
 - Description: After EXP-100T and EXP-100U, rerun a cheap one-replicate `file_backup` checkpoint 1 gate/smoke across C0/C1/C2 or inspect reference/model feasibility. Decide whether to keep `file_backup`, down-rank it to harness-validation-only, or replace it with another selected CLI/file-processing problem.
 - Dependencies: EXP-100T, EXP-100U
 - Acceptance criteria: documented keep/replace decision with evidence; `PROBLEM_SELECTION.md` and mini-screen config updated if replacement is chosen; no broader mini-screen rerun until this decision is recorded.
 - Complexity: M
-- Implementation notes: Decision evidence is recorded in `experiment/results/meaningful_mini_screen_rerun/analysis/file_backup_keep_replace_decision.md` and `docs/experiment/PROBLEM_SELECTION.md`. EXP-100R showed all C0/C1/C2 `file_backup` replicates failing checkpoint 1; near-miss means were C0 0.281, C1 0.115, and C2 0.104 hidden subtest pass rate. EXP-100U now catches the known C2 brittle YAML parser failure in old snapshots, but the prior all-condition checkpoint-1 failure means `file_backup` should not anchor the next reduced-drift evidence screen until a post-fix smoke proves checkpoint-1 feasibility. The mini-screen configs remain historical/replay configs; do not update them until a replacement problem has locked C2 coverage. Preflight now blocks evidence-producing profiles that still include `file_backup` with an `EXP-100X` evidence-disabled-problem reason.
+- Implementation notes: Decision evidence is recorded in `experiment/results/meaningful_mini_screen_rerun/analysis/file_backup_keep_replace_decision.md` and `docs/experiment/PROBLEM_SELECTION.md`. EXP-100R showed all C0/C1/C2 `file_backup` replicates failing checkpoint 1; near-miss means were C0 0.281, C1 0.115, and C2 0.104 hidden subtest pass rate. EXP-100U now catches the known C2 brittle YAML parser failure in old snapshots, but the prior all-condition checkpoint-1 failure means `file_backup` should not anchor the next reduced-drift evidence screen until a post-fix smoke proves checkpoint-1 feasibility. EXP-100Y replaced `file_backup` with `migrate_configs` in the current mini-screen configs after locked C2 coverage and reference acceptance passed. Preflight still blocks other evidence-producing profiles that include `file_backup` with an `EXP-100X` evidence-disabled-problem reason.
 - Risks/unknowns: Replacing the problem reduces comparability with earlier mini-screen runs but may be necessary for a meaningful drift signal.
 
 ### EXP-100Y - Promote A Replacement Problem Into The Evidence Mini-Screen
 
 - Phase: Problem selection / acceptance harness
-- Status: pending
+- Status: completed; `migrate_configs` is promoted into the evidence-producing mini-screen
 - Rationale: The next representative reduced-drift run needs a second problem that can plausibly survive multiple checkpoints and expose drift, not just first-checkpoint task difficulty.
 - Description: Implement locked C2 visible acceptance coverage for `migrate_configs` checkpoints 1-3, run reference-solution acceptance, run a cheap C0/C1/C2 one-replicate checkpoint-prefix smoke if budget allows, then replace `file_backup` in the evidence-producing mini-screen configs if the smoke shows at least 2 checkpoint opportunities for paired drift measurement. Use `log_query` as the fallback if `migrate_configs` coverage or smoke feasibility is poor.
 - Dependencies: EXP-100W, EXP-100X
 - Acceptance criteria: replacement candidate has current/prior checkpoint C2 coverage, reference acceptance passes, preflight coverage passes for the replacement mini-screen, and updated mini-screen configs list matched C0/C1/C2 trajectories over the same problem/checkpoint prefix/replicates.
 - Complexity: L
-- Implementation notes: Prefer `migrate_configs` first because it is CLI/file-processing, reference probes passed all hidden tests, and its domain maps cleanly to observable Gherkin examples without service lifecycle complexity.
+- Implementation notes: Added six locked `migrate_configs` executable acceptance scenarios covering checkpoints 1-3 in `experiment/steps/acceptance/standalone_runner.py`, mapped all checkpoint 1-3 feature scenarios in `experiment/steps/acceptance/coverage_ledger.yaml`, and validated the reference checkpoint 1, 2, and 3 solutions through current/prior acceptance in `experiment/results/reference_acceptance/`. The active mini-screen configs now use `code_search` and `migrate_configs` for C0/C1/C2 with 3 replicates. The mini-screen preflight is `ready` with 18 trajectories and 54 checkpoint executions; the broader screening profile remains blocked by `file_backup`, later checkpoint coverage, and `log_query` coverage. No paid C0/C1/C2 replacement smoke was run in this task; the next actual mini-screen run is the feasibility check.
 - Risks/unknowns: Implementing replacement coverage after seeing earlier mini-screen outcomes can introduce selection bias; document the rationale and preserve the old `file_backup` artifacts as historical, not discarded data.
 
 ### EXP-101 - Run Full Pilot Matrix
 
 - Phase: Full pilot run
-- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current C2 coverage exists for 6 of 19 selected checkpoint slots, while executed-feedback enforcement is now implemented for future C2 runs
+- Status: blocked by screening preflight in `experiment/results/screening_preflight/preflight.json`; current mini-screen preflight is ready, but broader C2 coverage exists for only 9 of 19 selected screening checkpoint slots and `file_backup` remains evidence-disabled
 - Rationale: Collect paired C0/C1/C2 trajectories.
 - Description: Run selected problems across C0/C1/C2 and 3 replicates if budget allows.
 - Dependencies: EXP-100A, EXP-100B, EXP-100C, EXP-100D, EXP-100E, EXP-100F, EXP-100Y

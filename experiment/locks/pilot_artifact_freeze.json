@@ -1,15 +1,15 @@
 {
   "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
-  "created_at": "2026-05-04T01:18:29.097621Z",
+  "created_at": "2026-05-04T01:42:42.264948Z",
   "excluded_paths": [],
   "files": {
     "docs/experiment/ACCEPTANCE_HARNESS.md": {
-      "sha256": "c3bc72927c10ddaeeafda94d9a5d64b803f426761fbede7ccab039f0ae5dea2c",
-      "size_bytes": 2815
+      "sha256": "96d00cb7f157fffef3735a11fef1dea9e8c8c2950517caa0910b9a5391fc3588",
+      "size_bytes": 3059
     },
     "docs/experiment/BACKLOG.md": {
-      "sha256": "00578aa07e9073c8e1deb459ad74ed23bd5a0f60835cf547f3ae6501ceb18e87",
-      "size_bytes": 60203
+      "sha256": "9ecf0ed679b3e2da86ee88cfe8150b2cd34a104b275f45137d7d0d470e771bd5",
+      "size_bytes": 60926
     },
     "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
       "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
@@ -20,12 +20,12 @@
       "size_bytes": 6960
     },
     "docs/experiment/DATA_SCHEMA.md": {
-      "sha256": "151e4c872b82327efa8a19400241f836b92b7d51da021b2d9a522ea2938c05f4",
-      "size_bytes": 6253
+      "sha256": "ccfe77364fa5e141d40727437b43e8cab61879aa8f1ca73f3573dc439ab83da5",
+      "size_bytes": 6428
     },
     "docs/experiment/EXPERIMENT_DESIGN.md": {
-      "sha256": "d6f5155526fbd9915d8d1ef57ca3899a2258cba9261a6ebac8e78313b7244d32",
-      "size_bytes": 7980
+      "sha256": "a1b00da4c53b5f11cd7c99450341d2c55b61ab7bb497c34436690bc35753935f",
+      "size_bytes": 8279
     },
     "docs/experiment/FULL_PILOT_RUN_GATE.md": {
       "sha256": "e7b484126fd9286aab8ffa1034168f5dbff8e538d725fa8dc44de7118e0d6dcb",
@@ -52,16 +52,16 @@
       "size_bytes": 1862
     },
     "docs/experiment/PROBLEM_SELECTION.md": {
-      "sha256": "8d59b730f236d0f2e249a1750c1462c87b474fb0e9bc57298eb2727f2b654d60",
-      "size_bytes": 9487
+      "sha256": "368f943a3830540ae5f1c6ca9847dc75e86ac86f9539f99748cdb910fd028e3b",
+      "size_bytes": 10757
     },
     "docs/experiment/PROMPT_TEMPLATES.md": {
       "sha256": "d3735235528d25f632cbd4b6f04d7d9dbf757ed8ece774fe026270795bae5a6a",
       "size_bytes": 6465
     },
     "docs/experiment/README.md": {
-      "sha256": "272089a136fef4de14a9f82bb08ad1a01a82b742191973f38a387592a7d9fac4",
-      "size_bytes": 14783
+      "sha256": "559c838c88adbe29a1ef5009ffc7013476f18e25f81d489837dd6c5eef814036",
+      "size_bytes": 15311
     },
     "docs/experiment/REPO_FORK_PLAN.md": {
       "sha256": "33202aab785830c49b86ea74f17b9462e2578175a19eb4e83324d6d08a8a3dd7",
@@ -76,12 +76,12 @@
       "size_bytes": 2365
     },
     "docs/experiment/SCREENING_RUN_STATUS.md": {
-      "sha256": "7321686c8c352b5957e78a66359f5c1e7e421797ff0036dec2b00963d6a0e27c",
-      "size_bytes": 10637
+      "sha256": "6e2372195d808b8c4d567f118e0da20d980a8367474f42dd51329ab98825cac2",
+      "size_bytes": 11871
     },
     "docs/experiment/SCREENING_SUBSET.md": {
-      "sha256": "7fec58d4b0e98c1609cac1a42798f66df110d50036d88201e6ed6bcfcb275bc4",
-      "size_bytes": 2993
+      "sha256": "03b2bccd31b045a91b7620ed702e026240918bda0e002f22c49db685916b47f3",
+      "size_bytes": 3705
     },
     "experiment/FORK_SETUP.md": {
       "sha256": "01e6116f410f791736ec9f7aba88043d59678e95c3c8855d501ab4822ca374ba",
@@ -96,16 +96,16 @@
       "size_bytes": 8690
     },
     "experiment/configs/mini_screen_c0.yaml": {
-      "sha256": "00862a8f055b9ce9952f8d75104845bf2e8ad8de31e2a3ea7d1c05576da40a05",
-      "size_bytes": 1575
+      "sha256": "579ea005f5cd884df000614622d513636ea16c219adeb97ff84b8c6080afc5dd",
+      "size_bytes": 1647
     },
     "experiment/configs/mini_screen_c1.yaml": {
-      "sha256": "d7e7ecab3a8d472142c18634649f25b42a5ff08058d97506cc5f8b1efd74d852",
-      "size_bytes": 1902
+      "sha256": "d7db0104baf4afc198b2daaa63bc1329dfadb1ee33d34aa18bb642c55b187102",
+      "size_bytes": 1974
     },
     "experiment/configs/mini_screen_c2.yaml": {
-      "sha256": "68d36478a5edcd9350d95d2e440b09c4c942cf9aa81b39aa413e1fbc736d77e2",
-      "size_bytes": 2283
+      "sha256": "6bd7cce09ec406ea80e42fb996e0fde0ba830735aee3ec7779972aba732ea27a",
+      "size_bytes": 2355
     },
     "experiment/configs/mvp_c0.yaml": {
       "sha256": "16f3bdc62f16b16c9a38d2d56c7e0ff6637bb57ac085d784dddf7a8e33fa0c4f",
@@ -316,8 +316,8 @@
       "size_bytes": 6810
     },
     "experiment/schemas/scenario_result.schema.json": {
-      "sha256": "efbb27aaff525197b00636473320ea94649a29ea0c04b399d850e428d52e36ac",
-      "size_bytes": 1687
+      "sha256": "9d2ea9118cfb9d8cdb457b6353ff8b3db4496991f9127bea76a7afeda197d9f0",
+      "size_bytes": 2064
     },
     "experiment/scripts/.gitkeep": {
       "sha256": "1f1aeeea426e55fde36e7df1bdaef4230d4a7a77275f626e999a7a940c55b5bd",
@@ -380,8 +380,8 @@
       "size_bytes": 3786
     },
     "experiment/scripts/validate_full_pilot_preflight.py": {
-      "sha256": "120de13140b45193f00377ef2e46830ca075bc556c2f6d815c191be28eaa075a",
-      "size_bytes": 29635
+      "sha256": "98eac797b2d2e6638b267d11de4643f4fbe31699df00046f6bdfe4ad0e3f85f6",
+      "size_bytes": 29687
     },
     "experiment/scripts/validate_locks.py": {
       "sha256": "9b10710c22d1715df0409262e98aa51e4c0b93c81c6d7fef2f5a23d32561739c",
@@ -424,26 +424,26 @@
       "size_bytes": 4958
     },
     "experiment/steps/acceptance/coverage_ledger.yaml": {
-      "sha256": "7c274bb2b8f0b779faf77a62efa8a50fe72f0c0602675c85c6aef58354b137e8",
-      "size_bytes": 9302
+      "sha256": "95414f5fc8e3020985e10a6922eaaec700f625dc606d71d9993e931eb5a8af13",
+      "size_bytes": 13946
     },
     "experiment/steps/acceptance/results.py": {
       "sha256": "f398ebd6a57209b1ec3b29660d746c65723307023be8c636b860fce8ee94549c",
       "size_bytes": 1452
     },
     "experiment/steps/acceptance/standalone_runner.py": {
-      "sha256": "990cf0684433aa5dd444acc71d8ba42b3545c12423e53490f7808eebcaf9ab7e",
-      "size_bytes": 75882
+      "sha256": "cabf4df1e3a783d82b38cb58a953842c3f1fa91a9f360e471778b32723c98954",
+      "size_bytes": 102850
     }
   },
-  "freeze_created_at": "2026-05-04T01:18:29.140909Z",
-  "freeze_hash": "4ae74a7060a0afaaf8dc450e71cd881dcdf6313ac2fcb0bd3d1a9b8432f8717b",
+  "freeze_created_at": "2026-05-04T01:42:42.309241Z",
+  "freeze_hash": "46cd8b27b1cf663bb9c7f6dcdbf6113261ed54e142640f4acbabc9b9e6633655",
   "freeze_schema_version": 1,
   "freeze_status": "pre_execution_artifact_freeze",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
     "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
-    "head_commit_at_manifest_generation": "3d68ef915f16e3be8f3d4f1bc63a1e3b1b442f3b"
+    "head_commit_at_manifest_generation": "011c7fae7b12a2cb1035dc788b1b9b546289c832"
   },
   "locked_paths": [
     "docs/experiment/**",
@@ -457,7 +457,7 @@
     "experiment/scripts/**",
     "experiment/schemas/**"
   ],
-  "manifest_hash": "01a36c1e62a6f555e8948ddaff232a073e58d5e498310a73582b795d1483cc7c",
+  "manifest_hash": "91f6611fdfddad48e8d907c535e91c5c296f0f5eb6c17271e2aacd9478b373d4",
   "matrix_summary": {
     "conditions": [
       "C0",
@@ -472,7 +472,7 @@
         "agent_harness": "codex",
         "checkpoint_counts": {
           "code_search": 3,
-          "file_backup": 3
+          "migrate_configs": 3
         },
         "checkpoint_executions": 18,
         "condition_id": "C0",
@@ -482,7 +482,7 @@
         "problem_count": 2,
         "problems": [
           "code_search",
-          "file_backup"
+          "migrate_configs"
         ],
         "replicate_count": 3,
         "replicate_ids": [
@@ -496,7 +496,7 @@
         "agent_harness": "codex",
         "checkpoint_counts": {
           "code_search": 3,
-          "file_backup": 3
+          "migrate_configs": 3
         },
         "checkpoint_executions": 18,
         "condition_id": "C1",
@@ -506,7 +506,7 @@
         "problem_count": 2,
         "problems": [
           "code_search",
-          "file_backup"
+          "migrate_configs"
         ],
         "replicate_count": 3,
         "replicate_ids": [
@@ -520,7 +520,7 @@
         "agent_harness": "codex",
         "checkpoint_counts": {
           "code_search": 3,
-          "file_backup": 3
+          "migrate_configs": 3
         },
         "checkpoint_executions": 18,
         "condition_id": "C2",
@@ -530,7 +530,7 @@
         "problem_count": 2,
         "problems": [
           "code_search",
-          "file_backup"
+          "migrate_configs"
         ],
         "replicate_count": 3,
         "replicate_ids": [

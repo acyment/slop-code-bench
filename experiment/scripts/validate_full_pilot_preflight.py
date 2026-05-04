@@ -654,7 +654,7 @@ def matrix_summary(
 
 def markdown_report(report: dict[str, Any]) -> str:
     lines = [
-        "# Full Pilot Preflight",
+        "# Pilot Preflight",
         "",
         f"Profile: `{report.get('profile', 'pilot')}`",
         f"Status: `{report['status']}`",
@@ -702,15 +702,16 @@ def markdown_report(report: dict[str, Any]) -> str:
             blocker_type = blocker.get("type")
             detail = json.dumps(blocker, sort_keys=True).replace("|", "\\|")
             lines.append(f"| {blocker_type} | `{detail}` |")
+    profile = str(report.get("profile", "selected"))
     lines.extend(
         [
             "",
             "## Interpretation",
             "",
             (
-                "The full pilot matrix is ready to execute."
+                f"The `{profile}` matrix is ready to execute."
                 if report["status"] == "ready"
-                else "The full pilot matrix is blocked. Do not run primary data collection until every gate check passes."
+                else f"The `{profile}` matrix is blocked. Do not run primary data collection until every gate check passes."
             ),
         ]
     )
