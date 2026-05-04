@@ -25,7 +25,7 @@ Avoid or defer problems that:
 | Problem | Type | Difficulty | Checkpoints | Dependencies | Initial Assessment |
 | --- | --- | --- | --- | --- | --- |
 | `code_search` | CLI code search/refactoring | Easy | 5 | none observed in config | Strong MVP candidate: JSONL outputs and clear examples. |
-| `file_backup` | CLI YAML backup scheduler/file walk | Easy | 4 | `pyyaml`, static assets | Strong MVP candidate after runtime probe: file behavior, domain language, and clean core pass rates. |
+| `file_backup` | CLI YAML backup scheduler/file walk | Easy | 4 | `pyyaml`, static assets | Down-ranked after EXP-100X for evidence-producing drift runs: all C0/C1/C2 EXP-100R replicates failed checkpoint 1. Keep as harness-validation-only until a post-fix smoke proves checkpoint-1 feasibility. |
 | `migrate_configs` | CLI config migration tool | Easy | 5 | `pyyaml` | Strong full-pilot candidate: config/file-processing behavior and clean reference pass rates. |
 | `log_query` | CLI NDJSON query language | Medium | 5 | none observed in config | Good pilot candidate: examples can be concrete and user-facing. |
 | `file_merger` | CLI data merge pipeline | Medium | 4 | `pyyaml`, `pyarrow` | Good pilot candidate; check runtime and Parquet dependencies. |
@@ -50,7 +50,7 @@ Reference-runtime probes were run against copied reference solution snapshots fo
 | Problem | Checkpoints | Runtime | Infrastructure failures | Notes |
 | --- | ---: | ---: | ---: | --- |
 | `code_search` | 5 | 42.6s | 0 | All hidden tests passed in the reference probe. |
-| `file_backup` | 4 | 42.8s | 0 | Core pass rate was 1.0 at all checkpoints; strict rate is below 1.0 due non-core failures. |
+| `file_backup` | 4 | 42.8s | 0 | Reference probe was feasible, but later model trajectories failed checkpoint 1 for every C0/C1/C2 replicate. Reference feasibility alone is not enough to keep it in the next evidence-producing mini-screen. |
 | `migrate_configs` | 5 | 54.6s | 0 | All hidden tests passed in the reference probe. |
 | `log_query` | 5 | 99.6s | 0 | All hidden tests passed in the reference probe. |
 | `file_merger` | 4 | 112.5s | 0 | All hidden tests passed; `pyarrow` makes it a heavier dependency case. |
@@ -59,9 +59,9 @@ Reference-runtime probes were run against copied reference solution snapshots fo
 
 The native local environment prints repeated non-fatal `uv init` warnings during setup because the temporary evaluation project is already initialized. These warnings did not surface as SCBench infrastructure failures.
 
-## Final First Pilot Set
+## Initial First Pilot Set
 
-Recommended first 6:
+Recommended first 6 from the discovery/reference-probe phase:
 
 1. `code_search`
 2. `file_backup`
@@ -78,6 +78,8 @@ Rationale:
 - keeps Gherkin conversion feasible,
 - gives 4-6 checkpoint trajectories without the 8-checkpoint hard task cost.
 
+This set is preserved for traceability. EXP-100X supersedes the evidence-producing role of `file_backup` until a post-fix smoke proves multi-checkpoint feasibility.
+
 Alternates:
 
 - Replace `migrate_configs` with `xjq` after resolving the checkpoint 1 and checkpoint 5 reference probe mismatches.
@@ -85,14 +87,38 @@ Alternates:
 - Replace `file_merger` with `file_query_tool` if SQL-like query behavior is more relevant to SpecCommons.
 - Add `execution_server` only after sandbox and timeout controls are explicitly verified.
 
+## EXP-100X Update
+
+Decision: down-rank `file_backup` to harness-validation-only for now.
+
+Evidence from EXP-100R and the near-miss analysis:
+
+- C0, C1, and C2 all failed `file_backup` checkpoint 1 in all three replicates.
+- Mean checkpoint-1 hidden subtest pass rates were C0 0.281, C1 0.115, and C2 0.104.
+- C2 visible acceptance passed before hidden failure in all three `file_backup` rows.
+- EXP-100U now catches the known C2 brittle YAML parser failure from the old snapshots, and the reference checkpoint 1 solution passes the new scenario.
+
+Interpretation:
+
+- `file_backup` remains useful for validating harness fidelity and hidden-failure-after-visible-pass instrumentation.
+- It is not currently useful as an evidence-producing long-horizon drift problem because no condition reaches checkpoint 2.
+- Do not run another representative reduced-drift mini-screen with `file_backup` unless a post-fix smoke shows checkpoint-1 survival and at least one later checkpoint opportunity.
+
+Replacement candidate:
+
+1. `migrate_configs`: first choice, pending locked C2 acceptance coverage for checkpoints 1-3.
+2. `log_query`: fallback if `migrate_configs` coverage or smoke feasibility is poor.
+
+Do not update the mini-screen configs until the replacement candidate has locked C2 coverage and reference acceptance passes. Preflight now blocks evidence-producing profiles that still include `file_backup` with the EXP-100X evidence-disabled-problem decision.
+
 ## MVP Problem Set
 
-Use:
+Historical MVP set:
 
 1. `code_search`
 2. `file_backup`
 
-Rationale:
+Original rationale:
 
 - both are CLI-based,
 - both have concrete observable behavior,
@@ -101,12 +127,18 @@ Rationale:
 - both can be tested without service lifecycle logic,
 - both should support a lightweight Gherkin acceptance harness.
 
+Current interpretation after EXP-100X:
+
+- keep `code_search`;
+- use `file_backup` only for harness-validation tasks;
+- promote `migrate_configs` as the next MVP/reduced-drift evidence candidate after C2 coverage is implemented.
+
 ## Screening Subset
 
 Use:
 
 1. `code_search`
-2. `file_backup`
+2. `file_backup` for historical comparison and harness validation only
 3. `migrate_configs`
 4. `log_query`
 
@@ -120,6 +152,8 @@ Rationale:
 - avoids `textdrop` until service lifecycle handling is stable.
 
 This gives 12 C0/C1/C2 trajectories and 57 checkpoint executions with one replicate.
+
+Current EXP-100X constraint: do not treat this as an evidence-producing screening subset until either `file_backup` is replaced by `migrate_configs` in the mini-screen path or a post-fix `file_backup` smoke demonstrates multi-checkpoint feasibility.
 
 ## Required Follow-Up Inspection Task
 

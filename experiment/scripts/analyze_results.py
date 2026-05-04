@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 from collections import defaultdict
 from datetime import UTC
 from datetime import datetime
@@ -28,6 +29,7 @@ TECHNICAL_SLOPE_FIELDS = [
     "acceptance_runtime_ms",
     "hidden_eval_runtime_ms",
 ]
+PARAMETRIZED_TEST_RE = re.compile(r"\[.*\]$")
 
 
 class AnalysisError(ValueError):
@@ -54,6 +56,16 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def read_json_optional(path: Path | None) -> dict[str, Any] | None:
+    if path is None or not path.is_file():
+        return None
+    with path.open("r", encoding="utf-8") as handle:
+        payload = json.load(handle)
+    if not isinstance(payload, dict):
+        raise AnalysisError(f"Expected JSON object at {path}")
+    return payload
+
+
 def write_json(path: Path, payload: dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -65,6 +77,13 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def write_text(path: Path, text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(text.rstrip() + "\n", encoding="utf-8")
+
+
+def write_jsonl(path: Path, rows: list[dict[str, Any]]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row, sort_keys=True) + "\n")
 
 
 def as_number(value: Any) -> float | None:
@@ -208,6 +227,232 @@ def safe_divide(numerator: int | float, denominator: int) -> float | None:
     if denominator <= 0:
         return None
     return numerator / denominator
+
+
+def repo_root_from_results_dir(results_dir: Path) -> Path:
+    for candidate in [results_dir.resolve(), *results_dir.resolve().parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    return Path.cwd().resolve()
+
+
+def resolve_artifact_path(path_text: Any, *, repo_root: Path) -> Path | None:
+    if not isinstance(path_text, str) or not path_text:
+        return None
+    path = Path(path_text)
+    if path.is_absolute():
+        return path
+    return repo_root / path
+
+
+def hidden_summary(row: dict[str, Any]) -> dict[str, Any]:
+    summary = row.get("hidden_test_summary")
+    if isinstance(summary, dict):
+        return summary
+    scbench = row.get("scbench")
+    if isinstance(scbench, dict):
+        return scbench
+    return {}
+
+
+def normalized_test_label(test_name: str) -> str:
+    return PARAMETRIZED_TEST_RE.sub("", test_name)
+
+
+def failed_cluster_labels(evaluation: dict[str, Any] | None) -> list[str]:
+    if evaluation is None:
+        return []
+    tests = evaluation.get("tests")
+    if not isinstance(tests, dict):
+        return []
+    labels: set[str] = set()
+    for group_name, group_payload in tests.items():
+        if not isinstance(group_payload, dict):
+            continue
+        failed = group_payload.get("failed")
+        if not isinstance(failed, list):
+            continue
+        for test_name in failed:
+            if not isinstance(test_name, str):
+                continue
+            labels.add(f"{group_name}:{normalized_test_label(test_name)}")
+    return sorted(labels)
+
+
+def evaluation_for_checkpoint(
+    row: dict[str, Any], *, repo_root: Path
+) -> dict[str, Any] | None:
+    artifact_paths = row.get("artifact_paths")
+    if not isinstance(artifact_paths, dict):
+        return None
+    evaluation_path = resolve_artifact_path(
+        artifact_paths.get("evaluation"),
+        repo_root=repo_root,
+    )
+    return read_json_optional(evaluation_path)
+
+
+def hidden_subtest_counts(row: dict[str, Any]) -> tuple[int | None, int | None]:
+    summary = hidden_summary(row)
+    passed = summary.get("passed_tests")
+    total = summary.get("total_tests")
+    if isinstance(passed, int) and isinstance(total, int):
+        return passed, total
+    rate = as_number(summary.get("strict_pass_rate"))
+    collected = summary.get("pytest_collected")
+    if rate is not None and isinstance(collected, int):
+        return int(round(rate * collected)), collected
+    return None, None
+
+
+def checkpoint_pass_rate(row: dict[str, Any]) -> float | None:
+    passed, total = hidden_subtest_counts(row)
+    if passed is None or total is None:
+        return None
+    return safe_divide(passed, total)
+
+
+def near_miss_rows(
+    checkpoint_rows: list[dict[str, Any]],
+    *,
+    repo_root: Path,
+) -> list[dict[str, Any]]:
+    pass_rates: dict[tuple[str, str, int, int], float | None] = {}
+    for row in checkpoint_rows:
+        problem_id = str(row.get("problem_id"))
+        checkpoint_index = int(row.get("checkpoint_index") or 0)
+        replicate_id = int(row.get("replicate_id") or 0)
+        condition_id = str(row.get("condition_id"))
+        pass_rates[(condition_id, problem_id, checkpoint_index, replicate_id)] = (
+            checkpoint_pass_rate(row)
+        )
+
+    rows: list[dict[str, Any]] = []
+    for row in sorted(
+        checkpoint_rows,
+        key=lambda item: (
+            str(item.get("problem_id")),
+            int(item.get("checkpoint_index") or 0),
+            int(item.get("replicate_id") or 0),
+            str(item.get("condition_id")),
+        ),
+    ):
+        if row.get("hidden_tests_passed") is not False:
+            continue
+        problem_id = str(row.get("problem_id"))
+        checkpoint_index = int(row.get("checkpoint_index") or 0)
+        replicate_id = int(row.get("replicate_id") or 0)
+        condition_id = str(row.get("condition_id"))
+        passed, total = hidden_subtest_counts(row)
+        pass_rate = checkpoint_pass_rate(row)
+        baseline_c0 = pass_rates.get(("C0", problem_id, checkpoint_index, replicate_id))
+        baseline_c1 = pass_rates.get(("C1", problem_id, checkpoint_index, replicate_id))
+        labels = failed_cluster_labels(
+            evaluation_for_checkpoint(row, repo_root=repo_root)
+        )
+        delta_vs_c0 = (
+            pass_rate - baseline_c0
+            if condition_id in {"C1", "C2"}
+            and pass_rate is not None
+            and baseline_c0 is not None
+            else None
+        )
+        delta_vs_c1 = (
+            pass_rate - baseline_c1
+            if condition_id == "C2"
+            and pass_rate is not None
+            and baseline_c1 is not None
+            else None
+        )
+        rows.append(
+            {
+                "condition_id": condition_id,
+                "problem_id": problem_id,
+                "checkpoint_id": row.get("checkpoint_id"),
+                "checkpoint_index": checkpoint_index,
+                "replicate_id": replicate_id,
+                "run_id": row.get("run_id"),
+                "visible_acceptance_passed": row.get("visible_acceptance_passed"),
+                "hidden_failure_after_visible_pass": row.get(
+                    "hidden_failure_after_visible_pass"
+                ),
+                "hidden_subtests_passed": passed,
+                "hidden_subtests_total": total,
+                "hidden_subtests_failed": (total - passed)
+                if passed is not None and total is not None
+                else None,
+                "hidden_subtest_pass_rate": pass_rate,
+                "delta_vs_c0_pass_rate": delta_vs_c0,
+                "delta_vs_c1_pass_rate": delta_vs_c1,
+                "failed_hidden_cluster_count": len(labels),
+                "failed_hidden_cluster_labels": labels,
+                "failed_hidden_cluster_label_text": ", ".join(labels),
+            }
+        )
+    return rows
+
+
+def aggregate_near_misses(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    grouped: dict[tuple[str, str, int], list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        grouped[
+            (
+                str(row["condition_id"]),
+                str(row["problem_id"]),
+                int(row["checkpoint_index"]),
+            )
+        ].append(row)
+    aggregates: list[dict[str, Any]] = []
+    for (condition_id, problem_id, checkpoint_index), group in sorted(grouped.items()):
+        pass_rates = [
+            float(row["hidden_subtest_pass_rate"])
+            for row in group
+            if row.get("hidden_subtest_pass_rate") is not None
+        ]
+        failed_counts = [
+            float(row["hidden_subtests_failed"])
+            for row in group
+            if row.get("hidden_subtests_failed") is not None
+        ]
+        cluster_counts = [
+            float(row["failed_hidden_cluster_count"])
+            for row in group
+            if row.get("failed_hidden_cluster_count") is not None
+        ]
+        deltas_c0 = [
+            float(row["delta_vs_c0_pass_rate"])
+            for row in group
+            if row.get("delta_vs_c0_pass_rate") is not None
+        ]
+        deltas_c1 = [
+            float(row["delta_vs_c1_pass_rate"])
+            for row in group
+            if row.get("delta_vs_c1_pass_rate") is not None
+        ]
+        aggregates.append(
+            {
+                "condition_id": condition_id,
+                "problem_id": problem_id,
+                "checkpoint_index": checkpoint_index,
+                "failed_checkpoint_count": len(group),
+                "mean_hidden_subtest_pass_rate": mean(pass_rates)
+                if pass_rates
+                else None,
+                "mean_hidden_subtests_failed": mean(failed_counts)
+                if failed_counts
+                else None,
+                "mean_failed_hidden_cluster_count": mean(cluster_counts)
+                if cluster_counts
+                else None,
+                "mean_delta_vs_c0_pass_rate": mean(deltas_c0)
+                if deltas_c0
+                else None,
+                "mean_delta_vs_c1_pass_rate": mean(deltas_c1)
+                if deltas_c1
+                else None,
+            }
+        )
+    return aggregates
 
 
 def technical_slopes(
@@ -356,6 +601,58 @@ def pass_matrix_markdown(rows: list[dict[str, Any]]) -> str:
     )
 
 
+def near_miss_markdown(
+    rows: list[dict[str, Any]],
+    aggregate: list[dict[str, Any]],
+) -> str:
+    sections = [
+        "# Near-Miss Metrics",
+        "",
+        "These are secondary diagnostics for hidden-test failures. Strict trajectory survival remains the primary metric.",
+        "",
+        "Failed hidden-test cluster labels are derived from SCBench evaluation summary names and strip parametrized fixture values; they do not include hidden test bodies.",
+        "",
+        "## Failed Checkpoints",
+        "",
+        markdown_table(
+            rows,
+            [
+                "condition_id",
+                "problem_id",
+                "checkpoint_id",
+                "replicate_id",
+                "visible_acceptance_passed",
+                "hidden_failure_after_visible_pass",
+                "hidden_subtests_passed",
+                "hidden_subtests_total",
+                "hidden_subtest_pass_rate",
+                "delta_vs_c0_pass_rate",
+                "delta_vs_c1_pass_rate",
+                "failed_hidden_cluster_count",
+                "failed_hidden_cluster_label_text",
+            ],
+        ),
+        "",
+        "## Aggregate Failed-Checkpoint Diagnostics",
+        "",
+        markdown_table(
+            aggregate,
+            [
+                "condition_id",
+                "problem_id",
+                "checkpoint_index",
+                "failed_checkpoint_count",
+                "mean_hidden_subtest_pass_rate",
+                "mean_hidden_subtests_failed",
+                "mean_failed_hidden_cluster_count",
+                "mean_delta_vs_c0_pass_rate",
+                "mean_delta_vs_c1_pass_rate",
+            ],
+        ),
+    ]
+    return "\n".join(sections)
+
+
 def run_analysis(*, results_dir: Path, output_dir: Path) -> dict[str, Any]:
     run_rows = read_jsonl(results_dir / "runs.jsonl")
     checkpoint_rows = read_jsonl(results_dir / "checkpoints.jsonl")
@@ -381,6 +678,9 @@ def run_analysis(*, results_dir: Path, output_dir: Path) -> dict[str, Any]:
     ]
     matrix = pass_matrix_rows(checkpoint_rows)
     aggregate = aggregate_by_condition_problem(summaries)
+    repo_root = repo_root_from_results_dir(results_dir)
+    near_misses = near_miss_rows(checkpoint_rows, repo_root=repo_root)
+    near_miss_aggregate = aggregate_near_misses(near_misses)
     evaluable_checkpoint_count = sum(
         1 for row in checkpoint_rows if row.get("hidden_tests_passed") is not None
     )
@@ -403,11 +703,18 @@ def run_analysis(*, results_dir: Path, output_dir: Path) -> dict[str, Any]:
         "trajectory_summaries": summaries,
         "condition_problem_summary": aggregate,
         "technical_slopes": slopes,
+        "near_miss_rows": near_misses,
+        "near_miss_summary": near_miss_aggregate,
     }
 
     write_json(output_dir / "summary.json", summary)
+    write_jsonl(output_dir / "near_miss_rows.jsonl", near_misses)
     write_text(output_dir / "trajectory_summary.md", trajectory_markdown(summaries))
     write_text(output_dir / "pass_matrix.md", pass_matrix_markdown(matrix))
+    write_text(
+        output_dir / "near_miss_summary.md",
+        near_miss_markdown(near_misses, near_miss_aggregate),
+    )
     write_text(
         output_dir / "condition_problem_summary.md",
         markdown_table(

@@ -4,10 +4,10 @@
       "details": {
         "added_files": [],
         "changed_files": [],
-        "checked_at": "2026-05-04T01:06:25.130971Z",
+        "checked_at": "2026-05-04T01:18:36.153230Z",
         "file_count_after": 108,
         "file_count_before": 108,
-        "freeze_hash": "73482f775f33a0cc814ac9e803b8abd35ce8c75b14bf7226d6fcbc14af5b0824",
+        "freeze_hash": "4ae74a7060a0afaaf8dc450e71cd881dcdf6313ac2fcb0bd3d1a9b8432f8717b",
         "freeze_status": "pre_execution_artifact_freeze",
         "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
         "missing_patterns_after": [],
@@ -21,7 +21,7 @@
         "schema_version": 1,
         "status": "unchanged"
       },
-      "freeze_hash": "73482f775f33a0cc814ac9e803b8abd35ce8c75b14bf7226d6fcbc14af5b0824",
+      "freeze_hash": "4ae74a7060a0afaaf8dc450e71cd881dcdf6313ac2fcb0bd3d1a9b8432f8717b",
       "id": "pilot_artifacts.freeze_manifest",
       "message": "Freeze manifest matches current files.",
       "status": "pass"
@@ -43,6 +43,40 @@
       "matrix_id": "mini_screen_c2",
       "message": "Model and agent are selected.",
       "status": "pass"
+    },
+    {
+      "blockers": [
+        {
+          "condition_id": "C0",
+          "decision_id": "EXP-100X",
+          "matrix_id": "mini_screen_c0",
+          "problem_id": "file_backup",
+          "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+          "status": "harness_validation_only",
+          "type": "evidence_disabled_problem"
+        },
+        {
+          "condition_id": "C1",
+          "decision_id": "EXP-100X",
+          "matrix_id": "mini_screen_c1",
+          "problem_id": "file_backup",
+          "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+          "status": "harness_validation_only",
+          "type": "evidence_disabled_problem"
+        },
+        {
+          "condition_id": "C2",
+          "decision_id": "EXP-100X",
+          "matrix_id": "mini_screen_c2",
+          "problem_id": "file_backup",
+          "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+          "status": "harness_validation_only",
+          "type": "evidence_disabled_problem"
+        }
+      ],
+      "id": "problem_selection.evidence_disabled",
+      "message": "One or more configured problems are currently disabled for evidence-producing drift runs.",
+      "status": "block"
     },
     {
       "id": "trajectory.execution_bridge",
@@ -188,25 +222,81 @@
       "status": "pass"
     },
     {
-      "blockers": [],
+      "blockers": [
+        {
+          "condition_id": "C0",
+          "decision_id": "EXP-100X",
+          "matrix_id": "mini_screen_c0",
+          "problem_id": "file_backup",
+          "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+          "status": "harness_validation_only",
+          "type": "evidence_disabled_problem"
+        },
+        {
+          "condition_id": "C1",
+          "decision_id": "EXP-100X",
+          "matrix_id": "mini_screen_c1",
+          "problem_id": "file_backup",
+          "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+          "status": "harness_validation_only",
+          "type": "evidence_disabled_problem"
+        },
+        {
+          "condition_id": "C2",
+          "decision_id": "EXP-100X",
+          "matrix_id": "mini_screen_c2",
+          "problem_id": "file_backup",
+          "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+          "status": "harness_validation_only",
+          "type": "evidence_disabled_problem"
+        }
+      ],
       "id": "reduced_drift.evidence_gate",
-      "message": "Configured run matrix is evidence-producing for a directional reduced-drift probe.",
+      "message": "Configured run matrix is not evidence-producing: 3 blocker(s).",
       "minimum_checkpoint_depth": 3,
-      "ready": true,
+      "ready": false,
       "required_conditions": [
         "C0",
         "C2"
       ],
-      "status": "pass"
+      "status": "block"
     }
   ],
   "evidence_gate": {
-    "blockers": [],
-    "message": "Configured run matrix is evidence-producing for a directional reduced-drift probe.",
-    "ready": true
+    "blockers": [
+      {
+        "condition_id": "C0",
+        "decision_id": "EXP-100X",
+        "matrix_id": "mini_screen_c0",
+        "problem_id": "file_backup",
+        "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+        "status": "harness_validation_only",
+        "type": "evidence_disabled_problem"
+      },
+      {
+        "condition_id": "C1",
+        "decision_id": "EXP-100X",
+        "matrix_id": "mini_screen_c1",
+        "problem_id": "file_backup",
+        "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+        "status": "harness_validation_only",
+        "type": "evidence_disabled_problem"
+      },
+      {
+        "condition_id": "C2",
+        "decision_id": "EXP-100X",
+        "matrix_id": "mini_screen_c2",
+        "problem_id": "file_backup",
+        "reason": "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this problem out of evidence-producing drift screens until a post-fix smoke demonstrates multi-checkpoint feasibility.",
+        "status": "harness_validation_only",
+        "type": "evidence_disabled_problem"
+      }
+    ],
+    "message": "Configured run matrix is not evidence-producing: 3 blocker(s).",
+    "ready": false
   },
   "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
-  "generated_at": "2026-05-04T01:06:25.167021Z",
+  "generated_at": "2026-05-04T01:18:36.195330Z",
   "matrix_summary": {
     "matrices": [
       {
@@ -251,5 +341,5 @@
   },
   "profile": "mini_screen",
   "schema_version": 1,
-  "status": "ready"
+  "status": "blocked"
 }

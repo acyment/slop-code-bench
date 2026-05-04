@@ -1,6 +1,6 @@
 {
   "artifact_policy": "Feature files, step helpers, prompts, schemas, runner/export scripts, pilot configs, and experiment docs are frozen before primary data collection. Any later edit requires a new freeze manifest and a deviation entry.",
-  "created_at": "2026-05-04T01:06:19.336142Z",
+  "created_at": "2026-05-04T01:18:29.097621Z",
   "excluded_paths": [],
   "files": {
     "docs/experiment/ACCEPTANCE_HARNESS.md": {
@@ -8,8 +8,8 @@
       "size_bytes": 2815
     },
     "docs/experiment/BACKLOG.md": {
-      "sha256": "198a7b0d3294f2775dd061f5839dc4e51a30c36be620aecc4c860ee2f7775316",
-      "size_bytes": 57324
+      "sha256": "00578aa07e9073c8e1deb459ad74ed23bd5a0f60835cf547f3ae6501ceb18e87",
+      "size_bytes": 60203
     },
     "docs/experiment/BENCHMARK_ARCHITECTURE.md": {
       "sha256": "70249aa423bde6be68934873e18c60f0c4d19a430e12038ade7fe3d2724f450e",
@@ -52,8 +52,8 @@
       "size_bytes": 1862
     },
     "docs/experiment/PROBLEM_SELECTION.md": {
-      "sha256": "49f4ec74db0525d3163ca001ecf8260acf5737172f78d9fd41ef194b02bc7f6e",
-      "size_bytes": 7046
+      "sha256": "8d59b730f236d0f2e249a1750c1462c87b474fb0e9bc57298eb2727f2b654d60",
+      "size_bytes": 9487
     },
     "docs/experiment/PROMPT_TEMPLATES.md": {
       "sha256": "d3735235528d25f632cbd4b6f04d7d9dbf757ed8ece774fe026270795bae5a6a",
@@ -76,12 +76,12 @@
       "size_bytes": 2365
     },
     "docs/experiment/SCREENING_RUN_STATUS.md": {
-      "sha256": "e8dc30965250254df29dfe73a467348b29986d2782b1e46734c26bf3ed3aca27",
-      "size_bytes": 9644
+      "sha256": "7321686c8c352b5957e78a66359f5c1e7e421797ff0036dec2b00963d6a0e27c",
+      "size_bytes": 10637
     },
     "docs/experiment/SCREENING_SUBSET.md": {
-      "sha256": "a157cd071b3ed5357e452b19d3767203fffdae8e7a85bed7adb25828583569d7",
-      "size_bytes": 2387
+      "sha256": "7fec58d4b0e98c1609cac1a42798f66df110d50036d88201e6ed6bcfcb275bc4",
+      "size_bytes": 2993
     },
     "experiment/FORK_SETUP.md": {
       "sha256": "01e6116f410f791736ec9f7aba88043d59678e95c3c8855d501ab4822ca374ba",
@@ -324,8 +324,8 @@
       "size_bytes": 7
     },
     "experiment/scripts/analyze_results.py": {
-      "sha256": "9b8c663fffbd426623984ad8b0dfff59ca38e9df2e06959205030c0dd3e78433",
-      "size_bytes": 14950
+      "sha256": "1c95bc6be30af11a9e564b39f1927d7c2555699146a1d98b598a52e879bd220c",
+      "size_bytes": 25935
     },
     "experiment/scripts/archive_artifacts.py": {
       "sha256": "eaa65c75cef2bf152bb7d9e71fc664c902eeaebb731650f70e8139e2980afe56",
@@ -380,8 +380,8 @@
       "size_bytes": 3786
     },
     "experiment/scripts/validate_full_pilot_preflight.py": {
-      "sha256": "bf9cf5a96bd8f65c2e4b35c4f677c35e693b8af908c5d35962876fbfa857bb3a",
-      "size_bytes": 27691
+      "sha256": "120de13140b45193f00377ef2e46830ca075bc556c2f6d815c191be28eaa075a",
+      "size_bytes": 29635
     },
     "experiment/scripts/validate_locks.py": {
       "sha256": "9b10710c22d1715df0409262e98aa51e4c0b93c81c6d7fef2f5a23d32561739c",
@@ -436,14 +436,14 @@
       "size_bytes": 75882
     }
   },
-  "freeze_created_at": "2026-05-04T01:06:19.383128Z",
-  "freeze_hash": "73482f775f33a0cc814ac9e803b8abd35ce8c75b14bf7226d6fcbc14af5b0824",
+  "freeze_created_at": "2026-05-04T01:18:29.140909Z",
+  "freeze_hash": "4ae74a7060a0afaaf8dc450e71cd881dcdf6313ac2fcb0bd3d1a9b8432f8717b",
   "freeze_schema_version": 1,
   "freeze_status": "pre_execution_artifact_freeze",
   "git": {
     "branch": "experiment/gherkin-drift-pilot",
     "freeze_commit_note": "Use the commit containing this manifest, or a tag pointing at that commit, as the immutable experiment freeze reference.",
-    "head_commit_at_manifest_generation": "cc89b524a4a84509e7bd22cbf77fc2d127279c06"
+    "head_commit_at_manifest_generation": "3d68ef915f16e3be8f3d4f1bc63a1e3b1b442f3b"
   },
   "locked_paths": [
     "docs/experiment/**",
@@ -457,7 +457,7 @@
     "experiment/scripts/**",
     "experiment/schemas/**"
   ],
-  "manifest_hash": "e1ba41cf5b59be00cdb46144f042b02d35277c31ce66d3bf199a1033d89bd8d5",
+  "manifest_hash": "01a36c1e62a6f555e8948ddaff232a073e58d5e498310a73582b795d1483cc7c",
   "matrix_summary": {
     "conditions": [
       "C0",

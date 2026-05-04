@@ -1,6 +1,6 @@
 # Screening Subset
 
-Status: selected before any evidence-producing run.
+Status: selected before any evidence-producing run; partially superseded by the EXP-100X `file_backup` decision.
 
 The screening subset is a smaller C0/C1/C2 matrix intended to detect obvious directional signal and pipeline problems before spending on the full EXP-101 matrix. It is not a replacement for the full pilot and should not be treated as conclusive.
 
@@ -9,7 +9,7 @@ The screening subset is a smaller C0/C1/C2 matrix intended to detect obvious dir
 Use:
 
 1. `code_search`
-2. `file_backup`
+2. `file_backup` for historical comparison and harness validation only
 3. `migrate_configs`
 4. `log_query`
 
@@ -18,11 +18,13 @@ Use:
 These four problems are the best first screening set because they cover the behaviors most relevant to the specification-drift claim while avoiding avoidable infrastructure confounds:
 
 - `code_search`: code-oriented CLI search/refactoring behavior with five checkpoints and strong concrete examples.
-- `file_backup`: stateful file-system behavior with prior behavior preservation and four checkpoints.
+- `file_backup`: stateful file-system behavior with prior behavior preservation and four checkpoints; after EXP-100X, do not use it as an evidence-producing drift problem until a post-fix smoke shows checkpoint-1 survival.
 - `migrate_configs`: structured configuration migration with parsing, validation, transformation, and five checkpoints.
 - `log_query`: query-language behavior over NDJSON with parsing/filtering/aggregation pressure and five checkpoints.
 
 Together they cover CLI tools, file processing, structured transformations, query behavior, cumulative prior-test preservation, and example-rich Gherkin conversion. All have reference probes with no SCBench infrastructure failures.
+
+EXP-100X update: `file_backup` failed checkpoint 1 in every C0/C1/C2 EXP-100R replicate, so it is down-ranked to harness-validation-only. The next representative evidence mini-screen should promote `migrate_configs` as the replacement after locked C2 coverage and reference acceptance pass.
 
 ## Deferred From Screening
 
@@ -55,4 +57,4 @@ uv run python experiment/scripts/run_pilot_subset.py \
   --run-id-prefix screening
 ```
 
-The evidence-producing screening run remains blocked until the native execution bridge and C2 snapshot acceptance integration are implemented.
+The evidence-producing screening run remains blocked until the replacement problem decision is reflected in configs, locked C2 acceptance coverage exists for every included checkpoint slot, and preflight returns `ready`.

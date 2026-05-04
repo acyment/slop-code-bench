@@ -6,7 +6,7 @@ Generated: 2026-05-03
 
 The native execution path is now implemented far enough to run SCBench through condition-specific fixtures without replacing hidden benchmark evaluation. A one-checkpoint paid smoke run succeeded for C2 on `code_search` checkpoint 1, a first reduced-drift probe ran for C0 vs C2, and the later meaningful mini-screen has now run and rerun across C0/C1/C2 for `code_search` and `file_backup`.
 
-This is still directional evidence. The latest EXP-100R rerun validates that C2 executable acceptance is being executed as a harness-mediated intervention, but it did not show a C2 survival advantage or reduce hidden-failure-after-visible-pass cases. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial beyond the mini-screen slots, and the remaining mini-screen blind spots need inspection before scaling.
+This is still directional evidence. The latest EXP-100R rerun validates that C2 executable acceptance is being executed as a harness-mediated intervention, but it did not show a C2 survival advantage or reduce hidden-failure-after-visible-pass cases. EXP-100W now adds near-miss diagnostics, and EXP-100X down-ranks `file_backup` to harness-validation-only for the next evidence-producing screen. The representative screening matrix remains blocked because locked C2 visible acceptance coverage is partial beyond the mini-screen slots and a replacement problem needs promotion before scaling.
 
 ## Seven-Step Run Checklist
 
@@ -120,6 +120,8 @@ Primary artifacts:
 - Normalized export: `experiment/results/meaningful_mini_screen_rerun/exported/`
 - Analysis summary: `experiment/results/meaningful_mini_screen_rerun/analysis/summary.json`
 - Comparison report: `experiment/results/meaningful_mini_screen_rerun/analysis/exp100r_comparison.md`
+- Near-miss report: `experiment/results/meaningful_mini_screen_rerun/analysis/near_miss_summary.md`
+- `file_backup` decision: `experiment/results/meaningful_mini_screen_rerun/analysis/file_backup_keep_replace_decision.md`
 
 ## Current Blocker
 
@@ -152,13 +154,16 @@ Key finding:
 - `file_backup`: currently unsuitable for drift measurement because all conditions fail checkpoint 1; C2 visible examples allowed a brittle YAML parser that handled hand-written Gherkin examples but failed benchmark-style valid YAML fixture shapes.
 - All C2 acceptance gates passed on first attempt, so C2 execution produced no repair feedback in EXP-100R.
 
-EXP-100T, EXP-100U, and EXP-100V are complete:
+EXP-100T, EXP-100U, EXP-100V, EXP-100W, and EXP-100X are complete:
 
 - visible C2 acceptance now uses benchmark-equivalent `uv run <script>` entrypoints for `code_search` and `file_backup` and records command provenance artifacts.
 - `file_backup` checkpoint 1 acceptance now includes a `yaml.safe_dump`-style schedule shape; the reference checkpoint 1 solution passes it, while all three EXP-100R C2 checkpoint 1 snapshots fail it as `product_error`.
 - `code_search` checkpoint 3 acceptance now catches the remaining EXP-100R C2 near-miss snapshots while the reference checkpoint 3 solution still passes.
+- near-miss analysis now reports hidden subtest pass-rate deltas and failed hidden cluster labels without exposing hidden test bodies.
+- `file_backup` is down-ranked to harness-validation-only because all C0/C1/C2 EXP-100R replicates failed checkpoint 1; `migrate_configs` is the first replacement candidate once locked C2 coverage exists.
+- preflight now blocks evidence-producing profiles that still include `file_backup` with an `EXP-100X` evidence-disabled-problem reason, so the old `mini_screen_*` configs are historical/replay configs rather than runnable evidence configs.
 
-Next complete EXP-100W and EXP-100X before another meaningful run: add near-miss metrics and decide whether to keep or replace `file_backup`.
+Next complete EXP-100Y before another meaningful run: promote `migrate_configs` or another replacement into the evidence mini-screen with locked C2 coverage and reference acceptance.
 
 After that, complete the remaining locked visible acceptance scenarios for the selected screening checkpoints and rerun:
 

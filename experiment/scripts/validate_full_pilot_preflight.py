@@ -34,6 +34,17 @@ CONFIG_PROFILES = {
     "pilot": PILOT_CONFIGS,
     "screening": SCREENING_CONFIGS,
 }
+EVIDENCE_DISABLED_PROBLEMS = {
+    "file_backup": {
+        "decision_id": "EXP-100X",
+        "status": "harness_validation_only",
+        "reason": (
+            "All C0/C1/C2 EXP-100R replicates failed checkpoint 1; keep this "
+            "problem out of evidence-producing drift screens until a post-fix "
+            "smoke demonstrates multi-checkpoint feasibility."
+        ),
+    }
+}
 
 
 class PreflightError(ValueError):
@@ -354,6 +365,44 @@ def check_feature_runner_coverage(
     }
 
 
+def configured_evidence_disabled_problem_blockers(
+    configs: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    blockers: list[dict[str, Any]] = []
+    for config in configs:
+        for problem_id in [str(problem) for problem in config["problems"]]:
+            decision = EVIDENCE_DISABLED_PROBLEMS.get(problem_id)
+            if decision is None:
+                continue
+            blockers.append(
+                {
+                    "type": "evidence_disabled_problem",
+                    "matrix_id": config.get("matrix_id"),
+                    "condition_id": config.get("condition", {}).get("id"),
+                    "problem_id": problem_id,
+                    **decision,
+                }
+            )
+    return blockers
+
+
+def check_evidence_problem_status(
+    repo_root: Path, config_rels: list[str]
+) -> dict[str, Any]:
+    configs = [load_yaml(repo_root / config_rel) for config_rel in config_rels]
+    blockers = configured_evidence_disabled_problem_blockers(configs)
+    return {
+        "id": "problem_selection.evidence_disabled",
+        "status": "pass" if not blockers else "block",
+        "message": (
+            "All configured problems are enabled for evidence-producing drift runs."
+            if not blockers
+            else "One or more configured problems are currently disabled for evidence-producing drift runs."
+        ),
+        "blockers": blockers,
+    }
+
+
 def model_key(config: dict[str, Any]) -> tuple[str, str]:
     model = config.get("model", {})
     return (str(model.get("provider")), str(model.get("name")))
@@ -377,6 +426,7 @@ def check_reduced_drift_evidence_gate(
         for config in configs
     }
     blockers: list[dict[str, Any]] = []
+    blockers.extend(configured_evidence_disabled_problem_blockers(configs))
 
     required_conditions = {"C0", "C2"}
     missing_conditions = sorted(required_conditions - set(by_condition))
@@ -683,6 +733,7 @@ def run_preflight(
     checks = [
         check_freeze_manifest(repo_root, freeze_manifest),
         *check_model_and_agent(repo_root, config_rels),
+        check_evidence_problem_status(repo_root, config_rels),
         check_execution_bridge(repo_root),
         check_acceptance_snapshot_bridge(repo_root),
         check_c2_feedback_enforcement(repo_root, config_rels),
