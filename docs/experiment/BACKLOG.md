@@ -611,13 +611,13 @@ Each task includes ID, title, phase, rationale, description, dependencies, accep
 ### EXP-100U - Add `file_backup` Fixture-Shape Acceptance Parity
 
 - Phase: Full pilot run
-- Status: pending
+- Status: completed; visible checkpoint 1 acceptance now includes a `yaml.safe_dump`-style schedule shape that catches the EXP-100R C2 parser failure
 - Rationale: EXP-100S found that `file_backup` visible examples did not cover valid YAML shapes representative of benchmark fixture materialization, allowing a brittle custom parser to pass C2 acceptance and fail hidden checkpoint 1.
 - Description: Add visible acceptance cases for legal YAML formatting variants, especially schedules generated through `yaml.safe_dump` with top-level sequence entries under `jobs:`. Keep cases derived from original checkpoint semantics, not copied from hidden expected outputs.
 - Dependencies: EXP-100S, EXP-100T
 - Acceptance criteria: current EXP-100R C2 `file_backup` checkpoint 1 snapshots fail the new visible scenario for parser/fixture-shape parity; reference checkpoint 1 solution passes; the scenario distinguishes parser failure from behavioral event mismatch; coverage ledger is updated.
 - Complexity: M
-- Implementation notes: Prefer generating the schedule fixture with the same public YAML library style the harness already uses rather than hardcoding hidden case files. Include an assertion that successful schedules emit at least one expected event so empty-output failures cannot pass.
+- Implementation notes: Added `file_backup.cp001.safe-dump-shape`, which writes the schedule through `yaml.safe_dump(sort_keys=False)` so sequence entries under `jobs:` and `exclude:` use the standard dumper indentation shape. The scenario treats non-zero exit as `product_error` and JSONL/event mismatches as `scenario_failure`. The reference checkpoint 1 solution passes all seven checkpoint 1 scenarios. Prior EXP-100R C2 checkpoint 1 snapshots r01-r03 all fail the new scenario with `failure_type: product_error` and exit code 1.
 - Risks/unknowns: This may still leave `file_backup` too hard for the selected model; if all conditions fail after this fix, replace or down-rank the problem.
 
 ### EXP-100V - Tighten `code_search` Checkpoint 3 Pattern Acceptance

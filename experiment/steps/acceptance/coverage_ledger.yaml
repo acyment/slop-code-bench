@@ -126,6 +126,13 @@ entries:
     reason: The checkpoint 1 runner exercises block-style YAML lists, omitted timezone and enabled defaults, and representative tmp/**, data?.txt, and report[12].log globs.
   - problem_id: file_backup
     checkpoint_index: 1
+    feature_scenario: YAML library dumped schedule shape is accepted
+    coverage: executable
+    runner_scenario_ids:
+      - file_backup.cp001.safe-dump-shape
+    reason: The checkpoint 1 runner writes the schedule with yaml.safe_dump so list items under jobs and exclude use the same valid indentation shape produced by a standard YAML dumper.
+  - problem_id: file_backup
+    checkpoint_index: 1
     feature_scenario: Malformed schedule YAML exits with an error
     coverage: executable
     runner_scenario_ids:

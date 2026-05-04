@@ -16,6 +16,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from typing import Any
 
+import yaml
+
 ScenarioFunc = Callable[[Path, Path], tuple[str | None, str | None]]
 
 ENTRYPOINT_TEMPLATE_BY_SCRIPT = {
@@ -1558,6 +1560,93 @@ jobs:
     return result["stdout_path"], result["stderr_path"]
 
 
+def scenario_file_backup_cp1_safe_dump_shape(
+    workspace: Path, artifact_root: Path
+) -> tuple[str | None, str | None]:
+    script_path = product_script(workspace, "backup_scheduler.py")
+    artifact_dir = artifact_root / "file_backup" / "checkpoint_1"
+
+    with TemporaryDirectory(prefix="file-backup-acceptance-") as tmp:
+        scratch = Path(tmp)
+        files_root = scratch / "files"
+        for rel_path, content in [
+            ("keep.txt", "keep"),
+            ("notes.bak", "old"),
+            ("tmp/cache.bin", "cache"),
+        ]:
+            write_text(files_root / rel_path, content)
+        schedule_path = scratch / "schedule.yaml"
+        schedule = {
+            "version": 1,
+            "timezone": "UTC",
+            "jobs": [
+                {
+                    "id": "dumped-shape",
+                    "source": "mount://",
+                    "destination": "backup://",
+                    "exclude": ["tmp/**", "*.bak"],
+                    "when": {"kind": "daily", "at": "03:30"},
+                }
+            ],
+        }
+        write_text(schedule_path, yaml.safe_dump(schedule, sort_keys=False))
+        result = run_backup_scheduler(
+            workspace=workspace,
+            script_path=script_path,
+            scratch=scratch,
+            artifact_dir=artifact_dir,
+            name="file_backup_cp001_safe_dump_shape",
+            schedule=schedule_path,
+            mount=files_root,
+            now="2025-09-10T03:30:00Z",
+            duration="0",
+        )
+
+    if result["exit_code"] != 0:
+        raise ProductError("safe-dumped schedule shape must parse successfully")
+    assert_stderr_empty(result)
+    rows = parse_json_lines(result["stdout"])
+    if (
+        not rows
+        or not isinstance(rows[0], dict)
+        or rows[0].get("event") != "SCHEDULE_PARSED"
+    ):
+        raise ScenarioFailureError("safe-dumped schedule produced no parse event")
+    assert_json_lines_match_subsets(
+        result["stdout"],
+        [
+            {"event": "SCHEDULE_PARSED", "timezone": "UTC", "jobs_total": 1},
+            {
+                "event": "JOB_ELIGIBLE",
+                "job_id": "dumped-shape",
+                "kind": "daily",
+                "now_local": "2025-09-10T03:30:00Z",
+            },
+            {"event": "JOB_STARTED", "job_id": "dumped-shape", "exclude_count": 2},
+            {"event": "FILE_SELECTED", "job_id": "dumped-shape", "path": "keep.txt"},
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "dumped-shape",
+                "path": "notes.bak",
+                "pattern": "*.bak",
+            },
+            {
+                "event": "FILE_EXCLUDED",
+                "job_id": "dumped-shape",
+                "path": "tmp/cache.bin",
+                "pattern": "tmp/**",
+            },
+            {
+                "event": "JOB_COMPLETED",
+                "job_id": "dumped-shape",
+                "selected": 1,
+                "excluded": 2,
+            },
+        ],
+    )
+    return result["stdout_path"], result["stderr_path"]
+
+
 def scenario_file_backup_cp1_malformed_yaml(
     workspace: Path, artifact_root: Path
 ) -> tuple[str | None, str | None]:
@@ -1921,6 +2010,14 @@ SCENARIO_SPECS: list[dict[str, Any]] = [
         "scenario_name": "Workspace product handles block lists, defaults, and representative globs",
         "tags": ["problem:file_backup", "checkpoint:1", "edge", "positive", "cli"],
         "scenario_func": scenario_file_backup_cp1_block_lists_defaults_globs,
+    },
+    {
+        "problem_id": "file_backup",
+        "checkpoint_index": 1,
+        "scenario_id": "file_backup.cp001.safe-dump-shape",
+        "scenario_name": "Workspace product accepts YAML dumper sequence indentation",
+        "tags": ["problem:file_backup", "checkpoint:1", "edge", "positive", "cli"],
+        "scenario_func": scenario_file_backup_cp1_safe_dump_shape,
     },
     {
         "problem_id": "file_backup",

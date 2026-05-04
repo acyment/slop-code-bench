@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-05-03T23:16:08.964997Z",
+  "generated_at": "2026-05-04T01:05:36.025644Z",
   "ledger_path": "experiment/steps/acceptance/coverage_ledger.yaml",
   "rows": [
     {
@@ -496,6 +496,35 @@
       "coverage": "executable",
       "feature_line": 140,
       "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
+      "feature_scenario": "YAML library dumped schedule shape is accepted",
+      "missing_runner_scenario_ids": [],
+      "problem_id": "file_backup",
+      "reason": "The checkpoint 1 runner writes the schedule with yaml.safe_dump so list items under jobs and exclude use the same valid indentation shape produced by a standard YAML dumper.",
+      "runner_scenario_ids": [
+        "file_backup.cp001.safe-dump-shape"
+      ],
+      "runner_scenarios": [
+        {
+          "checkpoint_index": 1,
+          "problem_id": "file_backup",
+          "scenario_id": "file_backup.cp001.safe-dump-shape",
+          "scenario_name": "Workspace product accepts YAML dumper sequence indentation",
+          "tags": [
+            "problem:file_backup",
+            "checkpoint:1",
+            "edge",
+            "positive",
+            "cli"
+          ]
+        }
+      ]
+    },
+    {
+      "blocker": false,
+      "checkpoint_index": 1,
+      "coverage": "executable",
+      "feature_line": 169,
+      "feature_path": "experiment/features/file_backup/checkpoint_001.feature",
       "feature_scenario": "Malformed schedule YAML exits with an error",
       "missing_runner_scenario_ids": [],
       "problem_id": "file_backup",
@@ -728,8 +757,8 @@
       {
         "blocker_count": 0,
         "checkpoint_index": 1,
-        "executable_scenario_count": 6,
-        "feature_scenario_count": 6,
+        "executable_scenario_count": 7,
+        "feature_scenario_count": 7,
         "problem_id": "file_backup",
         "required_missing_count": 0,
         "spec_only_scenario_count": 0
@@ -754,11 +783,11 @@
       }
     ],
     "coverage_counts": {
-      "executable": 20,
+      "executable": 21,
       "spec_only": 5
     },
-    "executable_scenario_count": 20,
-    "feature_scenario_count": 25,
+    "executable_scenario_count": 21,
+    "feature_scenario_count": 26,
     "invalid_coverage_count": 0,
     "missing_ledger_count": 0,
     "omitted_scenarios": [

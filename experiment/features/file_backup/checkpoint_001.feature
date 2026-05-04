@@ -136,6 +136,35 @@ Feature: Schedule-driven backup event simulation
     And stdout excludes "tmp/cache.bin" with pattern "tmp/**"
     And stdout selects "data10.txt", "keep.md", and "report3.log"
 
+  @edge @positive @cli @jsonl @file_io
+  Scenario: YAML library dumped schedule shape is accepted
+    Given a mounted file tree rooted at "files" contains:
+      | path | content |
+      | keep.txt | keep |
+      | notes.bak | old |
+      | tmp/cache.bin | cache |
+    And a schedule file named "schedule.yaml" contains YAML emitted by a standard dumper:
+      """
+      version: 1
+      timezone: UTC
+      jobs:
+      - id: dumped-shape
+        source: mount://
+        destination: backup://
+        exclude:
+        - tmp/**
+        - '*.bak'
+        when:
+          kind: daily
+          at: 03:30
+      """
+    When I run the scheduler at "2025-09-10T03:30:00Z" for "0" hours
+    Then stdout starts with a SCHEDULE_PARSED event
+    And stdout reports the dumped-shape job as due
+    And stdout selects "keep.txt"
+    And stdout excludes "notes.bak" with pattern "*.bak"
+    And stdout excludes "tmp/cache.bin" with pattern "tmp/**"
+
   @edge @negative @cli
   Scenario: Malformed schedule YAML exits with an error
     Given a schedule file named "schedule.yaml" contains:

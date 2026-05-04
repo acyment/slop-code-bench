@@ -4,10 +4,10 @@
       "details": {
         "added_files": [],
         "changed_files": [],
-        "checked_at": "2026-05-03T23:18:35.190508Z",
+        "checked_at": "2026-05-04T01:06:25.140474Z",
         "file_count_after": 108,
         "file_count_before": 108,
-        "freeze_hash": "51af9690b9640c235c9738835e451877edd714e807a73fe559fc9a90b9355ba9",
+        "freeze_hash": "73482f775f33a0cc814ac9e803b8abd35ce8c75b14bf7226d6fcbc14af5b0824",
         "freeze_status": "pre_execution_artifact_freeze",
         "manifest_path": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
         "missing_patterns_after": [],
@@ -21,7 +21,7 @@
         "schema_version": 1,
         "status": "unchanged"
       },
-      "freeze_hash": "51af9690b9640c235c9738835e451877edd714e807a73fe559fc9a90b9355ba9",
+      "freeze_hash": "73482f775f33a0cc814ac9e803b8abd35ce8c75b14bf7226d6fcbc14af5b0824",
       "id": "pilot_artifacts.freeze_manifest",
       "message": "Freeze manifest matches current files.",
       "status": "pass"
@@ -890,8 +890,8 @@
           {
             "blocker_count": 0,
             "checkpoint_index": 1,
-            "executable_scenario_count": 6,
-            "feature_scenario_count": 6,
+            "executable_scenario_count": 7,
+            "feature_scenario_count": 7,
             "problem_id": "file_backup",
             "required_missing_count": 0,
             "spec_only_scenario_count": 0
@@ -1015,12 +1015,12 @@
           }
         ],
         "coverage_counts": {
-          "executable": 20,
+          "executable": 21,
           "missing_ledger": 50,
           "spec_only": 5
         },
-        "executable_scenario_count": 20,
-        "feature_scenario_count": 75,
+        "executable_scenario_count": 21,
+        "feature_scenario_count": 76,
         "invalid_coverage_count": 0,
         "missing_ledger_count": 50,
         "omitted_scenarios": [
@@ -1063,8 +1063,8 @@
         "required_missing_count": 0,
         "spec_only_scenario_count": 5
       },
-      "executable_scenario_count": 20,
-      "feature_scenario_count": 75,
+      "executable_scenario_count": 21,
+      "feature_scenario_count": 76,
       "id": "c2.feature_runner_coverage",
       "invalid_coverage_count": 0,
       "message": "C2 feature-to-runner coverage has blockers: 50 required/missing scenario(s) need locked executable coverage.",
@@ -1926,7 +1926,7 @@
     "ready": false
   },
   "freeze_manifest": "/Users/acyment/dev/hit-sdd/repos/slop-code-bench/experiment/locks/pilot_artifact_freeze.json",
-  "generated_at": "2026-05-03T23:18:35.250185Z",
+  "generated_at": "2026-05-04T01:06:25.180352Z",
   "matrix_summary": {
     "matrices": [
       {

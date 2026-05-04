@@ -1,14 +1,14 @@
 # Acceptance Coverage Audit
 
 Status: `pass`
-Generated at: `2026-05-03T23:16:08.964997Z`
+Generated at: `2026-05-04T01:05:36.025644Z`
 Ledger: `experiment/steps/acceptance/coverage_ledger.yaml`
 Runner: `experiment/steps/acceptance/standalone_runner.py`
 
 ## Summary
 
-- Feature scenarios: `25`
-- Executable scenarios: `20`
+- Feature scenarios: `26`
+- Executable scenarios: `21`
 - Spec-only scenarios: `5`
 - Required missing scenarios: `0`
 - Blockers: `0`
@@ -20,7 +20,7 @@ Runner: `experiment/steps/acceptance/standalone_runner.py`
 | code_search | 1 | 3 | 1 | 2 | 0 | 0 |
 | code_search | 2 | 3 | 2 | 1 | 0 | 0 |
 | code_search | 3 | 7 | 7 | 0 | 0 | 0 |
-| file_backup | 1 | 6 | 6 | 0 | 0 | 0 |
+| file_backup | 1 | 7 | 7 | 0 | 0 | 0 |
 | file_backup | 2 | 3 | 3 | 0 | 0 | 0 |
 | file_backup | 3 | 3 | 1 | 2 | 0 | 0 |
 
